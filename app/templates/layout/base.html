@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <title>CrackerJack</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/themes/lumen.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/select2.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/crackerjack.css') }}">
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/jquery.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/jquery.validate.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/bootstrap.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/select2.full.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.js') }}"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">CrackerJack</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarColor03">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('home.index') }}">Home</a>
+            </li>
+            {% if current_user.admin %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('settings.admin') }}">Admin</a>
+            </li>
+            {% endif %}
+
+            {% if current_user.is_authenticated %}
+            <li>
+                <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+            </li>
+            {% else %}
+            <li>
+                <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="row mt-5">
+            <div class="col">
+                {% for category, message in messages %}
+                    {% if category == 'error' %}
+                <div class="alert alert-danger" role="alert">{{ message }}</div>
+                    {% elif category == 'success' %}
+                <div class="alert alert-success" role="alert">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>
