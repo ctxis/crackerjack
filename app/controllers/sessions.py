@@ -34,4 +34,11 @@ def create():
 @bp.route('/view/<int:session_id>/setup', methods=['GET'])
 @login_required
 def setup(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
     return 'setup'
