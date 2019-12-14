@@ -8,6 +8,8 @@
             <h3 class="card-header">Login</h3>
             <div class="card-body">
                 <form method="post" action="{{ url_for('auth.login') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                     <div class="form-group">
                         <input name="username" type="text" class="form-control" placeholder="Username" required autofocus>
                     </div>
