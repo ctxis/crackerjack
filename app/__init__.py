@@ -1,5 +1,5 @@
-import os
-from flask import Flask
+import os, datetime
+from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -42,6 +42,11 @@ def create_app(config_class=None):
 
     from app.controllers.sessions import bp as sessions_bp
     app.register_blueprint(sessions_bp, url_prefix='/sessions')
+
+    @app.before_request
+    def before_request():
+        session.permanent = True
+        app.permanent_session_lifetime = datetime.timedelta(minutes=20)
 
     return app
 
