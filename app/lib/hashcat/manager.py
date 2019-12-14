@@ -50,7 +50,7 @@ class HashcatManager:
 
         return False
 
-    def prepare_hashes_for_json(self, hashes):
+    def compact_hashes(self, hashes):
         data = {}
         for type, hashes in hashes.items():
             for code, hash in hashes.items():

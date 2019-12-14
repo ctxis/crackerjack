@@ -24,7 +24,6 @@ class Provider:
 
     def hashcat(self):
         settings = self.settings()
-
         return HashcatManager(
             self.shell(),
             settings.get('hashcat_binary', '')
@@ -35,5 +34,4 @@ class Provider:
 
     def wordlists(self):
         settings = self.settings()
-
         return WordlistManager(settings.get('wordlists_path'))

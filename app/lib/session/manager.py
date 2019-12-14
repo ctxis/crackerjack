@@ -91,12 +91,21 @@ class SessionManager:
 
         data = []
         for session in sessions:
+            hashcat = self.get_hashcat_settings(session.id)
+
             item = {
                 'id': session.id,
                 'name': session.name,
                 'user_id': session.user_id,
                 'created_at': session.created_at,
-                'active': session.active
+                'active': session.active,
+                'hashcat': {
+                    'configured': True if hashcat else False,
+                    'mode': '' if not hashcat else hashcat.mode,
+                    'hashtype': '' if not hashcat else hashcat.hashtype,
+                    'wordlist': '' if not hashcat else os.path.basename(hashcat.wordlist),
+                    'wordlist_path': '' if not hashcat else hashcat.wordlist
+                }
             }
 
             data.append(item)

@@ -32,7 +32,7 @@ def create():
     return redirect(url_for('sessions.setup_hashes', session_id=session.id))
 
 
-@bp.route('/view/<int:session_id>/setup/hashes', methods=['GET'])
+@bp.route('/<int:session_id>/setup/hashes', methods=['GET'])
 @login_required
 def setup_hashes(session_id):
     provider = Provider()
@@ -50,7 +50,7 @@ def setup_hashes(session_id):
     )
 
 
-@bp.route('/view/<int:session_id>/setup/hashes/save', methods=['POST'])
+@bp.route('/<int:session_id>/setup/hashes/save', methods=['POST'])
 @login_required
 def setup_hashes_save(session_id):
     provider = Provider()
@@ -82,7 +82,7 @@ def setup_hashes_save(session_id):
     return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
 
 
-@bp.route('/view/<int:session_id>/setup/hashcat', methods=['GET'])
+@bp.route('/<int:session_id>/setup/hashcat', methods=['GET'])
 @login_required
 def setup_hashcat(session_id):
     provider = Provider()
@@ -98,7 +98,7 @@ def setup_hashcat(session_id):
 
     supported_hashes = hashcat.get_supported_hashes()
     # We need to process the array in a way to make it easy for JSON usage.
-    supported_hashes = hashcat.prepare_hashes_for_json(supported_hashes)
+    supported_hashes = hashcat.compact_hashes(supported_hashes)
 
     password_wordlists = wordlists.get_wordlists()
 
@@ -110,7 +110,7 @@ def setup_hashcat(session_id):
     )
 
 
-@bp.route('/view/<int:session_id>/setup/hashcat/save', methods=['POST'])
+@bp.route('/<int:session_id>/setup/hashcat/save', methods=['POST'])
 @login_required
 def setup_hashcat_save(session_id):
     provider = Provider()
@@ -147,7 +147,25 @@ def setup_hashcat_save(session_id):
     return redirect(url_for('sessions.view', session_id=session_id))
 
 
-@bp.route('/view/<int:session_id>', methods=['GET'])
+@bp.route('/<int:session_id>/view', methods=['GET'])
 @login_required
 def view(session_id):
-    return 'view'
+    provider = Provider()
+    sessions = provider.sessions()
+    hashcat = provider.hashcat()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    session = sessions.get(current_user.id, session_id)[0]
+
+    supported_hashes = hashcat.get_supported_hashes()
+    # We need to process the array in a way to make it easy for JSON usage.
+    supported_hashes = hashcat.compact_hashes(supported_hashes)
+
+    return render_template(
+        'sessions/view.html',
+        session=session,
+        supported_hashes=supported_hashes
+    )

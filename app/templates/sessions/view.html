@@ -1,0 +1,94 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-2"></div>
+    <div class="col-8">
+        <h2>Session: {{ session.name }}</h2>
+        <hr>
+    </div>
+    <div class="col-2"></div>
+</div>
+
+<div class="row">
+    <div class="col-2"></div>
+    <div class="col-4">
+        <div class="card">
+            <h3 class="card-header">Details</h3>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="float-left">Session ID</div>
+                        <div class="float-right">{{ session.id }}</div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="float-left">Name</div>
+                        <div class="float-right">{{ session.name }}</div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="float-left">Created At</div>
+                        <div class="float-right">{{ session.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="float-left">Active</div>
+                        <div class="float-right">{{ 'Yes' if session.active else 'No' }}</div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="float-left">Hashcat Configured</div>
+                        <div class="float-right">{{ 'Yes' if session.hashcat.configured else 'No' }}</div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="float-left">Cracking Mode</div>
+                        <div class="float-right">{{ 'Wordlist' if session.hashcat.mode == 0 else 'Brute Force' }}</div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="float-left">Hash Type</div>
+                        <div class="float-right"><abbr title="{{ supported_hashes[session.hashcat.hashtype] }}">{{ session.hashcat.hashtype }}</abbr></div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="float-left">Wordlist</div>
+                        <div class="float-right"><abbr title="{{ session.hashcat.wordlist_path }}">{{ session.hashcat.wordlist }}</abbr></div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="float-left">Mask</div>
+                        <div class="float-right">N/A</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-4">
+        <div class="card">
+            <h3 class="card-header">Progress</h3>
+            <div class="card-body">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="float-left">Status</div>
+                        <div class="float-right">Running</div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="float-left">Passwords</div>
+                        <div class="float-right">8/20</div>
+                    </li>
+
+                    <li class="list-group-item">
+                        <div class="float-left">Elapsed / Remaining</div>
+                        <div class="float-right">01:02:03 / 02:03:04</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-2"></div>
+</div>
+{% endblock %}
