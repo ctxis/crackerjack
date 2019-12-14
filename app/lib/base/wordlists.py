@@ -31,3 +31,11 @@ class WordlistManager:
     def is_valid_wordlist(self, wordlist):
         wordlists = self.get_wordlists()
         return wordlist in wordlists
+
+    def get_wordlist_path(self, wordlist):
+        if not self.is_valid_wordlist(wordlist):
+            return ''
+
+        wordlists = self.get_wordlists()
+        wordlist = wordlists[wordlist]
+        return wordlist['path']

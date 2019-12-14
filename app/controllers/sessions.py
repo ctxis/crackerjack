@@ -137,9 +137,11 @@ def setup_hashcat_save(session_id):
     if has_errors:
         return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
 
+    wordlist_location = wordlists.get_wordlist_path(wordlist)
+
     sessions.set_hashcat_setting(session_id, 'mode', 0)
     sessions.set_hashcat_setting(session_id, 'hashtype', hash_type)
-    sessions.set_hashcat_setting(session_id, 'wordlist', wordlist)
+    sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
 
     flash('All settings saved. You can now start the session.', 'success')
     return redirect(url_for('sessions.view', session_id=session_id))
