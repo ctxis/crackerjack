@@ -7,9 +7,11 @@ class HealthCheck:
 
         settings = provider.settings()
         screens = provider.screens()
+        sessions = provider.sessions()
 
         self.check_settings(settings, errors)
         self.check_screens(screens, errors)
+        self.check_datapath(sessions, errors)
 
         return errors
 
@@ -35,6 +37,14 @@ class HealthCheck:
         screenrc_path = screens.get_screenrc_path()
 
         if not os.path.isfile(screenrc_path):
-            errors.append(screenrc_path + ' does not exist.')
+            errors.append(screenrc_path + ' does not exist')
         elif not os.access(screenrc_path, os.R_OK):
             errors.append(screenrc_path + ' is not readable')
+
+    def check_datapath(self, sessions, errors):
+        datapath = sessions.get_data_path()
+
+        if not os.path.isdir(datapath):
+            errors.append(datapath + ' does not exist')
+        elif not os.access(datapath, os.W_OK):
+            errors.append(datapath + ' is not writable')

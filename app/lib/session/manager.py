@@ -1,7 +1,9 @@
-import re, random, string
+import re, random, string, os
 from app.lib.models.session import SessionModel
 from app import db
+from pathlib import Path
 from sqlalchemy import and_, desc
+from flask import current_app
 
 
 class SessionManager:
@@ -44,3 +46,20 @@ class SessionManager:
         db.session.refresh(session)
 
         return session
+
+    def get_data_path(self):
+        path = Path(current_app.root_path)
+        return os.path.join(str(path.parent), 'data')
+
+    def can_access(self, user, session_id):
+        if user.admin:
+            return True
+
+        session = SessionModel.query.filter(
+            and_(
+                SessionModel.user_id == user.id,
+                SessionModel.id == session_id
+            )
+        ).first()
+
+        return True if session else False
