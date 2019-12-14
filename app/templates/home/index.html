@@ -1,1 +1,26 @@
 {% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-3"></div>
+    <div class="col-6">
+        <form method="post" action="{{ url_for('sessions.create') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="row">
+                <div class="col-8">
+                    <div class="form-group">
+                        <input type="text" name="name" id="name" class="form-control" placeholder="This will be auto-generated if left empty">
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block">Create Session</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-3"></div>
+</div>
+{% endblock %}

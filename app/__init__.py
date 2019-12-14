@@ -40,8 +40,11 @@ def create_app(config_class=None):
     from app.controllers.admin import bp as admin_bp
     app.register_blueprint(admin_bp, url_prefix='/admin')
 
+    from app.controllers.sessions import bp as sessions_bp
+    app.register_blueprint(sessions_bp, url_prefix='/sessions')
+
     return app
 
 
 # This has to be at the bottom.
-from app.lib.models import user
+from app.lib.models import user, config, session
