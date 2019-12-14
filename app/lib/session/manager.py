@@ -51,6 +51,16 @@ class SessionManager:
         path = Path(current_app.root_path)
         return os.path.join(str(path.parent), 'data')
 
+    def get_user_data_path(self, user_id):
+        path = os.path.join(self.get_data_path(), str(user_id))
+        if not os.path.isdir(path):
+            os.makedirs(path)
+
+        return path
+
+    def get_hashfile_path(self, user_id):
+        return os.path.join(self.get_user_data_path(user_id), 'hashes.txt')
+
     def can_access(self, user, session_id):
         if user.admin:
             return True
@@ -63,3 +73,28 @@ class SessionManager:
         ).first()
 
         return True if session else False
+
+    def get(self, user_id=0, session_id=0):
+        conditions = and_(1 == 1)
+        if user_id > 0 and session_id > 0:
+            conditions = and_(SessionModel.user_id == user_id, SessionModel.id == session_id)
+        elif user_id > 0:
+            conditions = and_(SessionModel.user_id == user_id)
+        elif session_id > 0:
+            conditions = and_(SessionModel.id == session_id)
+
+        sessions = SessionModel.query.filter(conditions).order_by(desc(SessionModel.id)).all()
+
+        data = []
+        for session in sessions:
+            item = {
+                'id': session.id,
+                'name': session.name,
+                'user_id': session.user_id,
+                'created_at': session.created_at,
+                'active': session.active
+            }
+
+            data.append(item)
+
+        return data

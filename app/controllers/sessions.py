@@ -2,6 +2,8 @@ from flask import Blueprint
 from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, flash, request
 from app.lib.base.provider import Provider
+from werkzeug.utils import secure_filename
+import pprint
 
 
 bp = Blueprint('sessions', __name__)
@@ -28,12 +30,12 @@ def create():
         flash('Could not create session', 'error')
         return redirect(url_for('home.index'))
 
-    return redirect(url_for('sessions.setup', session_id=session.id))
+    return redirect(url_for('sessions.setup_hashes', session_id=session.id))
 
 
-@bp.route('/view/<int:session_id>/setup', methods=['GET'])
+@bp.route('/view/<int:session_id>/setup/hashes', methods=['GET'])
 @login_required
-def setup(session_id):
+def setup_hashes(session_id):
     provider = Provider()
     sessions = provider.sessions()
 
@@ -41,4 +43,41 @@ def setup(session_id):
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
-    return 'setup'
+    session = sessions.get(current_user.id, session_id)[0]
+
+    return render_template(
+        'sessions/setup_hashes.html',
+        session=session
+    )
+
+
+@bp.route('/view/<int:session_id>/setup/hashes/save', methods=['POST'])
+@login_required
+def setup_hashes_save(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    hashes = request.form['hashes'].strip()
+
+    save_as = sessions.get_hashfile_path(current_user.id)
+
+    if len(hashes) > 0:
+        with open(save_as, 'w') as f:
+            f.write(hashes)
+    else:
+        if len(request.files) != 1:
+            flash('Uploaded file could not be found', 'error')
+            return redirect(url_for('sessions.setup_hashes', session_id=session_id))
+
+        file = request.files['hashfile']
+        if file.filename == '':
+            flash('No hashes uploaded', 'error')
+            return redirect(url_for('sessions.setup_hashes', session_id=session_id))
+
+        file.save(save_as)
+
+    return 'save'

@@ -43,10 +43,11 @@ def create_app(config_class=None):
     from app.controllers.sessions import bp as sessions_bp
     app.register_blueprint(sessions_bp, url_prefix='/sessions')
 
-    @app.before_request
-    def before_request():
-        session.permanent = True
-        app.permanent_session_lifetime = datetime.timedelta(minutes=20)
+    # @app.before_request
+    # def before_request():
+    #     session.permanent = True
+    #     app.permanent_session_lifetime = datetime.timedelta(minutes=1)
+    #     session.modified = True
 
     return app
 

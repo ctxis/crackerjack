@@ -1,0 +1,44 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-2"></div>
+    <div class="col-8">
+        <h2>Session: {{ session.name }}</h2>
+        <hr>
+    </div>
+    <div class="col-2"></div>
+</div>
+
+<div class="row">
+    <div class="col-2"></div>
+    <div class="col-8">
+        <div class="card">
+            <h4 class="card-header">Hashes</h4>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_hashes_save', session_id=session.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="form-group">
+                        <label for="hashfile">Upload file with hashes</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="hashfile" name="hashfile">
+                            <label class="custom-file-label" for="hashfile">Choose hashes file</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hashes">Or paste them here</label>
+                        <textarea name="hashes" id="hashes" class="form-control text-monospace" rows="10" placeholder="Hashes"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block">save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-2"></div>
+</div>
+{% endblock %}
