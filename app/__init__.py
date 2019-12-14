@@ -53,4 +53,4 @@ def create_app(config_class=None):
 
 
 # This has to be at the bottom.
-from app.lib.models import user, config, session
+from app.lib.models import user, config, session, hashcat

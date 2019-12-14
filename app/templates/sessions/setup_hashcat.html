@@ -1,0 +1,55 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-2"></div>
+    <div class="col-8">
+        <h2>Session: {{ session.name }}</h2>
+        <hr>
+    </div>
+    <div class="col-2"></div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-2"></div>
+    <div class="col-8">
+        <div class="card">
+            <h4 class="card-header">Hashcat Setup</h4>
+            <div class="card-body">
+                <form id="setup-hashcat" method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_hashcat_save', session_id=session.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="form-group">
+                        <label for="hash-type">Hash Type</label>
+                        <select name="hash-type" id="hash-type" class="form-control" required>
+                            <option value=""></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="wordlist">Wordlist</label>
+                        <select name="wordlist" id="wordlist" class="form-control" required>
+                            <option value=""></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block">save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-2"></div>
+</div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.sessions.setup.js') }}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var supported_hashes = {{ hashes_json|safe }};
+        var wordlists = {{ wordlists_json|safe }};
+        CJ_SessionsSetup.init(supported_hashes, wordlists);
+    });
+</script>
+{% endblock %}

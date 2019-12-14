@@ -1,5 +1,6 @@
 import re, random, string, os
 from app.lib.models.session import SessionModel
+from app.lib.models.hashcat import HashcatModel
 from app import db
 from pathlib import Path
 from sqlalchemy import and_, desc
@@ -61,6 +62,9 @@ class SessionManager:
     def get_hashfile_path(self, user_id):
         return os.path.join(self.get_user_data_path(user_id), 'hashes.txt')
 
+    def get_potfile_path(self, user_id):
+        return os.path.join(self.get_user_data_path(user_id), 'hashes.potfile')
+
     def can_access(self, user, session_id):
         if user.admin:
             return True
@@ -98,3 +102,32 @@ class SessionManager:
             data.append(item)
 
         return data
+
+    def set_hashcat_setting(self, session_id, name, value):
+        record = self.get_hashcat_settings(session_id)
+        if not record:
+            record = self.__create_hashcat_record(session_id)
+
+        if name == 'mode':
+            record.mode = value
+        elif name == 'hashtype':
+            record.hashtype = value
+        elif name == 'wordlist':
+            record.wordlist = value
+
+        db.session.commit()
+
+    def get_hashcat_settings(self, session_id):
+        return HashcatModel.query.filter(HashcatModel.session_id == session_id).first()
+
+    def __create_hashcat_record(self, session_id):
+        record = HashcatModel(
+            session_id=session_id
+        )
+
+        db.session.add(record)
+        db.session.commit()
+        # In order to get the created object, we need to refresh it.
+        db.session.refresh(record)
+
+        return record
