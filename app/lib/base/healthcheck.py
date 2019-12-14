@@ -1,4 +1,4 @@
-import os
+import os, pprint
 
 
 class HealthCheck:
@@ -6,8 +6,10 @@ class HealthCheck:
         errors = []
 
         settings = provider.settings()
+        screens = provider.screens()
 
         self.check_settings(settings, errors)
+        self.check_screens(screens, errors)
 
         return errors
 
@@ -28,3 +30,11 @@ class HealthCheck:
             errors.append('Wordlist directory does not exist')
         elif not os.access(wordlists_path, os.R_OK):
             errors.append('Wordlist directory is not readable')
+
+    def check_screens(self, screens, errors):
+        screenrc_path = screens.get_screenrc_path()
+
+        if not os.path.isfile(screenrc_path):
+            errors.append(screenrc_path + ' does not exist.')
+        elif not os.access(screenrc_path, os.R_OK):
+            errors.append(screenrc_path + ' is not readable')
