@@ -23,14 +23,14 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarColor03">
-        <ul class="navbar-nav mr-auto">
+    <div class="collapse navbar-collapse justify-content-end">
+        <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('home.index') }}">Home</a>
             </li>
             {% if current_user.admin %}
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('settings.admin') }}">Admin</a>
+                <a class="nav-link" href="{{ url_for('admin.settings') }}">Admin Settings</a>
             </li>
             {% endif %}
 

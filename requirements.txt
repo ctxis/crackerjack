@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 Flask-Migrate
 Flask-Login
 Flask-Bcrypt
+Flask-WTF
