@@ -46,7 +46,12 @@
                 {% endif %}
                 <th scope="row" class="{{ status_class }}">{{ status_text }}</th>
                 <td class="text-right">{{ session.hashcat.data.progress }}%</td>
-                <td class="text-right">{{ session.hashcat.data.all_passwords }}/{{ session.hashcat.data.cracked_passwords }}</td>
+                <td class="text-right">
+                    <span>{{ session.hashcat.data.cracked_passwords }}/{{ session.hashcat.data.all_passwords }}</span>
+                    {% if session.hashcat.data.cracked_passwords > 0 %}
+                    <a href="{{ url_for('sessions.download_cracked', session_id=session.id) }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
+                    {% endif %}
+                </td>
                 <td class="text-right"><abbr title="{{ session.hashcat.data.estimated_completion_time }}">{{ session.hashcat.data.time_remaining }}</abbr></td>
                 <td class="text-right">
                     <form method="post" action="{{ url_for('sessions.action', session_id=session.id) }}" id="form-action">

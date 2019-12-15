@@ -4,7 +4,7 @@ from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
 from app import db
 from pathlib import Path
 from sqlalchemy import and_, desc
-from flask import current_app
+from flask import current_app, send_file
 
 
 class SessionManager:
@@ -231,8 +231,8 @@ class SessionManager:
         if len(matches) > 0:
             passwords = matches[0].split('/')
             if len(passwords) == 2:
-                data['all_passwords'] = passwords[0]
-                data['cracked_passwords'] = passwords[1]
+                data['all_passwords'] = int(passwords[1])
+                data['cracked_passwords'] = int(passwords[0])
 
         # time remaining
         matches = re.findall('\((.*)\)', raw['Time.Estimated'])
@@ -270,4 +270,18 @@ class SessionManager:
 
         return data
 
+    def download_file(self, session_id, which_file):
+        session = self.get(session_id=session_id)[0]
+
+        if which_file == 'cracked':
+            file = self.get_crackedfile_path(session['user_id'], session_id)
+        else:
+            return 'Error'
+
+        if not os.path.exists(file):
+            return 'Error'
+
+        save_as = session['name'] + '.cracked'
+
+        return send_file(file, attachment_filename=save_as, as_attachment=True)
 

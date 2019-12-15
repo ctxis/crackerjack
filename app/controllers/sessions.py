@@ -1,6 +1,5 @@
-from flask import Blueprint
 from flask_login import current_user, login_required
-from flask import render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from app.lib.base.provider import Provider
 import json, pprint
 
@@ -193,3 +192,16 @@ def action(session_id):
         pass
 
     return redirect(url_for('sessions.view', session_id=session_id))
+
+
+@bp.route('/<int:session_id>/download/cracked', methods=['GET'])
+@login_required
+def download_cracked(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    return sessions.download_file(session_id, 'cracked')
