@@ -188,6 +188,8 @@ def action(session_id):
         result = sessions.action_start(session_id)
     elif action == 'reset':
         result = sessions.action_reset(session_id)
+    elif action == 'resume':
+        resume = sessions.action_resume(session_id)
     elif action == 'pause':
         pass
     elif action == 'stop':

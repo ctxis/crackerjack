@@ -203,6 +203,18 @@ class SessionManager:
 
         return True
 
+    def action_resume(self, session_id):
+        # First get the session.
+        session = self.get(session_id=session_id)[0]
+
+        # Get the screen.
+        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
+
+        # Hashcat only needs 'r' to resume.
+        screen.execute({'r':''})
+
+        return True
+
 
     def get_used_wordlists(self, session_id):
         return UsedWordlistModel.query.filter(UsedWordlistModel.session_id == session_id).all()
@@ -236,6 +248,10 @@ class SessionManager:
         #   99  UNKNOWN
         if raw['Status'] == 'Exhausted':
             data['process_state'] = 3
+        elif raw['Status'] == 'Running':
+            data['process_state'] = 1
+        elif raw['Status'] == 'Paused':
+            data['process_state'] = 4
 
         # progress
         matches = re.findall('\((\d+.\d+)', raw['Progress'])

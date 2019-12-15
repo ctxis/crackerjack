@@ -83,7 +83,7 @@ class HashcatManager:
             '--outfile': outputfile,
             '--potfile-path': potfile,
             '--status': '',
-            '--status-timer': 60,
+            '--status-timer': 1,
             hashfile: '',
             wordlist: ''
         }
