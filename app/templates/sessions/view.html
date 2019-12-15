@@ -12,6 +12,25 @@
 
 <div class="row">
     <div class="col-2"></div>
+    <div class="col-8">
+        <form method="post" action="{{ url_for('sessions.action', session_id=session.id) }}" class="float-left">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <button class="btn" type="submit" name="action" value="start" title="Start"><i class="fas fa-play-circle fa-2x text-success"></i></button>
+            <button class="btn" type="submit" name="action" value="pause" title="Pause"><i class="fas fa-pause-circle fa-2x text-warning"></i></button>
+            <button class="btn" type="submit" name="action" value="stop" title="Stop"><i class="fas fa-stop-circle fa-2x text-danger"></i></button>
+        </form>
+
+        <div class="float-right">
+            <a href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}" class="Hashes"><i class="fas fa-hashtag fa-2x"></i></a>
+            <a href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}" class="Hashcat Settings"><i class="fas fa-cogs fa-2x"></i></a>
+        </div>
+    </div>
+    <div class="col-2"></div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-2"></div>
     <div class="col-4">
         <div class="card">
             <h3 class="card-header">Details</h3>
