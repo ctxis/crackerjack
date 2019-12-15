@@ -1,6 +1,6 @@
 import re, random, string, os
 from app.lib.models.session import SessionModel
-from app.lib.models.hashcat import HashcatModel
+from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
 from app import db
 from pathlib import Path
 from sqlalchemy import and_, desc
@@ -8,6 +8,10 @@ from flask import current_app
 
 
 class SessionManager:
+    def __init__(self, hashcat, screens):
+        self.hashcat = hashcat
+        self.screens = screens
+
     def sanitise_name(self, name):
         return re.sub(r'\W+', '', name)
 
@@ -65,6 +69,12 @@ class SessionManager:
     def get_potfile_path(self, user_id):
         return os.path.join(self.get_user_data_path(user_id), 'hashes.potfile')
 
+    def get_screenfile_path(self, user_id):
+        return os.path.join(self.get_user_data_path(user_id), 'screen.log')
+
+    def get_crackedfile_path(self, user_id):
+        return os.path.join(self.get_user_data_path(user_id), 'hashes.cracked')
+
     def can_access(self, user, session_id):
         if user.admin:
             return True
@@ -96,6 +106,7 @@ class SessionManager:
             item = {
                 'id': session.id,
                 'name': session.name,
+                'screen_name': session.screen_name,
                 'user_id': session.user_id,
                 'created_at': session.created_at,
                 'active': session.active,
@@ -122,6 +133,14 @@ class SessionManager:
         elif name == 'hashtype':
             record.hashtype = value
         elif name == 'wordlist':
+            # When the wordlist is updated, add the previous wordlist to the "used_wordlists" table.
+            if record.wordlist != value:
+                used = UsedWordlistModel(
+                    session_id=session_id,
+                    wordlist=record.wordlist
+                )
+                db.session.add(used)
+
             record.wordlist = value
 
         db.session.commit()
@@ -140,3 +159,28 @@ class SessionManager:
         db.session.refresh(record)
 
         return record
+
+    def action_start(self, session_id):
+        # First get the session.
+        session = self.get(session_id=session_id)[0]
+
+        # Make sure the screen is running.
+        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id']))
+
+        command = self.hashcat.build_command_line(
+            session['name'],
+            session['hashcat']['mode'],
+            session['hashcat']['hashtype'],
+            self.get_hashfile_path(session['user_id']),
+            session['hashcat']['wordlist_path'],
+            self.get_crackedfile_path(session['user_id']),
+            self.get_potfile_path(session['user_id']),
+            False
+        )
+
+        screen.execute(command)
+
+        return True
+
+    def get_used_wordlists(self, session_id):
+        return UsedWordlistModel.query.filter(UsedWordlistModel.session_id == session_id).all()

@@ -73,3 +73,22 @@ class HashcatManager:
                 break
 
         return valid
+
+    def build_command_line(self, session_name, mode, hashtype, hashfile, wordlist, outputfile, potfile, force):
+        command = {
+            self.hashcat_binary: '',
+            '--session': session_name,
+            '--attack-mode': mode,
+            '--hash-type': hashtype,
+            '--outfile': outputfile,
+            '--potfile-path': potfile,
+            '--status': '',
+            '--status-timer': 60,
+            hashfile: '',
+            wordlist: ''
+        }
+
+        if force:
+            command['force'] = ''
+
+        return command

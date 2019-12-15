@@ -13,14 +13,17 @@ class Provider:
         return settings
 
     def sessions(self):
-        session = SessionManager()
+        session = SessionManager(
+            self.hashcat(),
+            self.screens()
+        )
         return session
 
     def healthcheck(self):
         return HealthCheck()
 
     def screens(self):
-        return ScreenManager()
+        return ScreenManager(self.shell())
 
     def hashcat(self):
         settings = self.settings()
