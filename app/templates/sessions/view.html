@@ -73,6 +73,9 @@
 
                         {% if session.hashcat.data.process_state == 1 %}
                         <a href="#" data-action="pause" title="Pause" class="form-action ml-2"><i class="fas fa-lg fa-pause text-warning"></i></a>
+                        {% endif %}
+
+                        {% if session.hashcat.data.process_state == 1 or session.hashcat.data.process_state == 4 %}
                         <a href="#" data-action="stop" title="Stop" class="form-action ml-2"><i class="fas fa-lg fa-stop text-danger"></i></a>
                         {% endif %}
                     </form>

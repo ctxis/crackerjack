@@ -191,9 +191,9 @@ def action(session_id):
     elif action == 'resume':
         resume = sessions.action_resume(session_id)
     elif action == 'pause':
-        pass
+        resume = sessions.action_pause(session_id)
     elif action == 'stop':
-        pass
+        resume = sessions.action_stop(session_id)
 
     return redirect(url_for('sessions.view', session_id=session_id))
 

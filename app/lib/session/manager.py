@@ -215,6 +215,29 @@ class SessionManager:
 
         return True
 
+    def action_pause(self, session_id):
+        # First get the session.
+        session = self.get(session_id=session_id)[0]
+
+        # Get the screen.
+        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
+
+        # Hashcat only needs 'r' to resume.
+        screen.execute({'p': ''})
+
+        return True
+
+    def action_stop(self, session_id):
+        # First get the session.
+        session = self.get(session_id=session_id)[0]
+
+        # Get the screen.
+        screen = self.screens.get(session['screen_name'],  log_file=self.get_screenfile_path(session['user_id'], session_id))
+
+        # Hashcat only needs 'r' to resume.
+        screen.execute({'q': ''})
+
+        return True
 
     def get_used_wordlists(self, session_id):
         return UsedWordlistModel.query.filter(UsedWordlistModel.session_id == session_id).all()
@@ -246,10 +269,12 @@ class SessionManager:
         #   3   FINISHED
         #   4   PAUSED
         #   99  UNKNOWN
+        if raw['Status'] == 'Running':
+            data['process_state'] = 1
+        elif raw['Status'] == 'Quit':
+            data['process_state'] = 2
         if raw['Status'] == 'Exhausted':
             data['process_state'] = 3
-        elif raw['Status'] == 'Running':
-            data['process_state'] = 1
         elif raw['Status'] == 'Paused':
             data['process_state'] = 4
 
