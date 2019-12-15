@@ -135,7 +135,7 @@ var CJ_Select2_Wordlists = {
 };
 
 var CJ_SessionsSetup = {
-    init: function(supported_hashes, wordlists) {
+    init: function(supported_hashes, wordlists, selected_hashtype, selected_wordlist) {
         supported_hashes = this.processSupportedHashes(supported_hashes);
         wordlists = this.processWordlists(wordlists);
 
@@ -146,7 +146,7 @@ var CJ_SessionsSetup = {
             templateResult: CJ_Select2_Hashcat.templateResult,
             templateSelection: CJ_Select2_Hashcat.templateSelection,
             matcher: CJ_Select2_Hashcat.matcher
-        });
+        }).val(selected_hashtype).trigger('change');
 
         $('#wordlist').select2({
             placeholder: 'Select wordlist',
@@ -155,9 +155,26 @@ var CJ_SessionsSetup = {
             templateResult: CJ_Select2_Wordlists.templateResult,
             templateSelection: CJ_Select2_Wordlists.templateSelection,
             matcher: CJ_Select2_Wordlists.matcher
-        });
+        }).val(selected_wordlist).trigger('change');
+
+        this.bindUsedWordlists();
 
         $('#setup-hashcat').validate();
+    },
+
+    bindUsedWordlists: function() {
+        $('.used_wordlists').click(function() {
+            if ($('.box-used_wordlists').hasClass('d-none')) {
+                $('.used_expand').addClass('d-none');
+                $('.used_collapse').removeClass('d-none');
+                $('.box-used_wordlists').removeClass('d-none');
+            } else {
+                $('.used_expand').removeClass('d-none');
+                $('.used_collapse').addClass('d-none');
+                $('.box-used_wordlists').addClass('d-none');
+            }
+            return false;
+        });
     },
 
     processSupportedHashes: function(supported_hashes) {

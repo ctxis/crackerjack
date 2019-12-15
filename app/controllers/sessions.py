@@ -102,11 +102,14 @@ def setup_hashcat(session_id):
 
     password_wordlists = wordlists.get_wordlists()
 
+    used_wordlists = sessions.get_used_wordlists(session_id)
+
     return render_template(
         'sessions/setup_hashcat.html',
         session=session,
         hashes_json=json.dumps(supported_hashes),
-        wordlists_json=json.dumps(password_wordlists)
+        wordlists_json=json.dumps(password_wordlists),
+        used_wordlists=used_wordlists
     )
 
 
@@ -169,3 +172,24 @@ def view(session_id):
         session=session,
         supported_hashes=supported_hashes
     )
+
+
+@bp.route('/<int:session_id>/action', methods=['POST'])
+@login_required
+def action(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    action = request.form['action'].strip()
+    if action == 'start':
+        result = sessions.action_start(session_id)
+    elif action == 'pause':
+        pass
+    elif action == 'stop':
+        pass
+
+    return redirect(url_for('sessions.view', session_id=session_id))
