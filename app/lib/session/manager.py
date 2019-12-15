@@ -1,4 +1,4 @@
-import re, random, string, os
+import re, random, string, os, pprint
 from app.lib.models.session import SessionModel
 from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
 from app import db
@@ -184,3 +184,33 @@ class SessionManager:
 
     def get_used_wordlists(self, session_id):
         return UsedWordlistModel.query.filter(UsedWordlistModel.session_id == session_id).all()
+
+    def __remove_escape_characters(self, data):
+        # https://stackoverflow.com/questions/14693701/how-can-i-remove-the-ansi-escape-sequences-from-a-string-in-python
+        ansi_escape_8bit = re.compile(br'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+        return ansi_escape_8bit.sub(b'', data)
+
+    def __fix_line_termination(self, data):
+        return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+
+    def get_hashcat_status(self, session_id):
+        # Load the session.
+        session = self.get(session_id=session_id)[0]
+
+        # Read the last 5KB from the screen log file.
+        stream = ''
+        with open(self.get_screenfile_path(session['user_id']), 'rb') as file:
+            file.seek(-1024 * 5, os.SEEK_END)
+            stream = file.read()
+
+        # Replace \r\n with \n, and any rebel \r to \n. We only like \n in here!
+        # Clean the file from escape characters.
+        stream = self.__remove_escape_characters(stream)
+        stream = self.__fix_line_termination(stream)
+
+        # Pass to hashcat class to parse and return a dict with all the data.
+        data = self.hashcat.parse_stream(stream)
+
+        return data
+
+

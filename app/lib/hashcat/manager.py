@@ -92,3 +92,50 @@ class HashcatManager:
             command['force'] = ''
 
         return command
+
+    def parse_stream(self, stream):
+        stream = str(stream)
+        progress = self.__stream_get_last_progress(stream)
+        data = self.__convert_stream_progress(progress)
+
+        return data
+
+    def __convert_stream_progress(self, progress):
+        data = {}
+
+        progress = progress.split("\n")
+
+        for line in progress:
+            parts = line.split(": ", 1)
+            key = parts[0].rstrip(".")
+            value = parts[1]
+
+            data[key] = value
+
+        return data
+
+    def __stream_get_last_progress(self, stream):
+        # Split all stream by \n.
+        stream = stream.split("\\n")
+
+        progress_starts_from = self.__stream_find_last_progress_line(stream)
+        if progress_starts_from is False:
+            return ''
+
+        progress = []
+        for i in range(progress_starts_from, len(stream)):
+            if stream[i] == '':
+                break
+
+            progress.append(stream[i])
+
+        return "\n".join(progress)
+
+    def __stream_find_last_progress_line(self, lines):
+        found = False
+        for i in range(len(lines) - 1, 0, -1):
+            if lines[i].startswith('Session..'):
+                found = i
+                break
+
+        return found

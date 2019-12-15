@@ -167,10 +167,13 @@ def view(session_id):
     # We need to process the array in a way to make it easy for JSON usage.
     supported_hashes = hashcat.compact_hashes(supported_hashes)
 
+    hashcat_status = sessions.get_hashcat_status(session_id)
+
     return render_template(
         'sessions/view.html',
         session=session,
-        supported_hashes=supported_hashes
+        supported_hashes=supported_hashes,
+        hashcat_status=hashcat_status
     )
 
 

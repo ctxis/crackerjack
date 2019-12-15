@@ -2,17 +2,17 @@
 
 {% block content %}
 <div class="row mt-5">
-    <div class="col-2"></div>
-    <div class="col-8">
+    <div class="col-1"></div>
+    <div class="col">
         <h2>Session: {{ session.name }}</h2>
         <hr>
     </div>
-    <div class="col-2"></div>
+    <div class="col-1"></div>
 </div>
 
 <div class="row">
-    <div class="col-2"></div>
-    <div class="col-8">
+    <div class="col-1"></div>
+    <div class="col">
         <form method="post" action="{{ url_for('sessions.action', session_id=session.id) }}" class="float-left">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -26,12 +26,12 @@
             <a href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}" class="Hashcat Settings"><i class="fas fa-cogs fa-2x"></i></a>
         </div>
     </div>
-    <div class="col-2"></div>
+    <div class="col-1"></div>
 </div>
 
 <div class="row mt-3">
-    <div class="col-2"></div>
-    <div class="col-4">
+    <div class="col-1"></div>
+    <div class="col-5">
         <div class="card">
             <h3 class="card-header">Details</h3>
             <div class="card-body">
@@ -85,7 +85,7 @@
         </div>
     </div>
 
-    <div class="col-4">
+    <div class="col-5">
         <div class="card">
             <h3 class="card-header">Progress</h3>
             <div class="card-body">
@@ -108,6 +108,26 @@
             </div>
         </div>
     </div>
-    <div class="col-2"></div>
+    <div class="col-1"></div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-1"></div>
+    <div class="col">
+        <div class="card">
+            <h3 class="card-header"><i class="fas fa-plus-square"></i> Raw Data</h3>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for key, value in hashcat_status.items() %}
+                    <li class="list-group-item">
+                        <div class="float-left">{{ key }}</div>
+                        <div class="float-right">{{ value }}</div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-1"></div>
 </div>
 {% endblock %}
