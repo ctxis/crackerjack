@@ -4,7 +4,7 @@
 <div class="row mt-5">
     <div class="col-1"></div>
     <div class="col">
-        <h2>Session: {{ session.name }}</h2>
+        <h1>{{ session.name }}</h1>
         <hr>
     </div>
     <div class="col-1"></div>
@@ -13,100 +13,93 @@
 <div class="row">
     <div class="col-1"></div>
     <div class="col">
-        <form method="post" action="{{ url_for('sessions.action', session_id=session.id) }}" class="float-left">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <table class="table">
+            <thead>
+            <tr class="table-dark">
+                <th>State</th>
+                <th class="text-right">Progress</th>
+                <th class="text-right">Cracked</th>
+                <th class="text-right">Estimated Time</th>
+                <th class="text-right">Manage</th>
+                <th class="text-right">Settings</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                {% set status_class = '' %}
+                {% set status_text = 'Unknown' %}
+                {% if session.hashcat.data.process_state == 0 %}
+                    {% set status_class = 'table-info' %}
+                    {% set status_text = 'Not Started' %}
+                {% elif session.hashcat.data.process_state == 1 %}
+                    {% set status_class = 'table-success' %}
+                    {% set status_text = 'Running' %}
+                {% elif session.hashcat.data.process_state == 2 %}
+                    {% set status_class = 'table-danger' %}
+                    {% set status_text = 'Stopped' %}
+                {% elif session.hashcat.data.process_state == 3 %}
+                    {% set status_class = '' %}
+                    {% set status_text = 'Finished' %}
+                {% elif session.hashcat.data.process_state == 4 %}
+                    {% set status_class = 'table-warning' %}
+                    {% set status_text = 'Paused' %}
+                {% endif %}
+                <th scope="row" class="{{ status_class }}">{{ status_text }}</th>
+                <td class="text-right">{{ session.hashcat.data.progress }}%</td>
+                <td class="text-right">{{ session.hashcat.data.all_passwords }}/{{ session.hashcat.data.cracked_passwords }}</td>
+                <td class="text-right"><abbr title="{{ session.hashcat.data.estimated_completion_time }}">{{ session.hashcat.data.time_remaining }}</abbr></td>
+                <td class="text-right">
+                    <form method="post" action="{{ url_for('sessions.action', session_id=session.id) }}" id="form-action">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="action" id="action" value="">
 
-            <button class="btn" type="submit" name="action" value="start" title="Start"><i class="fas fa-play-circle fa-2x text-success"></i></button>
-            <button class="btn" type="submit" name="action" value="pause" title="Pause"><i class="fas fa-pause-circle fa-2x text-warning"></i></button>
-            <button class="btn" type="submit" name="action" value="stop" title="Stop"><i class="fas fa-stop-circle fa-2x text-danger"></i></button>
-        </form>
+                        {%
+                            if session.hashcat.data.process_state == 0 or
+                                session.hashcat.data.process_state == 2 or
+                                session.hashcat.data.process_state == 3 or
+                                session.hashcat.data.process_state == 4
+                        %}
+                        <a href="#" data-action="start" title="Start" class="form-action ml-2"><i class="fas fa-lg fa-play text-success"></i></a>
+                        {% endif %}
 
-        <div class="float-right">
-            <a href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}" class="Hashes"><i class="fas fa-hashtag fa-2x"></i></a>
-            <a href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}" class="Hashcat Settings"><i class="fas fa-cogs fa-2x"></i></a>
-        </div>
+                        {% if session.hashcat.data.process_state == 1 %}
+                        <a href="#" data-action="pause" title="Pause" class="form-action ml-2"><i class="fas fa-lg fa-pause text-warning"></i></a>
+                        <a href="#" data-action="stop" title="Stop" class="form-action ml-2"><i class="fas fa-lg fa-stop text-danger"></i></a>
+                        {% endif %}
+                    </form>
+                </td>
+                <td class="text-right">
+                    <a href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}" title="Hashes" class="mr-2"><i class="fas fa-hashtag fa-lg"></i></a>
+                    <a href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}" title="Hashcat Settings"><i class="fas fa-cogs fa-lg"></i></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
     <div class="col-1"></div>
 </div>
 
-<div class="row mt-3">
+<div class="row">
     <div class="col-1"></div>
-    <div class="col-5">
-        <div class="card">
-            <h3 class="card-header">Details</h3>
-            <div class="card-body">
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <div class="float-left">Session ID</div>
-                        <div class="float-right">{{ session.id }}</div>
-                    </li>
-
-                    <li class="list-group-item">
-                        <div class="float-left">Name</div>
-                        <div class="float-right">{{ session.name }}</div>
-                    </li>
-
-                    <li class="list-group-item">
-                        <div class="float-left">Created At</div>
-                        <div class="float-right">{{ session.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
-                    </li>
-
-                    <li class="list-group-item">
-                        <div class="float-left">Active</div>
-                        <div class="float-right">{{ 'Yes' if session.active else 'No' }}</div>
-                    </li>
-
-                    <li class="list-group-item">
-                        <div class="float-left">Hashcat Configured</div>
-                        <div class="float-right">{{ 'Yes' if session.hashcat.configured else 'No' }}</div>
-                    </li>
-
-                    <li class="list-group-item">
-                        <div class="float-left">Cracking Mode</div>
-                        <div class="float-right">{{ 'Wordlist' if session.hashcat.mode == 0 else 'Brute Force' }}</div>
-                    </li>
-
-                    <li class="list-group-item">
-                        <div class="float-left">Hash Type</div>
-                        <div class="float-right"><abbr title="{{ supported_hashes[session.hashcat.hashtype] }}">{{ session.hashcat.hashtype }}</abbr></div>
-                    </li>
-
-                    <li class="list-group-item">
-                        <div class="float-left">Wordlist</div>
-                        <div class="float-right"><abbr title="{{ session.hashcat.wordlist_path }}">{{ session.hashcat.wordlist }}</abbr></div>
-                    </li>
-
-                    <li class="list-group-item">
-                        <div class="float-left">Mask</div>
-                        <div class="float-right">N/A</div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-5">
-        <div class="card">
-            <h3 class="card-header">Progress</h3>
-            <div class="card-body">
-                <ul class="list-group">
-                    <li class="list-group-item">
-                        <div class="float-left">Status</div>
-                        <div class="float-right">Running</div>
-                    </li>
-
-                    <li class="list-group-item">
-                        <div class="float-left">Passwords</div>
-                        <div class="float-right">8/20</div>
-                    </li>
-
-                    <li class="list-group-item">
-                        <div class="float-left">Elapsed / Remaining</div>
-                        <div class="float-right">01:02:03 / 02:03:04</div>
-                    </li>
-                </ul>
-            </div>
-        </div>
+    <div class="col">
+        <table class="table">
+            <thead>
+            <tr class="table-dark">
+                <th>Cracking Mode</th>
+                <th>Hash Type</th>
+                <th>Wordlist</th>
+                <th>Mask</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{{ 'Wordlist' if session.hashcat.mode == 0 else 'Brute Force' }}</td>
+                <td><abbr title="{{ supported_hashes[session.hashcat.hashtype] }}">{{ session.hashcat.hashtype }}</abbr></td>
+                <td><abbr title="{{ session.hashcat.wordlist_path }}">{{ session.hashcat.wordlist }}</abbr></td>
+                <td>N/A</td>
+            </tr>
+            </tbody>
+        </table>
     </div>
     <div class="col-1"></div>
 </div>
@@ -118,7 +111,7 @@
             <h3 class="card-header"><i class="fas fa-plus-square"></i> Raw Data</h3>
             <div class="card-body">
                 <ul class="list-group">
-                    {% for key, value in hashcat_status.items() %}
+                    {% for key, value in session.hashcat.data_raw.items() %}
                     <li class="list-group-item">
                         <div class="float-left">{{ key }}</div>
                         <div class="float-right">{{ value }}</div>
@@ -130,4 +123,12 @@
     </div>
     <div class="col-1"></div>
 </div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.sessions.view.js') }}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        CJ_SessionsView.init();
+    });
+</script>
 {% endblock %}

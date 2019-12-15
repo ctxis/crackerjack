@@ -66,7 +66,7 @@
     $(document).ready(function() {
         var supported_hashes = {{ hashes_json|safe }};
         var wordlists = {{ wordlists_json|safe }};
-        CJ_SessionsSetup.init(supported_hashes, wordlists, {{ session.hashcat.hashtype }}, '{{ session.hashcat.wordlist }}');
+        CJ_SessionsSetup.init(supported_hashes, wordlists, '{{ session.hashcat.hashtype }}', '{{ session.hashcat.wordlist }}');
     });
 </script>
 {% endblock %}

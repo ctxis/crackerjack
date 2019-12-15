@@ -107,6 +107,8 @@ class HashcatManager:
 
         for line in progress:
             parts = line.split(": ", 1)
+            if len(parts) != 2:
+                continue
             key = parts[0].rstrip(".")
             value = parts[1]
 

@@ -1,2 +1,3 @@
 multiuser on
 acladd pavel
+logfile flush 1

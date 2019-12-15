@@ -2,7 +2,7 @@ from flask import Blueprint
 from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, flash, request
 from app.lib.base.provider import Provider
-import json
+import json, pprint
 
 
 bp = Blueprint('sessions', __name__)
@@ -62,7 +62,7 @@ def setup_hashes_save(session_id):
 
     hashes = request.form['hashes'].strip()
 
-    save_as = sessions.get_hashfile_path(current_user.id)
+    save_as = sessions.get_hashfile_path(current_user.id, session_id)
 
     if len(hashes) > 0:
         with open(save_as, 'w') as f:
@@ -167,13 +167,10 @@ def view(session_id):
     # We need to process the array in a way to make it easy for JSON usage.
     supported_hashes = hashcat.compact_hashes(supported_hashes)
 
-    hashcat_status = sessions.get_hashcat_status(session_id)
-
     return render_template(
         'sessions/view.html',
         session=session,
-        supported_hashes=supported_hashes,
-        hashcat_status=hashcat_status
+        supported_hashes=supported_hashes
     )
 
 

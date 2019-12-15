@@ -56,24 +56,27 @@ class SessionManager:
         path = Path(current_app.root_path)
         return os.path.join(str(path.parent), 'data')
 
-    def get_user_data_path(self, user_id):
+    def get_user_data_path(self, user_id, session_id):
         path = os.path.join(self.get_data_path(), str(user_id))
+        if session_id > 0:
+            path = os.path.join(path, str(session_id))
+
         if not os.path.isdir(path):
             os.makedirs(path)
 
         return path
 
-    def get_hashfile_path(self, user_id):
-        return os.path.join(self.get_user_data_path(user_id), 'hashes.txt')
+    def get_hashfile_path(self, user_id, session_id):
+        return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.txt')
 
-    def get_potfile_path(self, user_id):
-        return os.path.join(self.get_user_data_path(user_id), 'hashes.potfile')
+    def get_potfile_path(self, user_id, session_id):
+        return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.potfile')
 
-    def get_screenfile_path(self, user_id):
-        return os.path.join(self.get_user_data_path(user_id), 'screen.log')
+    def get_screenfile_path(self, user_id, session_id):
+        return os.path.join(self.get_user_data_path(user_id, session_id), 'screen.log')
 
-    def get_crackedfile_path(self, user_id):
-        return os.path.join(self.get_user_data_path(user_id), 'hashes.cracked')
+    def get_crackedfile_path(self, user_id, session_id):
+        return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.cracked')
 
     def can_access(self, user, session_id):
         if user.admin:
@@ -102,6 +105,7 @@ class SessionManager:
         data = []
         for session in sessions:
             hashcat = self.get_hashcat_settings(session.id)
+            hashcat_data_raw = self.get_hashcat_status(session.user_id, session.id)
 
             item = {
                 'id': session.id,
@@ -115,7 +119,9 @@ class SessionManager:
                     'mode': '' if not hashcat else hashcat.mode,
                     'hashtype': '' if not hashcat else hashcat.hashtype,
                     'wordlist': '' if not hashcat else os.path.basename(hashcat.wordlist),
-                    'wordlist_path': '' if not hashcat else hashcat.wordlist
+                    'wordlist_path': '' if not hashcat else hashcat.wordlist,
+                    'data_raw': hashcat_data_raw,
+                    'data': self.process_hashcat_raw_data(hashcat_data_raw)
                 }
             }
 
@@ -134,7 +140,7 @@ class SessionManager:
             record.hashtype = value
         elif name == 'wordlist':
             # When the wordlist is updated, add the previous wordlist to the "used_wordlists" table.
-            if record.wordlist != value:
+            if record.wordlist != value and record.wordlist != '':
                 used = UsedWordlistModel(
                     session_id=session_id,
                     wordlist=record.wordlist
@@ -165,16 +171,16 @@ class SessionManager:
         session = self.get(session_id=session_id)[0]
 
         # Make sure the screen is running.
-        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id']))
+        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
 
         command = self.hashcat.build_command_line(
             session['name'],
             session['hashcat']['mode'],
             session['hashcat']['hashtype'],
-            self.get_hashfile_path(session['user_id']),
+            self.get_hashfile_path(session['user_id'], session_id),
             session['hashcat']['wordlist_path'],
-            self.get_crackedfile_path(session['user_id']),
-            self.get_potfile_path(session['user_id']),
+            self.get_crackedfile_path(session['user_id'], session_id),
+            self.get_potfile_path(session['user_id'], session_id),
             False
         )
 
@@ -193,14 +199,65 @@ class SessionManager:
     def __fix_line_termination(self, data):
         return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
 
-    def get_hashcat_status(self, session_id):
-        # Load the session.
-        session = self.get(session_id=session_id)[0]
+    def process_hashcat_raw_data(self, raw):
+        # Build base dictionary
+        data = {
+            'process_state': 0,
+            'all_passwords': 0,
+            'cracked_passwords': 0,
+            'time_remaining': '',
+            'estimated_completion_time': '',
+            'progress': 0
+        }
 
-        # Read the last 5KB from the screen log file.
-        stream = ''
-        with open(self.get_screenfile_path(session['user_id']), 'rb') as file:
-            file.seek(-1024 * 5, os.SEEK_END)
+        # process_state
+        # States are:
+        #   0   NOT_STARTED
+        #   1   RUNNING
+        #   2   STOPPED
+        #   3   FINISHED
+        #   4   PAUSED
+        #   99  UNKNOWN
+        if raw['Status'] == 'Exhausted':
+            data['process_state'] = 3
+
+        # progress
+        matches = re.findall('\((\d+.\d+)', raw['Progress'])
+        if len(matches) == 1:
+            data['progress'] = matches[0]
+
+        # passwords
+        matches = re.findall('(\d+/\d+)', raw['Recovered'])
+        if len(matches) > 0:
+            passwords = matches[0].split('/')
+            if len(passwords) == 2:
+                data['all_passwords'] = passwords[0]
+                data['cracked_passwords'] = passwords[1]
+
+        # time remaining
+        matches = re.findall('\((.*)\)', raw['Time.Estimated'])
+        if len(matches) == 1:
+            data['time_remaining'] = 'Finished' if matches[0] == '0 secs' else matches[0].strip()
+
+        # estimated completion time
+        matches = re.findall('(.*)\(', raw['Time.Estimated'])
+        if len(matches) == 1:
+            data['estimated_completion_time'] = matches[0].strip()
+
+        return data
+
+    def get_hashcat_status(self, user_id, session_id):
+        screen_log_file = self.get_screenfile_path(user_id, session_id)
+        if not os.path.isfile(screen_log_file):
+            return {}
+
+        # If we try to read more than the actual size of the file, it will throw an error.
+        filesize = os.path.getsize(screen_log_file)
+        bytes_to_read = filesize if filesize < 4096 else 4096
+
+        # Read the last 4KB from the screen log file.
+        with open(screen_log_file, 'rb') as file:
+            file.seek(bytes_to_read * -1, os.SEEK_END)
             stream = file.read()
 
         # Replace \r\n with \n, and any rebel \r to \n. We only like \n in here!

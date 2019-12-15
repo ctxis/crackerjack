@@ -68,6 +68,7 @@ class ScreenInstance:
             ' '.join(sanitised)
         ]
 
+        # print(" ".join(cmd))
         output = self.shell.execute(cmd)
 
         # Wait a couple of seconds.
