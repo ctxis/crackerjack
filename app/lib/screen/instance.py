@@ -87,3 +87,16 @@ class ScreenInstance:
         )
 
         return True
+
+    def quit(self):
+        output = self.shell.execute(
+            [
+                'screen',
+                '-X',
+                '-S',
+                self.name,
+                'quit'
+            ]
+        )
+
+        return True

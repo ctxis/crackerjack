@@ -188,6 +188,22 @@ class SessionManager:
 
         return True
 
+    def action_reset(self, session_id):
+        # First get the session.
+        session = self.get(session_id=session_id)[0]
+
+        # Make sure the screen is running.
+        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
+
+        # Close the screen.
+        screen.quit()
+
+        # Create it again.
+        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
+
+        return True
+
+
     def get_used_wordlists(self, session_id):
         return UsedWordlistModel.query.filter(UsedWordlistModel.session_id == session_id).all()
 

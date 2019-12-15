@@ -65,6 +65,7 @@
                                 session.hashcat.data.process_state == 4
                         %}
                         <a href="#" data-action="start" title="Start" class="form-action ml-2"><i class="fas fa-lg fa-play text-success"></i></a>
+                        <a href="#" data-action="reset" title="Reset - If the session won't start click this link" class="form-action ml-2"><i class="fas fa-lg fa-sync text-danger"></i></a>
                         {% endif %}
 
                         {% if session.hashcat.data.process_state == 1 %}

@@ -186,6 +186,8 @@ def action(session_id):
     action = request.form['action'].strip()
     if action == 'start':
         result = sessions.action_start(session_id)
+    elif action == 'reset':
+        result = sessions.action_reset(session_id)
     elif action == 'pause':
         pass
     elif action == 'stop':
