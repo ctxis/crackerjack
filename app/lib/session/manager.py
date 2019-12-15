@@ -166,76 +166,41 @@ class SessionManager:
 
         return record
 
-    def action_start(self, session_id):
+    def hashcat_action(self, session_id, action):
         # First get the session.
         session = self.get(session_id=session_id)[0]
 
         # Make sure the screen is running.
         screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
 
-        command = self.hashcat.build_command_line(
-            session['name'],
-            session['hashcat']['mode'],
-            session['hashcat']['hashtype'],
-            self.get_hashfile_path(session['user_id'], session_id),
-            session['hashcat']['wordlist_path'],
-            self.get_crackedfile_path(session['user_id'], session_id),
-            self.get_potfile_path(session['user_id'], session_id),
-            False
-        )
+        if action == 'start':
+            command = self.hashcat.build_command_line(
+                session['name'],
+                session['hashcat']['mode'],
+                session['hashcat']['hashtype'],
+                self.get_hashfile_path(session['user_id'], session_id),
+                session['hashcat']['wordlist_path'],
+                self.get_crackedfile_path(session['user_id'], session_id),
+                self.get_potfile_path(session['user_id'], session_id),
+                False
+            )
 
-        screen.execute(command)
+            screen.execute(command)
+        elif action == 'reset':
+            # Close the screen.
+            screen.quit()
 
-        return True
-
-    def action_reset(self, session_id):
-        # First get the session.
-        session = self.get(session_id=session_id)[0]
-
-        # Make sure the screen is running.
-        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
-
-        # Close the screen.
-        screen.quit()
-
-        # Create it again.
-        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
-
-        return True
-
-    def action_resume(self, session_id):
-        # First get the session.
-        session = self.get(session_id=session_id)[0]
-
-        # Get the screen.
-        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
-
-        # Hashcat only needs 'r' to resume.
-        screen.execute({'r':''})
-
-        return True
-
-    def action_pause(self, session_id):
-        # First get the session.
-        session = self.get(session_id=session_id)[0]
-
-        # Get the screen.
-        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
-
-        # Hashcat only needs 'r' to resume.
-        screen.execute({'p': ''})
-
-        return True
-
-    def action_stop(self, session_id):
-        # First get the session.
-        session = self.get(session_id=session_id)[0]
-
-        # Get the screen.
-        screen = self.screens.get(session['screen_name'],  log_file=self.get_screenfile_path(session['user_id'], session_id))
-
-        # Hashcat only needs 'r' to resume.
-        screen.execute({'q': ''})
+            # Create it again.
+            screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
+        elif action == 'resume':
+            # Hashcat only needs 'r' to resume.
+            screen.execute({'r': ''})
+        elif action == 'pause':
+            # Hashcat only needs 'p' to pause.
+            screen.execute({'p': ''})
+        elif action == 'stop':
+            # Hashcat only needs 'q' to pause.
+            screen.execute({'q': ''})
 
         return True
 

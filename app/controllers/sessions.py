@@ -184,16 +184,7 @@ def action(session_id):
         return redirect(url_for('home.index'))
 
     action = request.form['action'].strip()
-    if action == 'start':
-        result = sessions.action_start(session_id)
-    elif action == 'reset':
-        result = sessions.action_reset(session_id)
-    elif action == 'resume':
-        resume = sessions.action_resume(session_id)
-    elif action == 'pause':
-        resume = sessions.action_pause(session_id)
-    elif action == 'stop':
-        resume = sessions.action_stop(session_id)
+    result = sessions.hashcat_action(session_id, action)
 
     return redirect(url_for('sessions.view', session_id=session_id))
 
