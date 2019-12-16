@@ -120,6 +120,8 @@ class SessionManager:
                     'hashtype': '' if not hashcat else hashcat.hashtype,
                     'wordlist': '' if not hashcat else os.path.basename(hashcat.wordlist),
                     'wordlist_path': '' if not hashcat else hashcat.wordlist,
+                    'rule': '' if not hashcat else os.path.basename(hashcat.rule),
+                    'rule_path': '' if not hashcat else hashcat.rule,
                     'data_raw': hashcat_data_raw,
                     'data': self.process_hashcat_raw_data(hashcat_data_raw)
                 }
@@ -148,6 +150,8 @@ class SessionManager:
                 db.session.add(used)
 
             record.wordlist = value
+        elif name == 'rule':
+            record.rule = value
 
         db.session.commit()
 

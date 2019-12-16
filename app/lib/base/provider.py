@@ -7,6 +7,7 @@ from app.lib.base.shell import ShellManager
 from app.lib.base.wordlists import WordlistManager
 from app.lib.base.system import SystemManager
 from app.lib.base.filesystem import FileSystemManager
+from app.lib.base.rules import RulesManager
 
 
 class Provider:
@@ -39,7 +40,7 @@ class Provider:
 
     def wordlists(self):
         settings = self.settings()
-        return WordlistManager(self.filesystem(), settings.get('wordlists_path'))
+        return WordlistManager(self.filesystem(), settings.get('wordlists_path', ''))
 
     def system(self):
         return SystemManager(
@@ -49,3 +50,7 @@ class Provider:
 
     def filesystem(self):
         return FileSystemManager()
+
+    def rules(self):
+        settings = self.settings()
+        return RulesManager(self.filesystem(), settings.get('hashcat_rules_path', ''))

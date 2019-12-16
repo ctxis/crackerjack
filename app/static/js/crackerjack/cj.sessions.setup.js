@@ -135,7 +135,7 @@ var CJ_Select2_Wordlists = {
 };
 
 var CJ_SessionsSetup = {
-    init: function(supported_hashes, wordlists, selected_hashtype, selected_wordlist) {
+    init: function(supported_hashes, wordlists, selected_hashtype, selected_wordlist, selected_rule) {
         supported_hashes = this.processSupportedHashes(supported_hashes);
         wordlists = this.processWordlists(wordlists);
 
@@ -156,6 +156,8 @@ var CJ_SessionsSetup = {
             templateSelection: CJ_Select2_Wordlists.templateSelection,
             matcher: CJ_Select2_Wordlists.matcher
         }).val(selected_wordlist).trigger('change');
+
+        $('#rule').select2({}).val(selected_rule).trigger('change');
 
         this.bindUsedWordlists();
 

@@ -6,7 +6,7 @@ class FileSystemManager:
         if len(absolute_path) == '' or not os.path.isdir(absolute_path) or not os.access(absolute_path, os.R_OK):
             return {}
 
-        files = [f for f in os.listdir(absolute_path) if os.path.isfile(os.path.join(absolute_path, f))]
+        files = [f for f in sorted(os.listdir(absolute_path)) if os.path.isfile(os.path.join(absolute_path, f))]
         data = {}
         for file in files:
             data[file] = {

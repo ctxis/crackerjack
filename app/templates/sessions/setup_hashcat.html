@@ -51,6 +51,16 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="rule">Rules</label>
+                        <select name="rule" id="rule" class="form-control">
+                            <option value="">No Rules</option>
+                            {% for key, rule in rules.items() %}
+                            <option value="{{ key }}">{{ rule.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block">save</button>
                     </div>
                 </form>
@@ -66,7 +76,7 @@
     $(document).ready(function() {
         var supported_hashes = {{ hashes_json|safe }};
         var wordlists = {{ wordlists_json|safe }};
-        CJ_SessionsSetup.init(supported_hashes, wordlists, '{{ session.hashcat.hashtype }}', '{{ session.hashcat.wordlist }}');
+        CJ_SessionsSetup.init(supported_hashes, wordlists, '{{ session.hashcat.hashtype }}', '{{ session.hashcat.wordlist }}', '{{ session.hashcat.rule }}');
     });
 </script>
 {% endblock %}

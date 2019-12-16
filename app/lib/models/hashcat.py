@@ -9,6 +9,7 @@ class HashcatModel(db.Model):
     mode = db.Column(db.Integer, default=0, index=True, nullable=False)
     hashtype = db.Column(db.String, default='', index=True, nullable=False)
     wordlist = db.Column(db.String, default='', index=True, nullable=False)
+    rule = db.Column(db.String, default='', index=True, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
 
 

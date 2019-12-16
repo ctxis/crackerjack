@@ -88,6 +88,7 @@ def setup_hashcat(session_id):
     sessions = provider.sessions()
     hashcat = provider.hashcat()
     wordlists = provider.wordlists()
+    rules = provider.rules()
 
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
@@ -100,6 +101,7 @@ def setup_hashcat(session_id):
     supported_hashes = hashcat.compact_hashes(supported_hashes)
 
     password_wordlists = wordlists.get_wordlists()
+    hashcat_rules = rules.get_rules()
 
     used_wordlists = sessions.get_used_wordlists(session_id)
 
@@ -108,7 +110,8 @@ def setup_hashcat(session_id):
         session=session,
         hashes_json=json.dumps(supported_hashes),
         wordlists_json=json.dumps(password_wordlists),
-        used_wordlists=used_wordlists
+        used_wordlists=used_wordlists,
+        rules=hashcat_rules
     )
 
 
@@ -119,6 +122,7 @@ def setup_hashcat_save(session_id):
     sessions = provider.sessions()
     hashcat = provider.hashcat()
     wordlists = provider.wordlists()
+    rules = provider.rules()
 
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
@@ -126,6 +130,7 @@ def setup_hashcat_save(session_id):
 
     hash_type = request.form['hash-type'].strip()
     wordlist = request.form['wordlist'].strip()
+    rule = request.form['rule'].strip()
 
     has_errors = False
     if not hashcat.is_valid_hash_type(hash_type):
@@ -136,14 +141,20 @@ def setup_hashcat_save(session_id):
         has_errors = True
         flash('Invalid wordlist selected', 'error')
 
+    if len(rule) > 0 and not rules.is_valid_rule(rule):
+        has_errors = True
+        flash('Invalid rule selected', 'error')
+
     if has_errors:
         return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
 
     wordlist_location = wordlists.get_wordlist_path(wordlist)
+    rule_location = rules.get_rule_path(rule)
 
     sessions.set_hashcat_setting(session_id, 'mode', 0)
     sessions.set_hashcat_setting(session_id, 'hashtype', hash_type)
     sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
+    sessions.set_hashcat_setting(session_id, 'rule', rule_location)
 
     flash('All settings saved. You can now start the session.', 'success')
     return redirect(url_for('sessions.view', session_id=session_id))
