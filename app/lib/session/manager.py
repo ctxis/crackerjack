@@ -239,37 +239,42 @@ class SessionManager:
         #   3   FINISHED
         #   4   PAUSED
         #   99  UNKNOWN
-        if raw['Status'] == 'Running':
-            data['process_state'] = 1
-        elif raw['Status'] == 'Quit':
-            data['process_state'] = 2
-        if raw['Status'] == 'Exhausted':
-            data['process_state'] = 3
-        elif raw['Status'] == 'Paused':
-            data['process_state'] = 4
+        if 'Status' in raw:
+            if raw['Status'] == 'Running':
+                data['process_state'] = 1
+            elif raw['Status'] == 'Quit':
+                data['process_state'] = 2
+            if raw['Status'] == 'Exhausted':
+                data['process_state'] = 3
+            elif raw['Status'] == 'Paused':
+                data['process_state'] = 4
 
         # progress
-        matches = re.findall('\((\d+.\d+)', raw['Progress'])
-        if len(matches) == 1:
-            data['progress'] = matches[0]
+        if 'Progress' in raw:
+            matches = re.findall('\((\d+.\d+)', raw['Progress'])
+            if len(matches) == 1:
+                data['progress'] = matches[0]
 
         # passwords
-        matches = re.findall('(\d+/\d+)', raw['Recovered'])
-        if len(matches) > 0:
-            passwords = matches[0].split('/')
-            if len(passwords) == 2:
-                data['all_passwords'] = int(passwords[1])
-                data['cracked_passwords'] = int(passwords[0])
+        if 'Recovered' in raw:
+            matches = re.findall('(\d+/\d+)', raw['Recovered'])
+            if len(matches) > 0:
+                passwords = matches[0].split('/')
+                if len(passwords) == 2:
+                    data['all_passwords'] = int(passwords[1])
+                    data['cracked_passwords'] = int(passwords[0])
 
         # time remaining
-        matches = re.findall('\((.*)\)', raw['Time.Estimated'])
-        if len(matches) == 1:
-            data['time_remaining'] = 'Finished' if matches[0] == '0 secs' else matches[0].strip()
+        if 'Time.Estimated' in raw:
+            matches = re.findall('\((.*)\)', raw['Time.Estimated'])
+            if len(matches) == 1:
+                data['time_remaining'] = 'Finished' if matches[0] == '0 secs' else matches[0].strip()
 
         # estimated completion time
-        matches = re.findall('(.*)\(', raw['Time.Estimated'])
-        if len(matches) == 1:
-            data['estimated_completion_time'] = matches[0].strip()
+        if 'Time.Estimated' in raw:
+            matches = re.findall('(.*)\(', raw['Time.Estimated'])
+            if len(matches) == 1:
+                data['estimated_completion_time'] = matches[0].strip()
 
         return data
 
