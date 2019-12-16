@@ -23,7 +23,8 @@ def settings():
         settings={
             'allow_logins': settings.get('allow_logins', 0),
             'hashcat_binary': settings.get('hashcat_binary', ''),
-            'wordlists_path': settings.get('wordlists_path', '')
+            'wordlists_path': settings.get('wordlists_path', ''),
+            'hashcat_rules_path': settings.get('hashcat_rules_path', '')
         }
     )
 
@@ -40,6 +41,7 @@ def settings_save():
 
     hashcat_binary = request.form['hashcat_binary'].strip()
     wordlists_path = request.form['wordlists_path'].strip()
+    hashcat_rules_path = request.form['hashcat_rules_path'].strip()
     allow_logins = request.form.get('allow_logins', 0)
 
     has_errors = False
@@ -57,11 +59,19 @@ def settings_save():
         has_errors = True
         flash('Wordlist directory is not readable', 'error')
 
+    if len(hashcat_rules_path) == 0 or not os.path.isdir(hashcat_rules_path):
+        has_errors = True
+        flash('Hashcat rules directory does not exist', 'error')
+    elif not os.access(hashcat_rules_path, os.R_OK):
+        has_errors = True
+        flash('Hashcat rules directory is not readable', 'error')
+
     if has_errors:
         return redirect(url_for('admin.settings'))
 
     settings.save('hashcat_binary', hashcat_binary)
     settings.save('wordlists_path', wordlists_path)
+    settings.save('hashcat_rules_path', hashcat_rules_path)
     settings.save('allow_logins', allow_logins)
 
     # When settings are saved, run system updates.

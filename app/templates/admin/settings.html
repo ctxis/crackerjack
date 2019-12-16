@@ -29,6 +29,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="hashcat_rules_path">Hashcat Rules Path</label>
+                        <input name="hashcat_rules_path" type="text" id="hashcat_rules_path" class="form-control" value="{{ settings.hashcat_rules_path }}" placeholder="/path/to/hashcat/rules" required>
+                    </div>
+
+                    <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block">save</button>
                     </div>
                 </form>
