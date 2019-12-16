@@ -11,5 +11,14 @@ var CJ_SessionsView = {
             $('#form-action').submit();
             return false;
         });
+
+        $('.raw-progress').click(function() {
+            if ($('#raw-progress').hasClass('d-none')) {
+                $('#raw-progress').removeClass('d-none');
+            } else {
+                $('#raw-progress').addClass('d-none');
+            }
+            return false;
+        });
     }
 };

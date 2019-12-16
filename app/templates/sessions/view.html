@@ -45,7 +45,7 @@
                     {% set status_text = 'Paused' %}
                 {% endif %}
                 <th scope="row" class="{{ status_class }}">{{ status_text }}</th>
-                <td class="text-right">{{ session.hashcat.data.progress }}%</td>
+                <td class="text-right"><a href="#" title="Click to view raw output" class="raw-progress">{{ session.hashcat.data.progress }}%</a></td>
                 <td class="text-right">
                     <span>{{ session.hashcat.data.cracked_passwords }}/{{ session.hashcat.data.all_passwords }}</span>
                     {% if session.hashcat.data.cracked_passwords > 0 %}
@@ -85,6 +85,20 @@
                     <a href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}" title="Hashcat Settings"><i class="fas fa-cogs fa-lg"></i></a>
                 </td>
             </tr>
+            <tr id="raw-progress" class="d-none">
+                <td colspan="6">
+                    <table class="table table-sm table-striped">
+                        <tbody>
+                        {% for key, value in session.hashcat.data_raw.items() %}
+                        <tr>
+                            <th scope="row">{{ key }}</th>
+                            <td class="text-right">{{ value }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
@@ -112,26 +126,6 @@
             </tr>
             </tbody>
         </table>
-    </div>
-    <div class="col-1"></div>
-</div>
-
-<div class="row mt-2">
-    <div class="col-1"></div>
-    <div class="col">
-        <div class="card">
-            <h3 class="card-header"><i class="fas fa-plus-square"></i> Raw Data</h3>
-            <div class="card-body">
-                <ul class="list-group">
-                    {% for key, value in session.hashcat.data_raw.items() %}
-                    <li class="list-group-item">
-                        <div class="float-left">{{ key }}</div>
-                        <div class="float-right">{{ value }}</div>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
     </div>
     <div class="col-1"></div>
 </div>
