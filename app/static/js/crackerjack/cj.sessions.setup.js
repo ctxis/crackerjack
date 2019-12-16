@@ -136,9 +136,43 @@ var CJ_Select2_Wordlists = {
 
 var CJ_SessionsSetup = {
     init: function(supported_hashes, wordlists, selected_hashtype, selected_wordlist, selected_rule) {
-        supported_hashes = this.processSupportedHashes(supported_hashes);
-        wordlists = this.processWordlists(wordlists);
+        this.bindHashType(supported_hashes, selected_hashtype);
+        this.bindWordlists(wordlists, selected_wordlist);
+        this.bindRules(selected_rule);
+        this.bindUsedWordlists();
+        this.bindModes();
+        this.bindForm();
+    },
 
+    setModes: function() {
+        mode = $("input[name='mode']:checked").val();
+        if (mode == 0) {
+            $('.box-mode-wordlist').removeClass('d-none');
+            $('.box-mode-bruteforce').addClass('d-none');
+        } else if (mode == 3) {
+            $('.box-mode-bruteforce').removeClass('d-none');
+            $('.box-mode-wordlist').addClass('d-none');
+        }
+    },
+
+    bindModes: function() {
+        this.setModes();
+        $('.mode-option').click(function() {
+            CJ_SessionsSetup.setModes();
+            return true;
+        });
+    },
+
+    bindForm: function() {
+        $('#setup-hashcat').validate();
+    },
+
+    bindRules: function(selected_rule) {
+        $('#rule').select2({}).val(selected_rule).trigger('change');
+    },
+
+    bindHashType: function(supported_hashes, selected_hashtype) {
+        supported_hashes = this.processSupportedHashes(supported_hashes);
         $('#hash-type').select2({
             placeholder: 'Select hash type',
             data: supported_hashes,
@@ -147,7 +181,10 @@ var CJ_SessionsSetup = {
             templateSelection: CJ_Select2_Hashcat.templateSelection,
             matcher: CJ_Select2_Hashcat.matcher
         }).val(selected_hashtype).trigger('change');
+    },
 
+    bindWordlists: function(wordlists, selected_wordlist) {
+        wordlists = this.processWordlists(wordlists);
         $('#wordlist').select2({
             placeholder: 'Select wordlist',
             data: wordlists,
@@ -156,12 +193,6 @@ var CJ_SessionsSetup = {
             templateSelection: CJ_Select2_Wordlists.templateSelection,
             matcher: CJ_Select2_Wordlists.matcher
         }).val(selected_wordlist).trigger('change');
-
-        $('#rule').select2({}).val(selected_rule).trigger('change');
-
-        this.bindUsedWordlists();
-
-        $('#setup-hashcat').validate();
     },
 
     bindUsedWordlists: function() {

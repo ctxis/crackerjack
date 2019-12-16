@@ -13,12 +13,11 @@
 <div class="row mt-5">
     <div class="col-2"></div>
     <div class="col-8">
-        <div class="card">
-            <h4 class="card-header">Hashcat Setup</h4>
-            <div class="card-body">
-                <form id="setup-hashcat" method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_hashcat_save', session_id=session.id) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
+        <form id="setup-hashcat" method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_hashcat_save', session_id=session.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="card">
+                <h4 class="card-header">Hashcat Setup</h4>
+                <div class="card-body">
                     <div class="form-group">
                         <label for="hash-type">Hash Type</label>
                         <select name="hash-type" id="hash-type" class="form-control" required>
@@ -26,6 +25,23 @@
                         </select>
                     </div>
 
+                    <div class="form-group">
+                        <label>Attack Mode</label>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-wordlist" name="mode" class="mode-option custom-control-input" value="0" {{ 'checked' if session.hashcat.mode == 0 else '' }}>
+                            <label class="custom-control-label" for="mode-wordlist">Wordlist</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-bruteforce" name="mode" class="mode-option custom-control-input" value="3" {{ 'checked' if session.hashcat.mode == 3 else '' }}>
+                            <label class="custom-control-label" for="mode-bruteforce">Brute Force</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-2 box-mode-wordlist">
+                <h5 class="card-header">Wordlist Options</h5>
+                <div class="card-body">
                     <div class="form-group">
                         <label for="wordlist">Wordlist</label>
                         <select name="wordlist" id="wordlist" class="form-control" required>
@@ -63,9 +79,16 @@
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block">save</button>
                     </div>
-                </form>
+                </div>
             </div>
-        </div>
+
+            <div class="card mt-2 box-mode-bruteforce">
+                <h5 class="card-header">Brute Force Options</h5>
+                <div class="card-body">
+
+                </div>
+            </div>
+        </form>
     </div>
     <div class="col-2"></div>
 </div>

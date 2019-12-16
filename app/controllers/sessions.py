@@ -131,19 +131,30 @@ def setup_hashcat_save(session_id):
     hash_type = request.form['hash-type'].strip()
     wordlist = request.form['wordlist'].strip()
     rule = request.form['rule'].strip()
+    mode = int(request.form['mode'].strip())
+
+    if mode != 0 and mode != 3:
+        # As all the conditions below depend on the mode, if it's wrong return to the previous page immediately.
+        flash('Invalid attack mode selected', 'error')
+        return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
 
     has_errors = False
     if not hashcat.is_valid_hash_type(hash_type):
         has_errors = True
         flash('Invalid hash type selected', 'error')
 
-    if not wordlists.is_valid_wordlist(wordlist):
-        has_errors = True
-        flash('Invalid wordlist selected', 'error')
+    if mode == 0:
+        # Wordlist.
+        if not wordlists.is_valid_wordlist(wordlist):
+            has_errors = True
+            flash('Invalid wordlist selected', 'error')
 
-    if len(rule) > 0 and not rules.is_valid_rule(rule):
-        has_errors = True
-        flash('Invalid rule selected', 'error')
+        if len(rule) > 0 and not rules.is_valid_rule(rule):
+            has_errors = True
+            flash('Invalid rule selected', 'error')
+    elif mode == 3:
+        # Bruteforce.
+        pass
 
     if has_errors:
         return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
@@ -151,7 +162,7 @@ def setup_hashcat_save(session_id):
     wordlist_location = wordlists.get_wordlist_path(wordlist)
     rule_location = rules.get_rule_path(rule)
 
-    sessions.set_hashcat_setting(session_id, 'mode', 0)
+    sessions.set_hashcat_setting(session_id, 'mode', mode)
     sessions.set_hashcat_setting(session_id, 'hashtype', hash_type)
     sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
     sessions.set_hashcat_setting(session_id, 'rule', rule_location)
