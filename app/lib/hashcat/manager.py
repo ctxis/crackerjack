@@ -82,12 +82,14 @@ class HashcatManager:
             '--hash-type': hashtype,
             '--outfile': outputfile,
             '--potfile-path': potfile,
-            '--rules-file': rule,
             '--status': '',
             '--status-timer': 1,
             hashfile: '',
             wordlist: ''
         }
+
+        if len(rule) > 0:
+            command['--rules-file'] = rule
 
         if force:
             command['force'] = ''
