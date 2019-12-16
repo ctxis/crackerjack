@@ -1,4 +1,4 @@
-import os, datetime
+import os, datetime, pprint
 from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -53,14 +53,14 @@ def create_app(config_class=None):
             return provider.settings().get(name, default)
         return dict(setting_get=setting_get)
 
-    # @app.before_request
-    # def before_request():
-    #     session.permanent = True
-    #     app.permanent_session_lifetime = datetime.timedelta(minutes=1)
-    #     session.modified = True
+    @app.before_request
+    def before_request():
+        session.permanent = True
+        app.permanent_session_lifetime = datetime.timedelta(minutes=20)
+        session.modified = True
 
     return app
 
 
 # This has to be at the bottom.
-from app.lib.models import user, config, session, hashcat
+from app.lib.models import user, config, sessions, hashcat

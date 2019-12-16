@@ -1,5 +1,5 @@
 import re, random, string, os, pprint
-from app.lib.models.session import SessionModel
+from app.lib.models.sessions import SessionModel
 from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
 from app import db
 from pathlib import Path
