@@ -6,6 +6,10 @@ class SystemManager:
         self.shell = shell
         self.settings = settings
 
+    def run_updates(self):
+        self.update_hashcat_version()
+        self.update_git_hash_version()
+
     def update_hashcat_version(self):
         hashcat_binary = self.settings.get('hashcat_binary', '')
         if len(hashcat_binary) == 0:

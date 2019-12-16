@@ -64,5 +64,9 @@ def settings_save():
     settings.save('wordlists_path', wordlists_path)
     settings.save('allow_logins', allow_logins)
 
+    # When settings are saved, run system updates.
+    system = provider.system()
+    system.run_updates()
+
     flash('Settings saved', 'success')
     return redirect(url_for('admin.settings'))

@@ -29,8 +29,7 @@ def login():
         # On every login we get the hashcat version and the git hash version.
         provider = Provider()
         system = provider.system()
-        system.update_hashcat_version()
-        system.update_git_hash_version()
+        system.run_updates()
 
         return redirect(url_for('home.index'))
 
