@@ -43,6 +43,16 @@ def create_app(config_class=None):
     from app.controllers.sessions import bp as sessions_bp
     app.register_blueprint(sessions_bp, url_prefix='/sessions')
 
+    from app.lib.base.provider import Provider
+
+    # This is to be able to access settings from any template (shared variables).
+    @app.context_processor
+    def processor():
+        def setting_get(name, default=None):
+            provider = Provider()
+            return provider.settings().get(name, default)
+        return dict(setting_get=setting_get)
+
     # @app.before_request
     # def before_request():
     #     session.permanent = True

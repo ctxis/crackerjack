@@ -4,6 +4,7 @@ from flask import render_template, redirect, url_for, flash, request
 import flask_bcrypt as bcrypt
 from app.lib.models.user import UserModel
 from sqlalchemy import and_
+from app.lib.base.provider import Provider
 
 
 bp = Blueprint('auth', __name__)
@@ -25,6 +26,12 @@ def login():
             return redirect(url_for('auth.login'))
 
         login_user(user)
+        # On every login we get the hashcat version and the git hash version.
+        provider = Provider()
+        system = provider.system()
+        system.update_hashcat_version()
+        system.update_git_hash_version()
+
         return redirect(url_for('home.index'))
 
     return render_template('auth/login.html')

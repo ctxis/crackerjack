@@ -5,6 +5,7 @@ from app.lib.screen.manager import ScreenManager
 from app.lib.hashcat.manager import HashcatManager
 from app.lib.base.shell import ShellManager
 from app.lib.base.wordlists import WordlistManager
+from app.lib.base.system import SystemManager
 
 
 class Provider:
@@ -38,3 +39,9 @@ class Provider:
     def wordlists(self):
         settings = self.settings()
         return WordlistManager(settings.get('wordlists_path'))
+
+    def system(self):
+        return SystemManager(
+            self.shell(),
+            self.settings()
+        )
