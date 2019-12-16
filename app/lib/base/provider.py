@@ -6,6 +6,7 @@ from app.lib.hashcat.manager import HashcatManager
 from app.lib.base.shell import ShellManager
 from app.lib.base.wordlists import WordlistManager
 from app.lib.base.system import SystemManager
+from app.lib.base.filesystem import FileSystemManager
 
 
 class Provider:
@@ -38,10 +39,13 @@ class Provider:
 
     def wordlists(self):
         settings = self.settings()
-        return WordlistManager(settings.get('wordlists_path'))
+        return WordlistManager(self.filesystem(), settings.get('wordlists_path'))
 
     def system(self):
         return SystemManager(
             self.shell(),
             self.settings()
         )
+
+    def filesystem(self):
+        return FileSystemManager()
