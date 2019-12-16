@@ -184,6 +184,7 @@ class SessionManager:
                 session['hashcat']['hashtype'],
                 self.get_hashfile_path(session['user_id'], session_id),
                 session['hashcat']['wordlist_path'],
+                session['hashcat']['rule_path'],
                 self.get_crackedfile_path(session['user_id'], session_id),
                 self.get_potfile_path(session['user_id'], session_id),
                 False

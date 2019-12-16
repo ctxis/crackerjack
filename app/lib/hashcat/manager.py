@@ -74,7 +74,7 @@ class HashcatManager:
 
         return valid
 
-    def build_command_line(self, session_name, mode, hashtype, hashfile, wordlist, outputfile, potfile, force):
+    def build_command_line(self, session_name, mode, hashtype, hashfile, wordlist, rule, outputfile, potfile, force):
         command = {
             self.hashcat_binary: '',
             '--session': session_name,
@@ -82,6 +82,7 @@ class HashcatManager:
             '--hash-type': hashtype,
             '--outfile': outputfile,
             '--potfile-path': potfile,
+            '--rules-file': rule,
             '--status': '',
             '--status-timer': 1,
             hashfile: '',

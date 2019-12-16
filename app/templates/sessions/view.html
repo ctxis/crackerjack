@@ -45,7 +45,9 @@
                     {% set status_text = 'Paused' %}
                 {% endif %}
                 <th scope="row" class="{{ status_class }}">{{ status_text }}</th>
-                <td class="text-right"><a href="#" title="Click to view raw output" class="raw-progress">{{ session.hashcat.data.progress }}%</a></td>
+                <td class="text-right">
+                    <a href="#" title="Click to view raw output" class="raw-progress">{{ session.hashcat.data.progress }}%</a>
+                </td>
                 <td class="text-right">
                     <span>{{ session.hashcat.data.cracked_passwords }}/{{ session.hashcat.data.all_passwords }}</span>
                     {% if session.hashcat.data.cracked_passwords > 0 %}
@@ -85,6 +87,15 @@
                     <a href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}" title="Hashcat Settings"><i class="fas fa-cogs fa-lg"></i></a>
                 </td>
             </tr>
+            {% if session.hashcat.data.progress|int > 0 and session.hashcat.data.progress|int < 100 %}
+            <tr>
+                <td class="p-0" colspan="6">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" aria-valuenow="{{ session.hashcat.data.progress|int }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ session.hashcat.data.progress|int }}%"></div>
+                    </div>
+                </td>
+            </tr>
+            {% endif %}
             <tr id="raw-progress" class="d-none">
                 <td colspan="6">
                     <table class="table table-sm table-striped">
@@ -114,6 +125,7 @@
                 <th>Cracking Mode</th>
                 <th>Hash Type</th>
                 <th>Wordlist</th>
+                <th>Rule</th>
                 <th>Mask</th>
             </tr>
             </thead>
@@ -122,6 +134,7 @@
                 <td>{{ 'Wordlist' if session.hashcat.mode == 0 else 'Brute Force' }}</td>
                 <td><abbr title="{{ supported_hashes[session.hashcat.hashtype] }}">{{ session.hashcat.hashtype }}</abbr></td>
                 <td><abbr title="{{ session.hashcat.wordlist_path }}">{{ session.hashcat.wordlist }}</abbr></td>
+                <td><abbr title="{{ session.hashcat.rule_path }}">{{ session.hashcat.rule }}</abbr></td>
                 <td>N/A</td>
             </tr>
             </tbody>
