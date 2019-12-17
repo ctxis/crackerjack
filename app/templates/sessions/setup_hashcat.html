@@ -84,7 +84,7 @@
                     <div class="form-group row">
                         <label for="compiled-mask" class="col-sm-3 col-form-label">Calculated Mask</label>
                         <div class="col">
-                            <input type="text" class="form-control text-right" value="" placeholder="This will be either calculated or add manually add a mask" name="compiled-mask" id="compiled-mask">
+                            <input type="text" class="form-control text-right" name="compiled-mask" id="compiled-mask" value="{{ session.hashcat.mask }}" placeholder="This will be either calculated or add manually add a mask">
                             <div class="error mask-error"></div>
                         </div>
                     </div>
@@ -178,6 +178,7 @@
         CJ_SessionsSetup.init(supported_hashes, wordlists, '{{ session.hashcat.hashtype }}', '{{ session.hashcat.wordlist }}', '{{ session.hashcat.rule }}');
 
         CJ_HashcatMasks.init();
+        CJ_HashcatMasks.parseFromString($('#compiled-mask').val());
     });
 </script>
 {% endblock %}

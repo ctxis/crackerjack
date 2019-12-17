@@ -122,6 +122,7 @@ class SessionManager:
                     'wordlist_path': '' if not hashcat else hashcat.wordlist,
                     'rule': '' if not hashcat else os.path.basename(hashcat.rule),
                     'rule_path': '' if not hashcat else hashcat.rule,
+                    'mask': '' if not hashcat else hashcat.mask,
                     'data_raw': hashcat_data_raw,
                     'data': self.process_hashcat_raw_data(hashcat_data_raw)
                 }
