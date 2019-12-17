@@ -149,9 +149,9 @@
             <tr>
                 <td>{{ 'Wordlist' if session.hashcat.mode == 0 else 'Brute Force' }}</td>
                 <td><abbr title="{{ supported_hashes[session.hashcat.hashtype] }}">{{ session.hashcat.hashtype }}</abbr></td>
-                <td><abbr title="{{ session.hashcat.wordlist_path }}">{{ session.hashcat.wordlist }}</abbr></td>
-                <td><abbr title="{{ session.hashcat.rule_path }}">{{ session.hashcat.rule }}</abbr></td>
-                <td>{{ session.hashcat.mask }}</td>
+                <td><abbr title="{{ session.hashcat.wordlist_path }}">{{ session.hashcat.wordlist if session.hashcat.mode == 0 else '' }}</abbr></td>
+                <td><abbr title="{{ session.hashcat.rule_path }}">{{ session.hashcat.rule if session.hashcat.mode == 0 else '' }}</abbr></td>
+                <td>{{ session.hashcat.mask if session.hashcat.mode == 3 else '' }}</td>
             </tr>
             </tbody>
         </table>
