@@ -29,11 +29,18 @@ var CJ_HashcatMasks = {
 
     init: function() {
         // Clone the object - this is what we will use to add new position settings.
-        CJ_HashcatMasks.template = $('#mask-template').clone();
+        this.template = $('#mask-template').clone();
         // And remove it.
         $('#mask-template').remove();
-        CJ_HashcatMasks.bindMaxCharacters();
-        CJ_HashcatMasks.bindSettingActions();
+        this.bindMaxCharacters();
+        this.bindSettingActions();
+        this.bindCompiledMask();
+    },
+
+    bindCompiledMask: function() {
+        $('#compiled-mask').on('keyup', function() {
+            CJ_HashcatMasks.parseFromString($(this).val());
+        });
     },
 
     bindSettingActions: function() {
@@ -61,16 +68,28 @@ var CJ_HashcatMasks = {
             }
 
             if (!CJ_HashcatMasks.disableEvents) {
-                CJ_HashcatMasks.generatePositionElements(amount);
+                CJ_HashcatMasks.generatePositionElements(amount, false);
             }
         });
     },
 
-    generatePositionElements: function(amount) {
+    clearFields: function() {
+        allExistingPositions = this.getCurrentPositionElements();
+        for (var i = 1; i <= allExistingPositions; i++) {
+            var element = this.getPositionElement(i);
+            $(element).find('.mask-checkbox').prop('checked', false);
+            $(element).find('.mask-charset').val('');
+        }
+    },
+
+    generatePositionElements: function(amount, clearFields) {
         allExistingPositions = this.getCurrentPositionElements();
         if (allExistingPositions > amount) {
             for (var i = (amount + 1); i <= allExistingPositions; i++) {
                 this.removePositionElement(i);
+            }
+            if (clearFields) {
+                this.clearFields();
             }
             // No need to keep going as we won't be adding any new elements.
             return true;
@@ -101,6 +120,10 @@ var CJ_HashcatMasks = {
 
             // Add position element.
             $('#mask-placeholder').append(template);
+        }
+
+        if (clearFields) {
+            this.clearFields();
         }
     },
 
@@ -289,10 +312,7 @@ var CJ_HashcatMasks = {
     },
 
     updateUI: function(data) {
-        console.dir(data);
-        CJ_HashcatMasks.disableEvents = true;
-
-        this.generatePositionElements(data.positions);
+        this.generatePositionElements(data.positions, true);
         $('#mask-max-characters').val(data.positions);
 
         masks = data.mask.split('?');

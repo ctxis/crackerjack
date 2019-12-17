@@ -74,7 +74,7 @@ class HashcatManager:
 
         return valid
 
-    def build_command_line(self, session_name, mode, hashtype, hashfile, wordlist, rule, outputfile, potfile, force):
+    def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile, force):
         command = {
             self.hashcat_binary: '',
             '--session': session_name,
@@ -85,11 +85,20 @@ class HashcatManager:
             '--status': '',
             '--status-timer': 1,
             hashfile: '',
-            wordlist: ''
         }
 
-        if len(rule) > 0:
-            command['--rules-file'] = rule
+        if mode == 0:
+            # Wordlist.
+            command[wordlist] = ''
+
+            if len(rule) > 0:
+                command['--rules-file'] = rule
+        elif mode == 3:
+            # Bruteforce.
+            command[mask] = ''
+        else:
+            # Invalid or not implemented yet.
+            return {}
 
         if force:
             command['force'] = ''

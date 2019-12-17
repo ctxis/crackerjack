@@ -151,7 +151,7 @@
                 <td><abbr title="{{ supported_hashes[session.hashcat.hashtype] }}">{{ session.hashcat.hashtype }}</abbr></td>
                 <td><abbr title="{{ session.hashcat.wordlist_path }}">{{ session.hashcat.wordlist }}</abbr></td>
                 <td><abbr title="{{ session.hashcat.rule_path }}">{{ session.hashcat.rule }}</abbr></td>
-                <td>N/A</td>
+                <td>{{ session.hashcat.mask }}</td>
             </tr>
             </tbody>
         </table>

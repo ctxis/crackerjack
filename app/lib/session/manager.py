@@ -184,6 +184,7 @@ class SessionManager:
             command = self.hashcat.build_command_line(
                 session['name'],
                 session['hashcat']['mode'],
+                session['hashcat']['mask'],
                 session['hashcat']['hashtype'],
                 self.get_hashfile_path(session['user_id'], session_id),
                 session['hashcat']['wordlist_path'],
