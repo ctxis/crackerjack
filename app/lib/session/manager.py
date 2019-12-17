@@ -152,6 +152,8 @@ class SessionManager:
             record.wordlist = value
         elif name == 'rule':
             record.rule = value
+        elif name == 'mask':
+            record.mask = value
 
         db.session.commit()
 

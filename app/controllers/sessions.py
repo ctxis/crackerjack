@@ -132,6 +132,7 @@ def setup_hashcat_save(session_id):
     wordlist = request.form['wordlist'].strip()
     rule = request.form['rule'].strip()
     mode = int(request.form['mode'].strip())
+    mask = request.form['compiled-mask'].strip()
 
     if mode != 0 and mode != 3:
         # As all the conditions below depend on the mode, if it's wrong return to the previous page immediately.
@@ -153,8 +154,10 @@ def setup_hashcat_save(session_id):
             has_errors = True
             flash('Invalid rule selected', 'error')
     elif mode == 3:
-        # Bruteforce.
-        pass
+        # Mask.
+        if len(mask) == 0:
+            flash('No mask set', 'error')
+            has_errors = True
 
     if has_errors:
         return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
@@ -166,6 +169,7 @@ def setup_hashcat_save(session_id):
     sessions.set_hashcat_setting(session_id, 'hashtype', hash_type)
     sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
     sessions.set_hashcat_setting(session_id, 'rule', rule_location)
+    sessions.set_hashcat_setting(session_id, 'mask', mask)
 
     flash('All settings saved. You can now start the session.', 'success')
     return redirect(url_for('sessions.view', session_id=session_id))
