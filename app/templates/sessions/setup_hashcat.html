@@ -85,7 +85,81 @@
             <div class="card mt-2 box-mode-bruteforce">
                 <h5 class="card-header">Brute Force Options</h5>
                 <div class="card-body">
+                    <div class="form-group row">
+                        <label for="compiled-mask" class="col-sm-3 col-form-label">Calculated Mask</label>
+                        <div class="col">
+                            <input type="text" class="form-control text-right" value="" placeholder="This will be either calculated or add manually add a mask" name="compiled-mask" id="compiled-mask">
+                        </div>
+                    </div>
 
+                    <div class="form-group row">
+                        <label for="mask-max-characters" class="col-sm-3 col-form-label">Maximum Characters</label>
+                        <div class="col">
+                            <input type="number" min="0" step="1" class="form-control text-right" value="0" name="mask-max-characters" id="mask-max-characters">
+                        </div>
+                    </div>
+
+                    <div id="mask-placeholder"></div>
+
+                    <div id="mask-template" class="d-none mask-position">
+                        <div class="row">
+                            <div class="col-4">Position <span class="position-number"></span></div>
+                            <div class="col-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="lower" id="">
+                                    <label class="custom-control-label mask-label" data-mask="lower" for="">Lowercase</label>
+                                </div>
+
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="upper" id="">
+                                    <label class="custom-control-label mask-label" data-mask="upper" for="">Uppercase</label>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="digits" id="">
+                                    <label class="custom-control-label mask-label" data-mask="digits" for="">Digits</label>
+                                </div>
+
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="special" id="">
+                                    <label class="custom-control-label mask-label" data-mask="special" for="">Special</label>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="hexlower" id="">
+                                    <label class="custom-control-label mask-label" data-mask="hexlower" for="">Lower Hex</label>
+                                </div>
+
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="hexupper" id="">
+                                    <label class="custom-control-label mask-label" data-mask="hexupper" for="">Upper Hex</label>
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="binary" id="">
+                                    <label class="custom-control-label mask-label" data-mask="binary" for="">Binary</label>
+                                </div>
+
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="all" id="">
+                                    <label class="custom-control-label mask-label" data-mask="all" for="">All</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-4"></div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label class="col-form-label col-form-label-sm mask-label" data-mask="charset" for="">Custom Charset</label>
+                                    <input class="form-control form-control-sm mask-input mask-charset" data-mask="charset" type="text" id="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
@@ -94,12 +168,15 @@
 </div>
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.sessions.setup.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.hashcat.masks.js') }}"></script>
 
 <script type="text/javascript">
     $(document).ready(function() {
         var supported_hashes = {{ hashes_json|safe }};
         var wordlists = {{ wordlists_json|safe }};
         CJ_SessionsSetup.init(supported_hashes, wordlists, '{{ session.hashcat.hashtype }}', '{{ session.hashcat.wordlist }}', '{{ session.hashcat.rule }}');
+
+        CJ_HashcatMasks.init();
     });
 </script>
 {% endblock %}
