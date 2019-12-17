@@ -73,7 +73,17 @@
 
 <footer class="footer mt-auto pt-5 pb-3">
     <div class="container text-center">
-        <span class="text-default">Hashcat {{ setting_get('hashcat_version', '') }} | CrackerJack {{ setting_get('git_hash_version', '') }}</span>
+        {% set commit_count = setting_get('git_commit_count', 0)|int %}
+        <span class="text-default">
+            Hashcat
+            {{ setting_get('hashcat_version', '') }}
+            |
+            CrackerJack
+            {{ setting_get('git_hash_version', '') }}
+            {% if commit_count > 0 %}
+            | v{{ commit_count }}
+            {% endif %}
+        </span>
     </div>
 </footer>
 

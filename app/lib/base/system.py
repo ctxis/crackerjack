@@ -28,6 +28,11 @@ class SystemManager:
         if len(git_binary) == 0:
             return False
 
+        # Save latest commit short hash.
         version = self.shell.execute(['git', 'rev-parse', '--short', 'HEAD'])
         self.settings.save('git_hash_version', version)
+
+        # Save commit count on the master branch (like a version tracker).
+        count = int(self.shell.execute(['git', 'rev-list', '--count', 'master']))
+        self.settings.save('git_commit_count', count)
         return True
