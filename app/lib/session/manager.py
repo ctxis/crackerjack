@@ -182,7 +182,7 @@ class SessionManager:
 
         if action == 'start':
             command = self.hashcat.build_command_line(
-                session['name'],
+                session['screen_name'],
                 session['hashcat']['mode'],
                 session['hashcat']['mask'],
                 session['hashcat']['hashtype'],
