@@ -85,7 +85,25 @@ var CJ_HashcatMasks = {
     updateMasks: function() {
         masks = this.calculateMasks();
         compiled = this.compileMasks(masks);
+        // Check if all positions have been set.
+        if (!this.checkMasks(masks)) {
+            $('.mask-error').text('Not all positions have a mask assigned to them');
+        } else {
+            $('.mask-error').text('');
+        }
         $('#compiled-mask').val(compiled);
+    },
+
+    checkMasks: function(masks) {
+        var all = this.getCurrentPositionElements();
+        var actual = 0;
+        for (var i = 0; i < masks.length; i++) {
+            if (masks[i].mask.length > 0) {
+                actual++;
+            }
+        }
+
+        return (all == actual);
     },
 
     compileMasks: function(masks) {
