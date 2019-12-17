@@ -81,6 +81,36 @@
             <div class="card mt-2 box-mode-bruteforce">
                 <h5 class="card-header">Brute Force Options</h5>
                 <div class="card-body">
+                    <div class="form-group">
+                        <h4>Increments</h4>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="enable_increments">Enable Increments</label>
+                        <div class="custom-control custom-switch float-right">
+                            <input name="enable_increments" type="checkbox" class="custom-control-input" id="enable_increments" value="1" {{ 'checked' if session.hashcat.increment_min|int > 0 and session.hashcat.increment_max|int > 0 else '' }}>
+                            <label class="custom-control-label" for="enable_increments"></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="increment-min" class="col-sm-10 col-form-label">Start mask incrementing at</label>
+                        <div class="col">
+                            <input type="number" min="1" step="1" class="form-control text-right" name="increment-min" id="increment-min" value="{{ session.hashcat.increment_min }}" placeholder="1">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="increment-max" class="col-sm-10 col-form-label">Stop mask incrementing at</label>
+                        <div class="col">
+                            <input type="number" min="1" step="1" class="form-control text-right" name="increment-max" id="increment-max" value="{{ session.hashcat.increment_max }}" placeholder="10">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <h4>Mask</h4>
+                    </div>
+
                     <div class="form-group row">
                         <label for="compiled-mask" class="col-sm-3 col-form-label">Calculated Mask</label>
                         <div class="col">

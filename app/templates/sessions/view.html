@@ -143,6 +143,7 @@
                 <th>Wordlist</th>
                 <th>Rule</th>
                 <th>Mask</th>
+                <th>Increments</th>
             </tr>
             </thead>
             <tbody>
@@ -152,6 +153,11 @@
                 <td><abbr title="{{ session.hashcat.wordlist_path }}">{{ session.hashcat.wordlist if session.hashcat.mode == 0 else '' }}</abbr></td>
                 <td><abbr title="{{ session.hashcat.rule_path }}">{{ session.hashcat.rule if session.hashcat.mode == 0 else '' }}</abbr></td>
                 <td>{{ session.hashcat.mask if session.hashcat.mode == 3 else '' }}</td>
+                <td>
+                    {% if session.hashcat.increment_min|int > 0 or session.hashcat.increment_max|int > 0 %}
+                    {{ session.hashcat.increment_min }} - {{ session.hashcat.increment_max }}
+                    {% endif %}
+                </td>
             </tr>
             </tbody>
         </table>

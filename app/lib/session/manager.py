@@ -123,6 +123,8 @@ class SessionManager:
                     'rule': '' if not hashcat else os.path.basename(hashcat.rule),
                     'rule_path': '' if not hashcat else hashcat.rule,
                     'mask': '' if not hashcat else hashcat.mask,
+                    'increment_min': 0 if not hashcat else hashcat.increment_min,
+                    'increment_max': 0 if not hashcat else hashcat.increment_max,
                     'data_raw': hashcat_data_raw,
                     'data': self.process_hashcat_raw_data(hashcat_data_raw)
                 }
@@ -155,6 +157,10 @@ class SessionManager:
             record.rule = value
         elif name == 'mask':
             record.mask = value
+        elif name == 'increment_min':
+            record.increment_min = value
+        elif name == 'increment_max':
+            record.increment_max = value
 
         db.session.commit()
 
@@ -183,7 +189,7 @@ class SessionManager:
         if action == 'start':
             command = self.hashcat.build_command_line(
                 session['screen_name'],
-                session['hashcat']['mode'],
+                int(session['hashcat']['mode']),
                 session['hashcat']['mask'],
                 session['hashcat']['hashtype'],
                 self.get_hashfile_path(session['user_id'], session_id),
@@ -191,6 +197,8 @@ class SessionManager:
                 session['hashcat']['rule_path'],
                 self.get_crackedfile_path(session['user_id'], session_id),
                 self.get_potfile_path(session['user_id'], session_id),
+                int(session['hashcat']['increment_min']),
+                int(session['hashcat']['increment_max']),
                 False
             )
 

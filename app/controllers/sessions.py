@@ -133,6 +133,10 @@ def setup_hashcat_save(session_id):
     rule = request.form['rule'].strip()
     mode = int(request.form['mode'].strip())
     mask = request.form['compiled-mask'].strip()
+    enable_increments = int(request.form.get('enable_increments', 0))
+    if enable_increments == 1:
+        increment_min = int(request.form['increment-min'].strip())
+        increment_max = int(request.form['increment-max'].strip())
 
     if mode != 0 and mode != 3:
         # As all the conditions below depend on the mode, if it's wrong return to the previous page immediately.
@@ -159,6 +163,23 @@ def setup_hashcat_save(session_id):
             flash('No mask set', 'error')
             has_errors = True
 
+        if enable_increments == 1:
+            if increment_min <= 0:
+                has_errors = True
+                flash('Min Increment is invalid', 'error')
+
+            if increment_max <= 0:
+                has_errors = True
+                flash('Max Increment is invalid', 'error')
+
+            if increment_min > increment_max:
+                has_errors = True
+                flash('Min Increment cannot be bigger than Max Increment', 'error')
+
+        else:
+            increment_min = 0
+            increment_max = 0
+
     if has_errors:
         return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
 
@@ -170,6 +191,8 @@ def setup_hashcat_save(session_id):
     sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
     sessions.set_hashcat_setting(session_id, 'rule', rule_location)
     sessions.set_hashcat_setting(session_id, 'mask', mask)
+    sessions.set_hashcat_setting(session_id, 'increment_min', increment_min)
+    sessions.set_hashcat_setting(session_id, 'increment_max', increment_max)
 
     flash('All settings saved. You can now start the session.', 'success')
     return redirect(url_for('sessions.view', session_id=session_id))

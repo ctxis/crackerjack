@@ -142,6 +142,7 @@ var CJ_SessionsSetup = {
         this.bindUsedWordlists();
         this.bindModes();
         this.bindForm();
+        this.bindIncrements();
     },
 
     setModes: function() {
@@ -153,6 +154,13 @@ var CJ_SessionsSetup = {
             $('.box-mode-bruteforce').removeClass('d-none');
             $('.box-mode-wordlist').addClass('d-none');
         }
+    },
+
+    bindIncrements: function() {
+        $('#enable_increments').on('change', function() {
+            $('#increment-min').prop('disabled', !$(this).is(':checked'));
+            $('#increment-max').prop('disabled', !$(this).is(':checked'));
+        });
     },
 
     bindModes: function() {

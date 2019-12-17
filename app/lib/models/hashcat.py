@@ -11,6 +11,8 @@ class HashcatModel(db.Model):
     wordlist = db.Column(db.String, default='', index=True, nullable=True)
     rule = db.Column(db.String, default='', index=True, nullable=True)
     mask = db.Column(db.String, default='', index=True, nullable=True)
+    increment_min = db.Column(db.Integer, default=0, index=True, nullable=True)
+    increment_max = db.Column(db.Integer, default=0, index=True, nullable=True)
     created_at = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now())
 
 

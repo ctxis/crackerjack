@@ -74,7 +74,7 @@ class HashcatManager:
 
         return valid
 
-    def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile, force):
+    def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile, increment_min, increment_max, force):
         command = {
             self.hashcat_binary: '',
             '--session': session_name,
@@ -96,6 +96,15 @@ class HashcatManager:
         elif mode == 3:
             # Bruteforce.
             command[mask] = ''
+
+            if increment_min > 0 or increment_max > 0:
+                command['--increment'] = ''
+
+            if increment_min > 0:
+                command['--increment-min'] = increment_min
+
+            if increment_max > 0:
+                command['--increment-max'] = increment_max
         else:
             # Invalid or not implemented yet.
             return {}
