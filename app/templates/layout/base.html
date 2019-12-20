@@ -32,15 +32,22 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('home.index') }}">Home</a>
             </li>
-            {% if current_user.admin %}
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('admin.settings') }}">Admin Settings</a>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="menu-settings" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Settings
+                </a>
+                <div class="dropdown-menu" aria-labelledby="menu-settings">
+                    {% if current_user.admin %}
+                    <a class="dropdown-item" href="{{ url_for('admin.settings_hashcat') }}">Hashcat</a>
+                    <a class="dropdown-item" href="{{ url_for('admin.settings_auth') }}">Authentication</a>
+                    <a class="dropdown-item" href="#">Users</a>
+                    {% endif %}
+                </div>
             </li>
-            {% endif %}
 
             {% if current_user.is_authenticated %}
             <li>
-                <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout [ {{ current_user.first_name }} ]</a>
             </li>
             {% else %}
             <li>

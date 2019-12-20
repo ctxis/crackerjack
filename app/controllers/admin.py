@@ -8,9 +8,9 @@ from app.lib.base.provider import Provider
 bp = Blueprint('admin', __name__)
 
 
-@bp.route('/settings', methods=['GET'])
+@bp.route('/settings/hashcat', methods=['GET'])
 @login_required
-def settings():
+def settings_hashcat():
     if not current_user.admin:
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
@@ -19,9 +19,8 @@ def settings():
     settings = provider.settings()
 
     return render_template(
-        'admin/settings.html',
+        'admin/settings/hashcat.html',
         settings={
-            'allow_logins': settings.get('allow_logins', 0),
             'hashcat_binary': settings.get('hashcat_binary', ''),
             'wordlists_path': settings.get('wordlists_path', ''),
             'hashcat_rules_path': settings.get('hashcat_rules_path', '')
@@ -29,9 +28,9 @@ def settings():
     )
 
 
-@bp.route('/settings/save', methods=['POST'])
+@bp.route('/settings/hashcat/save', methods=['POST'])
 @login_required
-def settings_save():
+def settings_hashcat_save():
     if not current_user.admin:
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
@@ -42,7 +41,6 @@ def settings_save():
     hashcat_binary = request.form['hashcat_binary'].strip()
     wordlists_path = request.form['wordlists_path'].strip()
     hashcat_rules_path = request.form['hashcat_rules_path'].strip()
-    allow_logins = request.form.get('allow_logins', 0)
 
     has_errors = False
     if len(hashcat_binary) == 0 or not os.path.isfile(hashcat_binary):
@@ -67,11 +65,50 @@ def settings_save():
         flash('Hashcat rules directory is not readable', 'error')
 
     if has_errors:
-        return redirect(url_for('admin.settings'))
+        return redirect(url_for('admin.settings_hashcat'))
 
     settings.save('hashcat_binary', hashcat_binary)
     settings.save('wordlists_path', wordlists_path)
     settings.save('hashcat_rules_path', hashcat_rules_path)
+
+    # When settings are saved, run system updates.
+    system = provider.system()
+    system.run_updates()
+
+    flash('Settings saved', 'success')
+    return redirect(url_for('admin.settings_hashcat'))
+
+
+@bp.route('/settings/auth', methods=['GET'])
+@login_required
+def settings_auth():
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    provider = Provider()
+    settings = provider.settings()
+
+    return render_template(
+        'admin/settings/auth.html',
+        settings={
+            'allow_logins': settings.get('allow_logins', 0)
+        }
+    )
+
+
+@bp.route('/settings/auth/save', methods=['POST'])
+@login_required
+def settings_auth_save():
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    provider = Provider()
+    settings = provider.settings()
+
+    allow_logins = request.form.get('allow_logins', 0)
+
     settings.save('allow_logins', allow_logins)
 
     # When settings are saved, run system updates.
@@ -79,4 +116,4 @@ def settings_save():
     system.run_updates()
 
     flash('Settings saved', 'success')
-    return redirect(url_for('admin.settings'))
+    return redirect(url_for('admin.settings_auth'))
