@@ -90,10 +90,7 @@ def settings_auth():
     settings = provider.settings()
 
     return render_template(
-        'admin/settings/auth.html',
-        settings={
-            'allow_logins': settings.get('allow_logins', 0)
-        }
+        'admin/settings/auth.html'
     )
 
 
@@ -109,7 +106,41 @@ def settings_auth_save():
 
     allow_logins = request.form.get('allow_logins', 0)
 
+    ldap_enabled = int(request.form.get('ldap_enabled', 0))
+
+    # Put the rest of the ldap options in a dict to make it easier to validate and save.
+    ldap_settings = {
+        'ldap_host': {'value': request.form['ldap_host'].strip(), 'error': 'LDAP Host cannot be empty'},
+        'ldap_base_dn': {'value': request.form['ldap_base_dn'].strip(), 'error': 'LDAP Base cannot be empty'},
+        'ldap_domain': {'value': request.form['ldap_domain'].strip(), 'error': 'LDAP Domain cannot be empty'},
+        'ldap_bind_user': {'value': request.form['ldap_bind_user'].strip(), 'error': 'LDAP Bind User cannot be empty'},
+        'ldap_bind_pass': {'value': request.form['ldap_bind_pass'].strip(),
+                           'error': 'LDAP Bind Password cannot be empty'},
+        'ldap_mapping_username': {'value': request.form['ldap_mapping_username'].strip(),
+                                  'error': 'LDAP Mapping Username cannot be empty'},
+        'ldap_mapping_firstname': {'value': request.form['ldap_mapping_firstname'].strip(),
+                                   'error': 'LDAP Mapping First Name cannot be empty'},
+        'ldap_mapping_lastname': {'value': request.form['ldap_mapping_lastname'].strip(),
+                                  'error': 'LDAP Mapping Last Name cannot be empty'},
+        'ldap_mapping_email': {'value': request.form['ldap_mapping_email'].strip(),
+                               'error': 'LDAP Mapping E-mail cannot be empty'}
+    }
+
+    has_errors = False
+    if ldap_enabled == 1:
+        # If it's disabled it doesn't make sense to validate any settings.
+        for key, data in ldap_settings.items():
+            if len(data['value']) == 0:
+                has_errors = True
+                flash(data['error'], 'error')
+
+    if has_errors:
+        return redirect(url_for('admin.settings_auth'))
+
     settings.save('allow_logins', allow_logins)
+    settings.save('ldap_enabled', ldap_enabled)
+    for key, data in ldap_settings.items():
+        settings.save(key, data['value'])
 
     # When settings are saved, run system updates.
     system = provider.system()
