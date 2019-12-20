@@ -5,7 +5,6 @@ import flask_bcrypt as bcrypt
 from app.lib.models.user import UserModel
 from sqlalchemy import and_
 from app.lib.base.provider import Provider
-import pprint
 
 
 bp = Blueprint('auth', __name__)
