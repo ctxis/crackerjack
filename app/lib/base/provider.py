@@ -8,6 +8,7 @@ from app.lib.base.wordlists import WordlistManager
 from app.lib.base.system import SystemManager
 from app.lib.base.filesystem import FileSystemManager
 from app.lib.base.rules import RulesManager
+from app.lib.base.ldap import LDAPManager
 
 
 class Provider:
@@ -54,3 +55,20 @@ class Provider:
     def rules(self):
         settings = self.settings()
         return RulesManager(self.filesystem(), settings.get('hashcat_rules_path', ''))
+
+    def ldap(self):
+        settings = self.settings()
+        manager = LDAPManager()
+
+        manager.enabled = settings.get('ldap_enabled', 0)
+        manager.host = settings.get('ldap_host', '')
+        manager.base_dn = settings.get('ldap_base_dn', '')
+        manager.domain = settings.get('ldap_domain', '')
+        manager.bind_user = settings.get('ldap_bind_user', '')
+        manager.bind_pass = settings.get('ldap_bind_pass', '')
+        manager.mapping_username = settings.get('ldap_mapping_username', '')
+        manager.mapping_firstname = settings.get('ldap_mapping_firstname', '')
+        manager.mapping_lastname = settings.get('ldap_mapping_lastname', '')
+        manager.mapping_email = settings.get('ldap_mapping_email', '')
+
+        return manager
