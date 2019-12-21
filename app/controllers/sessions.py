@@ -137,6 +137,9 @@ def setup_hashcat_save(session_id):
     if enable_increments == 1:
         increment_min = int(request.form['increment-min'].strip())
         increment_max = int(request.form['increment-max'].strip())
+    else:
+        increment_min = 0
+        increment_max = 0
 
     if mode != 0 and mode != 3:
         # As all the conditions below depend on the mode, if it's wrong return to the previous page immediately.
