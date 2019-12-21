@@ -37,7 +37,52 @@ def password(user_id):
         flash('Access denied', 'error')
         return redirect(url_for('home.index'))
 
-    return 'password'
+    provider = Provider()
+    users = provider.users()
+    user = users.get_by_id(current_user.id)
+
+    return render_template(
+        'account/password.html',
+        user=user
+    )
+
+
+@bp.route('/<int:user_id>/password/save', methods=['POST'])
+@login_required
+def password_save(user_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    elif current_user.id != user_id:
+        flash('Access denied', 'error')
+        return redirect(url_for('home.index'))
+
+    provider = Provider()
+    users = provider.users()
+
+    existing_password = request.form['existing_password'].strip()
+    new_password = request.form['new_password'].strip()
+    confirm_password = request.form['confirm_password'].strip()
+
+    if len(existing_password) == 0:
+        flash('Please enter your existing password', 'error')
+        return redirect(url_for('account.password', user_id=user_id))
+    elif len(new_password) == 0:
+        flash('Please enter your new password', 'error')
+        return redirect(url_for('account.password', user_id=user_id))
+    elif len(confirm_password) == 0:
+        flash('Please confirm your new password', 'error')
+        return redirect(url_for('account.password', user_id=user_id))
+    elif new_password != confirm_password:
+        flash('Passwords do not match', 'error')
+        return redirect(url_for('account.password', user_id=user_id))
+    elif not users.validate_user_password(user_id, existing_password):
+        flash('Existing password is invalid', 'error')
+        return redirect(url_for('account.password', user_id=user_id))
+
+    users.update_password(user_id, new_password)
+
+    flash('Password updated', 'success')
+    return redirect(url_for('account.password', user_id=user_id))
 
 
 @bp.route('/<int:user_id>/theme', methods=['GET'])

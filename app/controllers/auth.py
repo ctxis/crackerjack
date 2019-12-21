@@ -1,7 +1,6 @@
 from flask import Blueprint
 from flask_login import login_user, logout_user, current_user
 from flask import render_template, redirect, url_for, flash, request
-import flask_bcrypt as bcrypt
 from app.lib.models.user import UserModel
 from sqlalchemy import and_
 from app.lib.base.provider import Provider
@@ -25,6 +24,7 @@ def login_process():
 
     provider = Provider()
     ldap = provider.ldap()
+    users = provider.users()
 
     username = request.form['username']
     password = request.form['password']
@@ -32,7 +32,7 @@ def login_process():
     # First check if user is local. Local users take priority.
     user = UserModel.query.filter(and_(UserModel.username == username, UserModel.ldap == 0)).first()
     if user:
-        if not bcrypt.check_password_hash(user.password, password):
+        if not users.validate_password(user.password, password):
             flash('Invalid credentials', 'error')
             return redirect(url_for('auth.login'))
     elif ldap.is_enabled():

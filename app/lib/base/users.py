@@ -1,6 +1,7 @@
 from app.lib.models.user import UserModel
 from app import db
-import bcrypt
+#import bcrypt
+import flask_bcrypt as bcrypt
 
 
 class UserManager:
@@ -42,7 +43,7 @@ class UserManager:
         if ldap == 0:
             if password != '':
                 # If the password is empty, it means it wasn't changed.
-                password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+                password = bcrypt.generate_password_hash(password)
         else:
             # This is an LDAP user, no point in setting their password.
             password = ''
@@ -72,4 +73,26 @@ class UserManager:
     def get_by_id(self, user_id):
         return UserModel.query.filter(UserModel.id == user_id).first()
 
+    def update_password(self, user_id, password):
+        user = self.get_by_id(user_id)
+        if user is None:
+            self.__error('Invalid User ID')
+            return False
 
+        password = bcrypt.generate_password_hash(password)
+        user.password = password
+
+        db.session.commit()
+        db.session.refresh(user)
+
+        return True
+
+    def validate_password(self, hash, password):
+        return bcrypt.check_password_hash(hash, password)
+
+    def validate_user_password(self, user_id, password):
+        user = self.get_by_id(user_id)
+        if not user:
+            return False
+
+        return bcrypt.check_password_hash(user.password, password)
