@@ -1,4 +1,4 @@
-import os, datetime, pprint
+import os, datetime
 from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -43,6 +43,9 @@ def create_app(config_class=None):
     from app.controllers.sessions import bp as sessions_bp
     app.register_blueprint(sessions_bp, url_prefix='/sessions')
 
+    from app.controllers.account import bp as account_bp
+    app.register_blueprint(account_bp, url_prefix='/account')
+
     from app.lib.base.provider import Provider
 
     # This is to be able to access settings from any template (shared variables).
@@ -51,7 +54,11 @@ def create_app(config_class=None):
         def setting_get(name, default=None):
             provider = Provider()
             return provider.settings().get(name, default)
-        return dict(setting_get=setting_get)
+
+        def user_setting_get(user_id, name, default=None):
+            provider = Provider()
+            return provider.user_settings().get(user_id, name, default)
+        return dict(setting_get=setting_get, user_setting_get=user_setting_get)
 
     @app.before_request
     def before_request():

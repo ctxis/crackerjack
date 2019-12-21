@@ -16,7 +16,7 @@ class UserManager:
     def save(self, user_id, username, password, first_name, last_name, email, admin, ldap):
         if user_id > 0:
             # This is a user-edit.
-            user = self.__get_by_id(user_id)
+            user = self.get_by_id(user_id)
             if user is None:
                 self.__error('Invalid User ID')
                 return False
@@ -34,7 +34,7 @@ class UserManager:
 
         # If there was a username update, check to see if the new username already exists.
         if username != user.username:
-            u = self.__get_by_username(username)
+            u = self.get_by_username(username)
             if u:
                 self.__error('Username already exists')
                 return False
@@ -66,8 +66,10 @@ class UserManager:
 
         return True
 
-    def __get_by_username(self, username):
+    def get_by_username(self, username):
         return UserModel.query.filter(UserModel.username == username).first()
 
-    def __get_by_id(self, user_id):
+    def get_by_id(self, user_id):
         return UserModel.query.filter(UserModel.id == user_id).first()
+
+

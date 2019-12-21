@@ -1,0 +1,29 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-3"></div>
+    <div class="col">
+        <h3 class="card-header">Theme Settings</h3>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('account.theme_save', user_id=user.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-group">
+                    <label for="theme">Theme</label>
+                    <select name="theme" id="theme" class="form-control">
+                        <option value=""></option>
+                        {% for name, theme in themes.items() %}
+                        {% set t = name|replace('.css', '') %}
+                        <option value="{{ t }}" {{ 'selected' if selected_theme == t else '' }}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">save</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-3"></div>
+</div>
+{% endblock %}

@@ -18,7 +18,7 @@ class UserSettings(db.Model):
     __tablename__ = 'user_settings'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, default=0, index=True)
-    name = db.Column(db.String, default='')
+    name = db.Column(db.String, default='', nullable=True)
     value = db.Column(db.Text, nullable=True)
 
     __table_args__ = (db.UniqueConstraint('user_id', 'name', name='index_user_settings_user_id_name'),)
