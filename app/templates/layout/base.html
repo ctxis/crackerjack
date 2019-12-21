@@ -32,6 +32,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('home.index') }}">Home</a>
             </li>
+            {% if current_user.is_authenticated %}
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="menu-settings" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Settings
@@ -44,6 +45,7 @@
                     {% endif %}
                 </div>
             </li>
+            {% endif %}
 
             {% if current_user.is_authenticated %}
             <li>
