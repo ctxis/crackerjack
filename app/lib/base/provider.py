@@ -9,6 +9,7 @@ from app.lib.base.system import SystemManager
 from app.lib.base.filesystem import FileSystemManager
 from app.lib.base.rules import RulesManager
 from app.lib.base.ldap import LDAPManager
+from app.lib.base.users import UserManager
 
 
 class Provider:
@@ -72,3 +73,6 @@ class Provider:
         manager.mapping_email = settings.get('ldap_mapping_email', '')
 
         return manager
+
+    def users(self):
+        return UserManager()
