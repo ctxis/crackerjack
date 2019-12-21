@@ -11,7 +11,7 @@
 
                 <div class="form-group">
                     <label for="theme">Theme</label>
-                    <select name="theme" id="theme" class="form-control">
+                    <select name="theme" id="theme" class="form-control custom-select">
                         <option value=""></option>
                         {% for name, theme in themes.items() %}
                         {% set t = name|replace('.css', '') %}
