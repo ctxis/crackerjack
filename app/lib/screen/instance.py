@@ -1,4 +1,5 @@
-import time, shlex
+import time
+import shlex
 
 
 class ScreenInstance:

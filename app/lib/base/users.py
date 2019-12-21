@@ -1,6 +1,5 @@
 from app.lib.models.user import UserModel
 from app import db
-#import bcrypt
 import flask_bcrypt as bcrypt
 
 

@@ -1,7 +1,7 @@
 from flask_login import current_user, login_required
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from app.lib.base.provider import Provider
-import json, pprint
+import json
 
 
 bp = Blueprint('sessions', __name__)

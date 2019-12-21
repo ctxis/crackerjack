@@ -1,4 +1,7 @@
-import re, random, string, os, pprint
+import re
+import random
+import string
+import os
 from app.lib.models.sessions import SessionModel
 from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
 from app import db

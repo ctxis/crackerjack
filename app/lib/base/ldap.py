@@ -1,6 +1,5 @@
 import ldap3
 from sqlalchemy import and_
-
 from app.lib.models.user import UserModel
 from app import db
 

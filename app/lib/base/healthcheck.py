@@ -1,4 +1,4 @@
-import os, pprint
+import os
 
 
 class HealthCheck:
