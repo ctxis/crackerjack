@@ -41,7 +41,7 @@
                     {% if current_user.admin %}
                     <a class="dropdown-item" href="{{ url_for('admin.settings_hashcat') }}">Hashcat</a>
                     <a class="dropdown-item" href="{{ url_for('admin.settings_auth') }}">Authentication</a>
-                    <a class="dropdown-item" href="#">Users</a>
+                    <a class="dropdown-item" href="{{ url_for('admin.users') }}">Users</a>
                     {% endif %}
                 </div>
             </li>

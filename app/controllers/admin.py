@@ -3,6 +3,7 @@ from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, flash, request
 import os
 from app.lib.base.provider import Provider
+from app.lib.models.user import UserModel
 
 
 bp = Blueprint('admin', __name__)
@@ -87,7 +88,6 @@ def settings_auth():
         return redirect(url_for('home.index'))
 
     provider = Provider()
-    settings = provider.settings()
 
     return render_template(
         'admin/settings/auth.html'
@@ -148,3 +148,20 @@ def settings_auth_save():
 
     flash('Settings saved', 'success')
     return redirect(url_for('admin.settings_auth'))
+
+
+@bp.route('/users', methods=['GET'])
+@login_required
+def users():
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    # users = UserModel.query.filter(and_(UserModel.username == username, UserModel.ldap == 0)).first()
+    # sessions = SessionModel.query.filter(conditions).order_by(desc(SessionModel.id)).all()
+    users = UserModel.query.filter().order_by(UserModel.id).all()
+
+    return render_template(
+        'admin/users/index.html',
+        users=users
+    )
