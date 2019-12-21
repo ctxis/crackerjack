@@ -96,3 +96,6 @@ class UserManager:
             return False
 
         return bcrypt.check_password_hash(user.password, password)
+
+    def get_user_count(self):
+        return db.session.query(UserModel).count()

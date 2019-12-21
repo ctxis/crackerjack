@@ -46,6 +46,9 @@ def create_app(config_class=None):
     from app.controllers.account import bp as account_bp
     app.register_blueprint(account_bp, url_prefix='/account')
 
+    from app.controllers.install import bp as install_bp
+    app.register_blueprint(install_bp, url_prefix='/install')
+
     from app.lib.base.provider import Provider
 
     # This is to be able to access settings from any template (shared variables).

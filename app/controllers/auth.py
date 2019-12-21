@@ -25,9 +25,12 @@ def login_process():
     provider = Provider()
     ldap = provider.ldap()
     users = provider.users()
+    settings = provider.settings()
 
     username = request.form['username']
     password = request.form['password']
+
+    allow_logins = int(settings.get('allow_logins', 0))
 
     # First check if user is local. Local users take priority.
     user = UserModel.query.filter(and_(UserModel.username == username, UserModel.ldap == 0)).first()
@@ -35,7 +38,7 @@ def login_process():
         if not users.validate_password(user.password, password):
             flash('Invalid credentials', 'error')
             return redirect(url_for('auth.login'))
-    elif ldap.is_enabled():
+    elif ldap.is_enabled() and allow_logins == 1:
         if not ldap.authenticate(username, password, True):
             flash('Invalid credentials', 'error')
             return redirect(url_for('auth.login'))

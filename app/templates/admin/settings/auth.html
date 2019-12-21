@@ -44,7 +44,7 @@
                                 <div class="row">
                                     <div class="col-4"><label for="ldap_host">Host</label></div>
                                     <div class="col">
-                                        <input name="ldap_host" type="text" id="ldap_host" class="form-control" value="{{ setting_get('ldap_host') }}" placeholder="">
+                                        <input name="ldap_host" type="text" id="ldap_host" class="form-control" value="{{ setting_get('ldap_host', '') }}" placeholder="">
                                     </div>
                                 </div>
                             </div>
@@ -53,7 +53,7 @@
                                 <div class="row">
                                     <div class="col-4"><label for="ldap_base_dn">Base DN</label></div>
                                     <div class="col">
-                                        <input name="ldap_base_dn" type="text" id="ldap_base_dn" class="form-control" value="{{ setting_get('ldap_base_dn') }}" placeholder="dc=example,dc=com">
+                                        <input name="ldap_base_dn" type="text" id="ldap_base_dn" class="form-control" value="{{ setting_get('ldap_base_dn', '') }}" placeholder="dc=example,dc=com">
                                     </div>
                                 </div>
                             </div>
@@ -62,7 +62,7 @@
                                 <div class="row">
                                     <div class="col-4"><label for="ldap_domain">Domain</label></div>
                                     <div class="col">
-                                        <input name="ldap_domain" type="text" id="ldap_domain" class="form-control" value="{{ setting_get('ldap_domain') }}" placeholder="EXAMPLE">
+                                        <input name="ldap_domain" type="text" id="ldap_domain" class="form-control" value="{{ setting_get('ldap_domain', '') }}" placeholder="EXAMPLE">
                                     </div>
                                 </div>
                             </div>
@@ -71,7 +71,7 @@
                                 <div class="row">
                                     <div class="col-4"><label for="ldap_bind_user">Bind Username</label></div>
                                     <div class="col">
-                                        <input name="ldap_bind_user" type="text" id="ldap_bind_user" class="form-control" value="{{ setting_get('ldap_bind_user') }}" placeholder="readonlyuser">
+                                        <input name="ldap_bind_user" type="text" id="ldap_bind_user" class="form-control" value="{{ setting_get('ldap_bind_user', '') }}" placeholder="readonlyuser">
                                     </div>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@
                                 <div class="row">
                                     <div class="col-4"><label for="ldap_bind_pass">Bind Password</label></div>
                                     <div class="col">
-                                        <input name="ldap_bind_pass" type="password" id="ldap_bind_pass" class="form-control" value="{{ setting_get('ldap_bind_pass') }}" placeholder="readonlypass">
+                                        <input name="ldap_bind_pass" type="password" id="ldap_bind_pass" class="form-control" value="{{ setting_get('ldap_bind_pass', '') }}" placeholder="readonlypass">
                                     </div>
                                 </div>
                             </div>
@@ -91,7 +91,7 @@
                                 <div class="row">
                                     <div class="col-4"><label for="ldap_mapping_username">Username</label></div>
                                     <div class="col">
-                                        <input name="ldap_mapping_username" type="text" id="ldap_mapping_username" class="form-control" value="{{ setting_get('ldap_mapping_username') }}" placeholder="sAMAccountName">
+                                        <input name="ldap_mapping_username" type="text" id="ldap_mapping_username" class="form-control" value="{{ setting_get('ldap_mapping_username', '') }}" placeholder="sAMAccountName">
                                     </div>
                                 </div>
                             </div>
@@ -100,7 +100,7 @@
                                 <div class="row">
                                     <div class="col-4"><label for="ldap_mapping_firstname">First Name</label></div>
                                     <div class="col">
-                                        <input name="ldap_mapping_firstname" type="text" id="ldap_mapping_firstname" class="form-control" value="{{ setting_get('ldap_mapping_firstname') }}" placeholder="givenName">
+                                        <input name="ldap_mapping_firstname" type="text" id="ldap_mapping_firstname" class="form-control" value="{{ setting_get('ldap_mapping_firstname', '') }}" placeholder="givenName">
                                     </div>
                                 </div>
                             </div>
@@ -109,7 +109,7 @@
                                 <div class="row">
                                     <div class="col-4"><label for="ldap_mapping_lastname">Last Name</label></div>
                                     <div class="col">
-                                        <input name="ldap_mapping_lastname" type="text" id="ldap_mapping_lastname" class="form-control" value="{{ setting_get('ldap_mapping_lastname') }}" placeholder="sn">
+                                        <input name="ldap_mapping_lastname" type="text" id="ldap_mapping_lastname" class="form-control" value="{{ setting_get('ldap_mapping_lastname', '') }}" placeholder="sn">
                                     </div>
                                 </div>
                             </div>
@@ -118,7 +118,7 @@
                                 <div class="row">
                                     <div class="col-4"><label for="ldap_mapping_email">E-mail</label></div>
                                     <div class="col">
-                                        <input name="ldap_mapping_email" type="text" id="ldap_mapping_email" class="form-control" value="{{ setting_get('ldap_mapping_email') }}" placeholder="mail">
+                                        <input name="ldap_mapping_email" type="text" id="ldap_mapping_email" class="form-control" value="{{ setting_get('ldap_mapping_email', '') }}" placeholder="mail">
                                     </div>
                                 </div>
                             </div>
