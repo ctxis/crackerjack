@@ -31,17 +31,18 @@ def login_process():
 
     # First check if user is local. Local users take priority.
     user = UserModel.query.filter(and_(UserModel.username == username, UserModel.ldap == 0)).first()
-    if user is None or not bcrypt.check_password_hash(user.password, password):
-        # Next, we check LDAP.
-        if ldap.is_enabled():
-            if ldap.authenticate(username, password):
-                user = ldap.load_user(username)
-            else:
-                flash('Invalid credentials', 'error')
-                return redirect(url_for('auth.login'))
-        else:
+    if user:
+        if not bcrypt.check_password_hash(user.password, password):
             flash('Invalid credentials', 'error')
             return redirect(url_for('auth.login'))
+    elif ldap.is_enabled():
+        if not ldap.authenticate(username, password, True):
+            flash('Invalid credentials', 'error')
+            return redirect(url_for('auth.login'))
+        user = UserModel.query.filter(and_(UserModel.username == username, UserModel.ldap == 1)).first()
+    else:
+        flash('Invalid credentials', 'error')
+        return redirect(url_for('auth.login'))
 
     login_user(user)
 

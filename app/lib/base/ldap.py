@@ -101,13 +101,16 @@ class LDAPManager:
     def is_enabled(self):
         return self._enabled > 0
 
-    def authenticate(self, username, password):
+    def authenticate(self, username, password, auto_create_user=False):
         server = ldap3.Server(self._host, get_info=ldap3.ALL)
         user = self._domain + "\\" + username
         conn = ldap3.Connection(server, user=user, password=password, authentication=ldap3.NTLM)
         result = conn.bind()
         if result:
             conn.unbind()
+
+        if auto_create_user:
+            self.load_user(username)
 
         return result
 
