@@ -8,10 +8,12 @@ class HealthCheck:
         settings = provider.settings()
         screens = provider.screens()
         sessions = provider.sessions()
+        shell = provider.shell()
 
         self.check_settings(settings, errors)
         self.check_screens(screens, errors)
         self.check_datapath(sessions, errors)
+        self.check_screen_software(shell, errors)
 
         return errors
 
@@ -48,3 +50,14 @@ class HealthCheck:
             errors.append(datapath + ' does not exist')
         elif not os.access(datapath, os.W_OK):
             errors.append(datapath + ' is not writable')
+
+    def check_screen_software(self, shell, errors):
+        screen_binary = shell.execute(['which', 'screen'])
+        if len(screen_binary) == 0:
+            errors.append('screen binary does not exist')
+            # No need to keep checking.
+            return False
+
+        output = shell.execute(['screen', '--help'])
+        if "-Logfile" not in output:
+            errors.append('The *screen* application seems to be out of date. In order for CrackerJack to work it will need to be v4.06 or higher, as those versions introduced the -Logfile parameter which is required.')
