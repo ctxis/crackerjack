@@ -28,4 +28,10 @@ def index():
         for error in errors:
             flash(error, 'error')
 
-    return render_template('home/index.html')
+    sessions = provider.sessions()
+    all_sessions = sessions.get(current_user.id)
+
+    return render_template(
+        'home/index.html',
+        sessions=all_sessions
+    )

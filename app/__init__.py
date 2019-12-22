@@ -61,7 +61,12 @@ def create_app(config_class=None):
         def user_setting_get(user_id, name, default=None):
             provider = Provider()
             return provider.user_settings().get(user_id, name, default)
-        return dict(setting_get=setting_get, user_setting_get=user_setting_get)
+
+        def template():
+            provider = Provider()
+            return provider.template()
+
+        return dict(setting_get=setting_get, user_setting_get=user_setting_get, template=template)
 
     @app.before_request
     def before_request():

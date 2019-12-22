@@ -42,25 +42,7 @@
             </thead>
             <tbody>
             <tr>
-                {% set status_class = '' %}
-                {% set status_text = 'Unknown' %}
-                {% if session.hashcat.data.process_state == 0 %}
-                    {% set status_class = 'table-info' %}
-                    {% set status_text = 'Not Started' %}
-                {% elif session.hashcat.data.process_state == 1 %}
-                    {% set status_class = 'table-success' %}
-                    {% set status_text = 'Running' %}
-                {% elif session.hashcat.data.process_state == 2 %}
-                    {% set status_class = 'table-danger' %}
-                    {% set status_text = 'Stopped' %}
-                {% elif session.hashcat.data.process_state == 3 %}
-                    {% set status_class = '' %}
-                    {% set status_text = 'Finished' %}
-                {% elif session.hashcat.data.process_state == 4 %}
-                    {% set status_class = 'table-warning' %}
-                    {% set status_text = 'Paused' %}
-                {% endif %}
-                <th scope="row" class="{{ status_class }}">{{ status_text }}</th>
+                <th scope="row" class="table-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</th>
                 <td class="text-right">
                     <a href="#" title="Click to view raw output" class="raw-progress">{{ session.hashcat.data.progress }}%</a>
                 </td>

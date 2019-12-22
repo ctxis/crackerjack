@@ -11,6 +11,7 @@ from app.lib.base.rules import RulesManager
 from app.lib.base.ldap import LDAPManager
 from app.lib.base.users import UserManager
 from app.lib.base.user_settings import UserSettingsManager
+from app.lib.base.template import TemplateManager
 
 
 class Provider:
@@ -80,3 +81,6 @@ class Provider:
 
     def user_settings(self):
         return UserSettingsManager()
+
+    def template(self):
+        return TemplateManager()

@@ -2,18 +2,18 @@
 
 {% block content %}
 <div class="row mt-5">
-    <div class="col-3"></div>
-    <div class="col-6">
+    <div class="col-1"></div>
+    <div class="col">
         <form method="post" action="{{ url_for('sessions.create') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <div class="row">
-                <div class="col-8">
+                <div class="col-9">
                     <div class="form-group">
                         <input type="text" name="name" id="name" class="form-control" placeholder="This will be auto-generated if left empty">
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="col-3">
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block">Create Session</button>
                     </div>
@@ -21,6 +21,49 @@
             </div>
         </form>
     </div>
-    <div class="col-3"></div>
+    <div class="col-1"></div>
+</div>
+
+<div class="row">
+    <div class="col-1"></div>
+    <div class="col">
+        <div class="card">
+            <h3 class="card-header">Sessions</h3>
+            <div class="card-body">
+                <table class="table table-sm table-striped">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Name</th>
+                        <th>State</th>
+                        <th class="text-right">Progress</th>
+                        <th class="text-right">Cracked</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for session in sessions %}
+                    <tr>
+                        <td>{{ session.id }}</td>
+                        <td>{{ session.user.record.username }}</td>
+                        <td><a href="{{ url_for('sessions.view', session_id=session.id) }}">{{ session.name }}</a></td>
+                        <td class="table-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</td>
+                        <td class="text-right">{{ session.hashcat.data.progress }}%</td>
+                        <td class="text-right">
+                            <span>{{ session.hashcat.data.cracked_passwords }}/{{ session.hashcat.data.all_passwords }}</span>
+                            {% if session.hashcat.data.cracked_passwords > 0 %}
+                            <span>
+                                <a href="{{ url_for('sessions.download_cracked', session_id=session.id) }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-1"></div>
 </div>
 {% endblock %}

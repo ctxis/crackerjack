@@ -3,6 +3,7 @@ import random
 import string
 import os
 from app.lib.models.sessions import SessionModel
+from app.lib.models.user import UserModel
 from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
 from app import db
 from pathlib import Path
@@ -130,6 +131,9 @@ class SessionManager:
                     'increment_max': 0 if not hashcat else hashcat.increment_max,
                     'data_raw': hashcat_data_raw,
                     'data': self.process_hashcat_raw_data(hashcat_data_raw)
+                },
+                'user': {
+                    'record': UserModel.query.filter(UserModel.id == session.user_id).first()
                 }
             }
 
