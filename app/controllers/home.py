@@ -14,7 +14,7 @@ def index():
 
     provider = Provider()
     users = provider.users()
-    if (users.get_user_count() == 0):
+    if users.get_user_count() == 0:
         # Looks like we need to setup the administrator.
         return redirect(url_for('install.index'))
 
