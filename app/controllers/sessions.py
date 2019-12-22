@@ -41,7 +41,8 @@ def setup_hashes(session_id):
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
-    session = sessions.get(current_user.id, session_id)[0]
+    user_id = 0 if current_user.admin else current_user.id
+    session = sessions.get(user_id, session_id)[0]
 
     return render_template(
         'sessions/setup_hashes.html',
@@ -94,7 +95,8 @@ def setup_hashcat(session_id):
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
-    session = sessions.get(current_user.id, session_id)[0]
+    user_id = 0 if current_user.admin else current_user.id
+    session = sessions.get(user_id, session_id)[0]
 
     supported_hashes = hashcat.get_supported_hashes()
     # We need to process the array in a way to make it easy for JSON usage.
@@ -212,7 +214,8 @@ def view(session_id):
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
-    session = sessions.get(current_user.id, session_id)[0]
+    user_id = 0 if current_user.admin else current_user.id
+    session = sessions.get(user_id, session_id)[0]
 
     supported_hashes = hashcat.get_supported_hashes()
     # We need to process the array in a way to make it easy for JSON usage.

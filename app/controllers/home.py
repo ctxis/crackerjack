@@ -30,7 +30,11 @@ def index():
 
     sessions = provider.sessions()
 
-    all_sessions = sessions.get(current_user.id)
+    if current_user.admin:
+        all_sessions = sessions.get()
+    else:
+        all_sessions = sessions.get(current_user.id)
+        
     processes = sessions.get_running_processes()
 
     return render_template(
