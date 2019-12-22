@@ -162,3 +162,20 @@ class HashcatManager:
                 break
 
         return found
+
+    def get_running_processes_commands(self):
+        if len(self.hashcat_binary) == 0:
+            return []
+
+        # Return only the command column from the running processes.
+        output = self.shell.execute(['ps', '-www', '-x', '-o', 'cmd'])
+        output = output.split("\n")
+
+        processes = []
+        length = len(self.hashcat_binary)
+        for line in output:
+            # Check if the beginning of the command path matches the path of the hashcat binary path.
+            if line[:length] == self.hashcat_binary:
+                processes.append(line)
+
+        return processes

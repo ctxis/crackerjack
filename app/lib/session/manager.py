@@ -336,3 +336,48 @@ class SessionManager:
 
         return send_file(file, attachment_filename=save_as, as_attachment=True)
 
+    def get_running_processes(self):
+        sessions = self.get()
+
+        data = {
+            'stats': {
+                'all': 0,
+                'web': 0,
+                'ssh': 0
+            },
+            'commands': {
+                'all': [],
+                'web': [],
+                'ssh': []
+            }
+        }
+
+        processes = self.hashcat.get_running_processes_commands()
+
+        data['stats']['all'] = len(processes)
+        data['commands']['all'] = processes
+
+        for process in processes:
+            name = self.__extract_session_from_process(process)
+            found = False
+            for session in sessions:
+                if session['screen_name'] == name:
+                    found = True
+                    break
+
+            key = 'web' if found else 'ssh'
+            data['stats'][key] = data['stats'][key] + 1
+            data['commands'][key].append(process)
+
+        return data
+
+    def __extract_session_from_process(self, process):
+        parts = process.split(" ")
+        name = ''
+        for i, item in enumerate(parts):
+            if item == '--session':
+                name = parts[i + 1]
+                break
+
+        return name
+

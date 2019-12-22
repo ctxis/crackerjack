@@ -2,6 +2,33 @@
 
 {% block content %}
 <div class="row mt-5">
+    <div class="col-2"></div>
+    <div class="col">
+        <div class="row">
+            <div class="col text-monospace text-center">
+                <div class="p-2 border border-info">
+                    <div style="font-size: 300%;">{{ processes.stats.all }}</div>
+                    <div class="pt-2 pb-2 border-top">processes</div>
+                </div>
+            </div>
+            <div class="col text-monospace text-center">
+                <div class="p-2 border border-info">
+                    <div style="font-size: 300%;">{{ processes.stats.web }}</div>
+                    <div class="pt-2 pb-2 border-top">via web</div>
+                </div>
+            </div>
+            <div class="col text-monospace text-center">
+                <div class="text-monospace p-2 border border-info">
+                    <div style="font-size: 300%;">{{ processes.stats.ssh }}</div>
+                    <div class="pt-2 pb-2 border-top">via ssh</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-2"></div>
+</div>
+
+<div class="row mt-5">
     <div class="col-1"></div>
     <div class="col">
         <form method="post" action="{{ url_for('sessions.create') }}">

@@ -29,9 +29,12 @@ def index():
             flash(error, 'error')
 
     sessions = provider.sessions()
+
     all_sessions = sessions.get(current_user.id)
+    processes = sessions.get_running_processes()
 
     return render_template(
         'home/index.html',
-        sessions=all_sessions
+        sessions=all_sessions,
+        processes=processes
     )
