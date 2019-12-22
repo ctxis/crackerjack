@@ -45,9 +45,9 @@ def logins(user_id):
     )
 
 
-@bp.route('/<int:user_id>/password', methods=['GET'])
+@bp.route('/<int:user_id>/settings', methods=['GET'])
 @login_required
-def password(user_id):
+def settings(user_id):
     if current_user.id != user_id:
         flash('Access denied', 'error')
         return redirect(url_for('home.index'))
@@ -57,14 +57,14 @@ def password(user_id):
     user = users.get_by_id(current_user.id)
 
     return render_template(
-        'account/password.html',
+        'account/settings.html',
         user=user
     )
 
 
-@bp.route('/<int:user_id>/password/save', methods=['POST'])
+@bp.route('/<int:user_id>/settings/save', methods=['POST'])
 @login_required
-def password_save(user_id):
+def settings_save(user_id):
     if current_user.id != user_id:
         flash('Access denied', 'error')
         return redirect(url_for('home.index'))
@@ -94,8 +94,8 @@ def password_save(user_id):
 
     users.update_password(user_id, new_password)
 
-    flash('Password updated', 'success')
-    return redirect(url_for('account.password', user_id=user_id))
+    flash('Settings updated', 'success')
+    return redirect(url_for('account.settings', user_id=user_id))
 
 
 @bp.route('/<int:user_id>/theme', methods=['GET'])
