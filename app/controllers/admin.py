@@ -204,3 +204,20 @@ def user_save(user_id):
 
     flash('User saved', 'success')
     return redirect(url_for('admin.users'))
+
+
+@bp.route('/logins', methods=['GET'])
+@login_required
+def logins():
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    provider = Provider()
+    users = provider.users()
+    user_logins = users.get_user_logins(0)
+
+    return render_template(
+        'admin/users/logins.html',
+        logins=user_logins
+    )

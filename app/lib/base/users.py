@@ -1,4 +1,4 @@
-from sqlalchemy import desc
+from sqlalchemy import desc, and_
 from app.lib.models.user import UserModel, UserLogins
 from app import db
 import flask_bcrypt as bcrypt
@@ -107,5 +107,15 @@ class UserManager:
         return True
 
     def get_user_logins(self, user_id):
-        logins = UserLogins.query.join(UserModel, UserLogins.user_id == UserModel.id).add_columns(UserLogins.id, UserLogins.login_at, UserModel.username).filter(UserLogins.user_id == user_id).order_by(desc(UserLogins.id)).all()
+        conditions = and_(1 == 1)
+        if user_id > 0:
+            conditions = and_(UserLogins.user_id == user_id)
+
+        logins = UserLogins.query\
+            .join(UserModel, UserLogins.user_id == UserModel.id)\
+            .add_columns(UserLogins.id, UserLogins.login_at, UserModel.username)\
+            .filter(conditions)\
+            .order_by(desc(UserLogins.id))\
+            .all()
+
         return logins

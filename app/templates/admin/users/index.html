@@ -8,7 +8,10 @@
             <h3 class="card-header">Users</h3>
             <div class="card-body">
                 <div class="clearfix">
-                    <a href="{{ url_for('admin.user_edit', user_id=0) }}" class="btn btn-primary float-right">Add Local User</a>
+                    <div class="float-right">
+                        <a href="{{ url_for('admin.logins') }}" class="btn btn-primary">View User Logins</a>
+                        <a href="{{ url_for('admin.user_edit', user_id=0) }}" class="btn btn-primary">Add Local User</a>
+                    </div>
                 </div>
 
                 <table class="table table-sm table-striped mt-4">
