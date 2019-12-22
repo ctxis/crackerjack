@@ -65,8 +65,7 @@ def setup_hashes_save(session_id):
     save_as = sessions.get_hashfile_path(current_user.id, session_id)
 
     if len(hashes) > 0:
-        with open(save_as, 'w') as f:
-            f.write(hashes)
+        sessions.save_hashes(current_user.id, session_id, hashes)
     else:
         if len(request.files) != 1:
             flash('Uploaded file could not be found', 'error')

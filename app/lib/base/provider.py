@@ -87,4 +87,4 @@ class Provider:
         return TemplateManager()
 
     def api(self):
-        return ApiManager()
+        return ApiManager(self.sessions())

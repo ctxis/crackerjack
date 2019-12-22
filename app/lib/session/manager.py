@@ -231,6 +231,8 @@ class SessionManager:
         elif action == 'stop':
             # Hashcat only needs 'q' to pause.
             screen.execute({'q': ''})
+        else:
+            return False
 
         return True
 
@@ -390,3 +392,9 @@ class SessionManager:
 
         return name
 
+    def save_hashes(self, user_id, session_id, hashes):
+        save_as = self.get_hashfile_path(user_id, session_id)
+        with open(save_as, 'w') as f:
+            f.write(hashes)
+
+        return True

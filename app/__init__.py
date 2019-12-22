@@ -49,6 +49,10 @@ def create_app(config_class=None):
     from app.controllers.install import bp as install_bp
     app.register_blueprint(install_bp, url_prefix='/install')
 
+    from app.controllers.api import bp as api_bp
+    app.register_blueprint(api_bp, url_prefix='/api/v1')
+    csrf.exempt(api_bp)
+
     from app.lib.base.provider import Provider
 
     # This is to be able to access settings from any template (shared variables).
