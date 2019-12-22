@@ -13,6 +13,14 @@
 <div class="row">
     <div class="col-2"></div>
     <div class="col-8">
+        {% if session.hashcat.hashfile_exists %}
+        <div class="clearfix mb-3">
+            <div class="float-right">
+                <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}" class="btn btn-primary">Download Uploaded Hashes</a>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="card">
             <h4 class="card-header">Hashes</h4>
             <div class="card-body">

@@ -29,7 +29,14 @@
 <div class="row">
     <div class="col-1"></div>
     <div class="col">
-        <table class="table">
+        <div class="clearfix">
+            <div class="float-right">
+                <a href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}" class="btn btn-primary">Hashes</a>
+                <a href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}" class="btn btn-primary"><i class="fas fa-cogs fa-sm"></i> Hashcat</a>
+            </div>
+        </div>
+
+        <table class="table mt-3">
             <thead>
             <tr class="table-primary">
                 <th>State</th>
@@ -37,7 +44,6 @@
                 <th class="text-right">Cracked</th>
                 <th class="text-right">Estimated Time</th>
                 <th class="text-right">Manage</th>
-                <th class="text-right">Settings</th>
             </tr>
             </thead>
             <tbody>
@@ -49,7 +55,7 @@
                 <td class="text-right">
                     <span>{{ session.hashcat.data.cracked_passwords }}/{{ session.hashcat.data.all_passwords }}</span>
                     {% if session.hashcat.data.cracked_passwords > 0 %}
-                    <a href="{{ url_for('sessions.download_cracked', session_id=session.id) }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
+                    <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
                     {% endif %}
                 </td>
                 <td class="text-right"><abbr title="{{ session.hashcat.data.estimated_completion_time }}">{{ session.hashcat.data.time_remaining }}</abbr></td>
@@ -79,10 +85,6 @@
                         <a href="#" data-action="stop" title="Stop" class="form-action ml-2"><i class="fas fa-lg fa-stop text-danger"></i></a>
                         {% endif %}
                     </form>
-                </td>
-                <td class="text-right">
-                    <a href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}" title="Hashes" class="mr-2"><i class="fas fa-hashtag fa-lg"></i></a>
-                    <a href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}" title="Hashcat Settings"><i class="fas fa-cogs fa-lg"></i></a>
                 </td>
             </tr>
             {% if session.hashcat.data.progress|int > 0 and session.hashcat.data.progress|int < 100 %}

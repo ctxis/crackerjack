@@ -73,6 +73,10 @@ class SessionManager:
     def get_hashfile_path(self, user_id, session_id):
         return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.txt')
 
+    def hashfile_exists(self, user_id, session_id):
+        path = self.get_hashfile_path(user_id, session_id)
+        return os.path.isfile(path)
+
     def get_potfile_path(self, user_id, session_id):
         return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.potfile')
 
@@ -130,7 +134,9 @@ class SessionManager:
                     'increment_min': 0 if not hashcat else hashcat.increment_min,
                     'increment_max': 0 if not hashcat else hashcat.increment_max,
                     'data_raw': hashcat_data_raw,
-                    'data': self.process_hashcat_raw_data(hashcat_data_raw)
+                    'data': self.process_hashcat_raw_data(hashcat_data_raw),
+                    'hashfile': self.get_hashfile_path(session.user_id, session.id),
+                    'hashfile_exists': self.hashfile_exists(session.user_id, session.id)
                 },
                 'user': {
                     'record': UserModel.query.filter(UserModel.id == session.user_id).first()
@@ -324,15 +330,18 @@ class SessionManager:
     def download_file(self, session_id, which_file):
         session = self.get(session_id=session_id)[0]
 
+        save_as = session['name']
         if which_file == 'cracked':
             file = self.get_crackedfile_path(session['user_id'], session_id)
+            save_as = save_as + '.cracked'
+        elif which_file == 'hashes':
+            file = self.get_hashfile_path(session['user_id'], session_id)
+            save_as = save_as + '.hashes'
         else:
             return 'Error'
 
         if not os.path.exists(file):
             return 'Error'
-
-        save_as = session['name'] + '.cracked'
 
         return send_file(file, attachment_filename=save_as, as_attachment=True)
 

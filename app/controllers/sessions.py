@@ -242,9 +242,9 @@ def action(session_id):
     return redirect(url_for('sessions.view', session_id=session_id))
 
 
-@bp.route('/<int:session_id>/download/cracked', methods=['GET'])
+@bp.route('/<int:session_id>/download/<string:which_file>', methods=['GET'])
 @login_required
-def download_cracked(session_id):
+def download_file(session_id, which_file):
     provider = Provider()
     sessions = provider.sessions()
 
@@ -252,4 +252,4 @@ def download_cracked(session_id):
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
-    return sessions.download_file(session_id, 'cracked')
+    return sessions.download_file(session_id, which_file)

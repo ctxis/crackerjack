@@ -80,7 +80,7 @@
                             <span>{{ session.hashcat.data.cracked_passwords }}/{{ session.hashcat.data.all_passwords }}</span>
                             {% if session.hashcat.data.cracked_passwords > 0 %}
                             <span>
-                                <a href="{{ url_for('sessions.download_cracked', session_id=session.id) }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
+                                <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
                             </span>
                             {% endif %}
                         </td>
