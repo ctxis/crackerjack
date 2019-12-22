@@ -1,4 +1,5 @@
-from app.lib.models.user import UserModel
+from sqlalchemy import desc
+from app.lib.models.user import UserModel, UserLogins
 from app import db
 import flask_bcrypt as bcrypt
 
@@ -98,3 +99,13 @@ class UserManager:
 
     def get_user_count(self):
         return db.session.query(UserModel).count()
+
+    def record_login(self, user_id):
+        login = UserLogins(user_id=user_id)
+        db.session.add(login)
+        db.session.commit()
+        return True
+
+    def get_user_logins(self, user_id):
+        logins = UserLogins.query.join(UserModel, UserLogins.user_id == UserModel.id).add_columns(UserLogins.id, UserLogins.login_at, UserModel.username).filter(UserLogins.user_id == user_id).order_by(desc(UserLogins.id)).all()
+        return logins

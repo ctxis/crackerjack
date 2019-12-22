@@ -28,12 +28,27 @@ def index(user_id):
     )
 
 
+@bp.route('/<int:user_id>/logins', methods=['GET'])
+@login_required
+def logins(user_id):
+    if current_user.id != user_id:
+        flash('Access denied', 'error')
+        return redirect(url_for('home.index'))
+
+    provider = Provider()
+    users = provider.users()
+    user_logins = users.get_user_logins(user_id)
+
+    return render_template(
+        'account/logins.html',
+        logins=user_logins
+    )
+
+
 @bp.route('/<int:user_id>/password', methods=['GET'])
 @login_required
 def password(user_id):
-    if not current_user.is_authenticated:
-        return redirect(url_for('auth.login'))
-    elif current_user.id != user_id:
+    if current_user.id != user_id:
         flash('Access denied', 'error')
         return redirect(url_for('home.index'))
 
@@ -50,9 +65,7 @@ def password(user_id):
 @bp.route('/<int:user_id>/password/save', methods=['POST'])
 @login_required
 def password_save(user_id):
-    if not current_user.is_authenticated:
-        return redirect(url_for('auth.login'))
-    elif current_user.id != user_id:
+    if current_user.id != user_id:
         flash('Access denied', 'error')
         return redirect(url_for('home.index'))
 
@@ -88,9 +101,7 @@ def password_save(user_id):
 @bp.route('/<int:user_id>/theme', methods=['GET'])
 @login_required
 def theme(user_id):
-    if not current_user.is_authenticated:
-        return redirect(url_for('auth.login'))
-    elif current_user.id != user_id:
+    if current_user.id != user_id:
         flash('Access denied', 'error')
         return redirect(url_for('home.index'))
 
@@ -114,9 +125,7 @@ def theme(user_id):
 @bp.route('/<int:user_id>/theme/save', methods=['POST'])
 @login_required
 def theme_save(user_id):
-    if not current_user.is_authenticated:
-        return redirect(url_for('auth.login'))
-    elif current_user.id != user_id:
+    if current_user.id != user_id:
         flash('Access denied', 'error')
         return redirect(url_for('home.index'))
 

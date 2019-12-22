@@ -48,6 +48,7 @@ def login_process():
         return redirect(url_for('auth.login'))
 
     login_user(user)
+    users.record_login(user.id)
 
     # On every login we get the hashcat version and the git hash version.
     system = provider.system()
