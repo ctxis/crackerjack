@@ -87,7 +87,7 @@
                     </form>
                 </td>
             </tr>
-            {% if session.hashcat.data.progress|int > 0 and session.hashcat.data.progress|int < 100 %}
+            {% if session.hashcat.data.progress|int > 0 and session.hashcat.data.progress|int < 100 and session.hashcat.data.process_state == 1 %}
             <tr>
                 <td class="p-0" colspan="6">
                     <div class="progress">
