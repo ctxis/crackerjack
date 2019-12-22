@@ -147,6 +147,10 @@ var CJ_SessionsSetup = {
 
     setModes: function() {
         mode = $("input[name='mode']:checked").val();
+        if (typeof mode == 'undefined') {
+            $('#mode-wordlist').prop('checked', true);
+            mode = 0;
+        }
         if (mode == 0) {
             $('.box-mode-wordlist').removeClass('d-none');
             $('.box-mode-bruteforce').addClass('d-none');
