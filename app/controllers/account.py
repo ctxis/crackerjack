@@ -145,3 +145,69 @@ def theme_save(user_id):
 
     flash('Theme saved. To make sure everything is working, please force-refresh the page (CTRL-F5)', 'success')
     return redirect(url_for('account.theme', user_id=user_id))
+
+
+@bp.route('/<int:user_id>/api', methods=['GET'])
+@login_required
+def api(user_id):
+    if current_user.id != user_id:
+        flash('Access denied', 'error')
+        return redirect(url_for('home.index'))
+
+    provider = Provider()
+    apiman = provider.api()
+
+    apikeys = apiman.get(user_id)
+
+    return render_template(
+        'account/api.html',
+        apikeys=apikeys
+    )
+
+
+@bp.route('/<int:user_id>/api/add', methods=['POST'])
+@login_required
+def api_add(user_id):
+    if current_user.id != user_id:
+        flash('Access denied', 'error')
+        return redirect(url_for('home.index'))
+
+    name = request.form['name'].strip()
+    if len(name) == 0:
+        flash('Please select a key name', 'error')
+        return redirect(url_for('account.api', user_id=user_id))
+
+    provider = Provider()
+    apiman = provider.api()
+
+    if not apiman.create_key(user_id, name):
+        flash('Could not create key', 'error')
+        return redirect(url_for('account.api', user_id=user_id))
+
+    flash('Key created', 'success')
+    return redirect(url_for('account.api', user_id=user_id))
+
+
+@bp.route('/<int:user_id>/api/set/<int:key_id>/status', methods=['POST'])
+@login_required
+def api_set_status(user_id, key_id):
+    if current_user.id != user_id:
+        flash('Access denied', 'error')
+        return redirect(url_for('home.index'))
+
+    provider = Provider()
+    apiman = provider.api()
+
+    if not apiman.can_access(current_user, key_id):
+        flash('Access denied', 'error')
+        return redirect(url_for('home.index'))
+
+    action = request.form['action'].strip()
+    value = True if action == 'enable' else False
+
+    if not apiman.set_key_status(key_id, value):
+        flash('Could not set key status', 'error')
+        return redirect(url_for('account.api', user_id=user_id))
+
+    flash('Status updated', 'success')
+    return redirect(url_for('account.api', user_id=user_id))

@@ -1,4 +1,5 @@
 from app import db
+import datetime
 
 
 class ApiKeys(db.Model):
@@ -8,3 +9,4 @@ class ApiKeys(db.Model):
     name = db.Column(db.String, default='', nullable=True)
     apikey = db.Column(db.String, default='', nullable=True)
     enabled = db.Column(db.Boolean, default=False, index=True, nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now())

@@ -28,6 +28,13 @@
                             <div class="pt-2">Login Logs</div>
                         </a>
                     </div>
+
+                    <div class="col">
+                        <a href="{{ url_for('account.api', user_id=user.id) }}" class="text-center">
+                            <div><i class="fas fa-key fa-3x"></i></div>
+                            <div class="pt-2">API Keys</div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

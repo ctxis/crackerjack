@@ -12,6 +12,7 @@ from app.lib.base.ldap import LDAPManager
 from app.lib.base.users import UserManager
 from app.lib.base.user_settings import UserSettingsManager
 from app.lib.base.template import TemplateManager
+from app.lib.base.api import ApiManager
 
 
 class Provider:
@@ -84,3 +85,6 @@ class Provider:
 
     def template(self):
         return TemplateManager()
+
+    def api(self):
+        return ApiManager()
