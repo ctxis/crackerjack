@@ -78,4 +78,4 @@ def create_app(config_class=None):
 
 
 # This has to be at the bottom.
-from app.lib.models import user, config, sessions, hashcat
+from app.lib.models import user, config, sessions, hashcat, api
