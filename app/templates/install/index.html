@@ -4,40 +4,42 @@
 <div class="row mt-5">
     <div class="col-3"></div>
     <div class="col">
-        <h3 class="card-header">CrackerJack Setup</h3>
-        <div class="card-body">
-            <form method="post" action="{{ url_for('install.save') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="card">
+            <h3 class="card-header">CrackerJack Setup</h3>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('install.save') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                <div class="form-group">
-                    <label for="username">Administrator Username</label>
-                    <input type="text" value="" name="username" id="username" class="form-control" placeholder="admin" required autofocus>
-                </div>
+                    <div class="form-group">
+                        <label for="username">Administrator Username</label>
+                        <input type="text" value="" name="username" id="username" class="form-control" placeholder="admin" required autofocus>
+                    </div>
 
-                <div class="form-group">
-                    <label for="password">Administrator Password</label>
-                    <input type="password" value="" name="password" id="password" class="form-control" placeholder="correct horse battery staple" required>
-                </div>
+                    <div class="form-group">
+                        <label for="password">Administrator Password</label>
+                        <input type="password" value="" name="password" id="password" class="form-control" placeholder="correct horse battery staple" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="first_name">First Name</label>
-                    <input type="text" value="" name="first_name" id="first_name" class="form-control" placeholder="Admin" required>
-                </div>
+                    <div class="form-group">
+                        <label for="first_name">First Name</label>
+                        <input type="text" value="" name="first_name" id="first_name" class="form-control" placeholder="Admin" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="last_name">Last Name</label>
-                    <input type="text" value="" name="last_name" id="last_name" class="form-control" placeholder="User" required>
-                </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name</label>
+                        <input type="text" value="" name="last_name" id="last_name" class="form-control" placeholder="User" required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="email">E-Mail</label>
-                    <input type="text" value="" name="email" id="email" class="form-control" placeholder="you@yourdomain.com" required>
-                </div>
+                    <div class="form-group">
+                        <label for="email">E-Mail</label>
+                        <input type="text" value="" name="email" id="email" class="form-control" placeholder="you@yourdomain.com" required>
+                    </div>
 
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-block">setup</button>
-                </div>
-            </form>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block">setup</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     <div class="col-3"></div>
