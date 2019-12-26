@@ -1,5 +1,5 @@
 import os, datetime
-from flask import Flask, session
+from flask import Flask, session, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
