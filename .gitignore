@@ -18,3 +18,6 @@ migrations/
 
 data/*
 !data/.gitkeep
+
+os/config/*
+!os/config/.gitkeep

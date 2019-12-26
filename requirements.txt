@@ -5,3 +5,4 @@ Flask-Login
 Flask-Bcrypt
 Flask-WTF
 ldap3 # TODO - Replace with Flask ldap3 Login
+gunicorn
