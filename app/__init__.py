@@ -78,6 +78,10 @@ def create_app(config_class=None):
         app.permanent_session_lifetime = datetime.timedelta(minutes=20)
         session.modified = True
 
+    @app.errorhandler(500)
+    def internal_error(error):
+        return render_template('errors/500.html')
+
     return app
 
 
