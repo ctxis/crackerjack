@@ -45,28 +45,22 @@ if [ ! "$(printf '%s\n' "$PYTHON_REQUIRED_VERSION" "$PYTHON_VERSION" | sort -V |
   exit 1
 fi
 
-# Navigate to CJ root path.
-cd "$CJ_PATH" || exit 1
-
 # Create venv.
-"$PYTHON" -m venv venv
+cd "$CJ_PATH" && "$PYTHON" -m venv venv
 
 # Activate.
-. venv/bin/activate
+cd "$CJ_PATH" && . venv/bin/activate
 
 # Install requirements.
-"$PIP" install -r requirements.txt
+cd "$CJ_PATH" && "$PIP" install -r requirements.txt
 
 # Install Flask database.
-flask db init
-flask db migrate
-flask db upgrade
+cd "$CJ_PATH" && flask db init
+cd "$CJ_PATH" && flask db migrate
+cd "$CJ_PATH" && flask db upgrade
 
 # Deactivate.
-deactivate
-
-# Return to the current directory
-cd "$CURRENT_PATH" || exit 1
+cd "$CJ_PATH" && deactivate
 
 # Set the right permissions.
 sudo chown -R www-data:www-data "$CJ_PATH/instance" "$CJ_PATH/data"
