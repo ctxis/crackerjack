@@ -2,7 +2,7 @@
 
 # Get the current script's absolute path.
 CURRENT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-CJ_PATH=$(cd "$CURRENT_PATH/../../" && pwd)
+CJ_PATH=$(cd "$CURRENT_PATH/../" && pwd)
 
 #
 # First check if required software is installed
@@ -46,21 +46,25 @@ if [ ! "$(printf '%s\n' "$PYTHON_REQUIRED_VERSION" "$PYTHON_VERSION" | sort -V |
 fi
 
 # Create venv.
-cd "$CJ_PATH" && "$PYTHON" -m venv venv
+cd "$CJ_PATH" || exit 1
+
+"$PYTHON" -m venv venv
 
 # Activate.
-cd "$CJ_PATH" && . venv/bin/activate
+. venv/bin/activate
 
 # Install requirements.
 cd "$CJ_PATH" && "$PIP" install -r requirements.txt
 
 # Install Flask database.
-cd "$CJ_PATH" && flask db init
-cd "$CJ_PATH" && flask db migrate
-cd "$CJ_PATH" && flask db upgrade
+flask db init
+flask db migrate
+flask db upgrade
 
 # Deactivate.
-cd "$CJ_PATH" && deactivate
+deactivate
+
+cd "$CURRENT_PATH" || exit 1
 
 # Set the right permissions.
 sudo chown -R www-data:www-data "$CJ_PATH/instance" "$CJ_PATH/data"
