@@ -39,6 +39,7 @@ cp "$CJ_SERVICE_TEMPLATE" "$CJ_CONFIG_SERVICE"
 sed -i "s/CJPATH/$ESCAPED_PATH/g" "$CJ_CONFIG_SERVICE"
 
 sudo ln -s "$CJ_CONFIG_SERVICE" "$CJ_SYSTEMD_SERVICE"
+sudo systemctl enable crackerjack.service
 sudo systemctl start crackerjack.service
 sudo systemctl status crackerjack.service
 
