@@ -19,6 +19,7 @@ CJ_CONFIG_FOLDER="$CJ_OS_FOLDER/config"
 CJ_CONFIG_NGINX="$CJ_CONFIG_FOLDER/crackerjack"
 CJ_NGINX_TEMPLATE="$CJ_OS_FOLDER/nginx/crackerjack.conf"
 CJ_NGINX_HOST="/etc/nginx/sites-enabled/crackerjack"
+CJ_NGINX_SSL="$CJ_CONFIG_FOLDER/ssl"
 
 #
 # Check files.
@@ -51,8 +52,15 @@ if [ -z "$DOMAIN" ]; then
   exit 1
 fi
 
+#
+# Generate self-signed SSL certificate.
+#
+openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout "$CJ_NGINX_SSL.key" -out "$CJ_NGINX_SSL.crt"
+
+ESCAPED_PATH=$(echo "$CJ_NGINX_SSL" | sed 's/\//\\\//g')
 cp "$CJ_NGINX_TEMPLATE" "$CJ_CONFIG_NGINX"
 sed -i "s/CJDOMAIN/$DOMAIN/g" "$CJ_CONFIG_NGINX"
+sed -i "s/CJ_SSL_PATH/$ESCAPED_PATH/g" "$CJ_CONFIG_NGINX"
 sudo ln -s "$CJ_CONFIG_NGINX" "$CJ_NGINX_HOST"
 sudo systemctl restart nginx
 
