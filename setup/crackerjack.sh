@@ -48,21 +48,21 @@ fi
 # Create venv.
 cd "$CJ_PATH" || exit 1
 
-"$PYTHON" -m venv venv
+cd "$CJ_PATH" && "$PYTHON" -m venv venv
 
 # Activate.
-. venv/bin/activate
+cd "$CJ_PATH" && source venv/bin/activate
 
 # Install requirements.
 cd "$CJ_PATH" && "$PIP" install -r requirements.txt
 
 # Install Flask database.
-flask db init
-flask db migrate
-flask db upgrade
+cd "$CJ_PATH" && flask db init
+cd "$CJ_PATH" && flask db migrate
+cd "$CJ_PATH" && flask db upgrade
 
 # Deactivate.
-deactivate
+cd "$CJ_PATH" && deactivate
 
 cd "$CURRENT_PATH" || exit 1
 
