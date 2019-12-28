@@ -8,7 +8,7 @@ Group=www-data
 WorkingDirectory=CJPATH
 EnvironmentFile=/etc/environment
 Environment="PATH=CJPATH/venv/bin:$PATH"
-ExecStart=CJPATH/venv/bin/gunicorn --workers 3 --bind unix:/tmp/crackerjack.sock -m 007 wsgi:app
+ExecStart=CJPATH/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:33333 -m 007 wsgi:app
 
 [Install]
 WantedBy=multi-user.target

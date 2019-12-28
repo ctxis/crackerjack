@@ -3,7 +3,7 @@
 #
 # Make sure we can execute sudo commands
 #
-echo "This script will need to run some sudo commands, please enter your sudo password below to ensure you have the right permimssions:"
+echo "This script will need to run some sudo commands, please enter your sudo password below to ensure you have the right permissions:"
 SUDO=$(sudo whoami)
 if [ -z "$SUDO" ]; then
   echo "Invalid SUDO credentials - aborting"
