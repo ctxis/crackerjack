@@ -1,4 +1,5 @@
-import os, datetime
+import os
+import datetime
 from flask import Flask, session, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -15,16 +16,22 @@ csrf = CSRFProtect()
 
 def create_app(config_class=None):
     app = Flask(__name__, instance_relative_config=True)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'crackerjack.sqlite3')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = 'ThisIsNotTheKeyYouAreLookingFor'
-
-    app.config.from_object(config_class)
 
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
+
+    # First we load everything we need in order to end up with a working app.
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'crackerjack.sqlite3')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = 'ThisIsNotTheKeyYouAreLookingFor'
+
+    # And now we override any custom settings from config.cfg if it exists.
+    app.config.from_pyfile('config.py', silent=True)
+
+    # If we have passed any object on app creation (ie testing), override here.
+    app.config.from_object(config_class)
 
     db.init_app(app)
     migrate.init_app(app, db)
