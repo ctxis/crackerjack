@@ -61,7 +61,7 @@ ESCAPED_PATH=$(echo "$CJ_APACHE_SSL" | sed 's/\//\\\//g')
 cp "$CJ_APACHE_TEMPLATE" "$CJ_CONFIG_APACHE"
 sed -i "s/CJDOMAIN/$DOMAIN/g" "$CJ_CONFIG_APACHE"
 sed -i "s/CJ_SSL_PATH/$ESCAPED_PATH/g" "$CJ_CONFIG_APACHE"
-sudo ln -s "$CJ_APACHE_NGINX" "$CJ_APACHE_HOST"
+sudo ln -s "$CJ_CONFIG_APACHE" "$CJ_APACHE_HOST"
 sudo a2enmod proxy proxy_http rewrite ssl
 sudo systemctl restart apache2
 
