@@ -51,6 +51,17 @@ This will create the "crackerjack" host which will proxy all its traffic to the 
 ```
 This option will also generated a self-signed certificate which will be located in the same folder - feel free to replace it.
 
+## Install apache2 host
+If you are running apache2, run
+```
+./setup/ubuntu/apache.sh
+```
+This will create the "crackerjack" host which will proxy all its traffic to the systemd service created above. The apache config file will be at:
+```
+./os/config/crackerjack.conf
+```
+This option will also generated a self-signed certificate which will be located in the same folder - feel free to replace it.
+
 # Third-party Software
 
 ## Screen
