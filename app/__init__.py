@@ -26,6 +26,8 @@ def create_app(config_class=None):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'crackerjack.sqlite3')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = 'ThisIsNotTheKeyYouAreLookingFor'
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
 
     # And now we override any custom settings from config.cfg if it exists.
     app.config.from_pyfile('config.py', silent=True)
