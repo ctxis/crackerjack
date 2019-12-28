@@ -1,6 +1,4 @@
-# Install
-
-## Requirements
+# Requirements
 
 * python >= 3.6
     * In python 3.6 onwards dictionaries hold items in the same order you add them. Sounds to me this should have been the deal since version 1.
@@ -9,9 +7,9 @@
 * hashcat
     * Any version will do, all supported hashes are dynamically extracted from the --help option.
 
-## Setup Environment
+# Installation
 
-### Virtual Environment
+## Virtual Environment
 ```
 python3 -m venv venv
 . venv/bin/activate
@@ -22,11 +20,38 @@ flask db upgrade
 deactivate
 ```
 
-### Folder permissions
-Within the root folder, run:
+## Folder permissions
+Within the folder, run:
 ```
 sudo chown -R www-data:www-data ./instance ./data
 ``` 
+
+## Install systemd service
+Run
+```
+./setup/ubuntu/service.sh
+```
+This will create the "crackerjack.service" and its config file will be located at:
+```
+./os/config/crackerjack.service
+```
+To control the service use:
+```
+sudo systemctl start|stop|disable crackerjack.service
+```
+
+## Install nginx host
+If you are running nginx, run
+```
+./setup/ubuntu/nginx.sh
+```
+This will create the "crackerjack" host which will proxy all its traffic to the systemd service created above. The nginx config file will be at:
+```
+./os/config/crackerjack
+```
+This option will also generated a self-signed certificate which will be located in the same folder - feel free to replace it.
+
+# Third-party Software
 
 ## Screen
 
