@@ -9,6 +9,27 @@
 
 # Installation
 
+## Basic Software Requirement
+Install basic packages using:
+```
+sudo apt install vim git screen python3-venv python-pip
+```
+
+If you want to use nginx:
+```
+sudo apt install nginx
+```
+And if you are an Apache fan:
+```
+sudo apt install apache2
+```
+
+## Clone Repo
+
+```
+git clone [[this-repo]]
+```
+
 ## Virtual Environment
 ```
 python3 -m venv venv
@@ -89,3 +110,7 @@ sudo make install
 $ screen --version
 Screen version 4.07.00 (GNU) 02-Oct-19
 ```
+
+## Hashcat
+
+It's recommended to compile hashcat from source - instructions are at https://github.com/hashcat/hashcat/blob/master/BUILD.md
