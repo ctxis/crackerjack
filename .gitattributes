@@ -1,0 +1,4 @@
+app/static/css/lib/* linguist-vendored
+app/static/css/themes/* linguist-vendored
+app/static/fontawesome/* linguist-vendored
+app/static/js/lib/* linguist-vendored
