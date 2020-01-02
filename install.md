@@ -114,3 +114,9 @@ Screen version 4.07.00 (GNU) 02-Oct-19
 ## Hashcat
 
 It's recommended to compile hashcat from source - instructions are at https://github.com/hashcat/hashcat/blob/master/BUILD.md
+
+# CrackerJack Configuration
+
+To set your own Flask configuration:
+ 
+Copy `config.py` from `./setup/config.py` to `./instance/config.py`
