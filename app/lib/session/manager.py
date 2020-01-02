@@ -12,9 +12,10 @@ from flask import current_app, send_file
 
 
 class SessionManager:
-    def __init__(self, hashcat, screens):
+    def __init__(self, hashcat, screens, wordlists):
         self.hashcat = hashcat
         self.screens = screens
+        self.wordlists = wordlists
 
     def sanitise_name(self, name):
         return re.sub(r'\W+', '', name)
@@ -126,7 +127,7 @@ class SessionManager:
                     'configured': True if hashcat else False,
                     'mode': '' if not hashcat else hashcat.mode,
                     'hashtype': '' if not hashcat else hashcat.hashtype,
-                    'wordlist': '' if not hashcat else os.path.basename(hashcat.wordlist),
+                    'wordlist': '' if not hashcat else self.wordlists.get_name_from_path(hashcat.wordlist),
                     'wordlist_path': '' if not hashcat else hashcat.wordlist,
                     'rule': '' if not hashcat else os.path.basename(hashcat.rule),
                     'rule_path': '' if not hashcat else hashcat.rule,

@@ -1,19 +1,23 @@
 import os
+import glob
 
 
 class FileSystemManager:
-    def get_files(self, absolute_path):
+    def get_files(self, absolute_path, recursive=False):
         if len(absolute_path) == '' or not os.path.isdir(absolute_path) or not os.access(absolute_path, os.R_OK):
             return {}
 
-        files = [f for f in sorted(os.listdir(absolute_path)) if os.path.isfile(os.path.join(absolute_path, f))]
         data = {}
-        for file in files:
-            data[file] = {
-                'name': file,
-                'path': os.path.join(absolute_path, file),
-                'size': os.stat(os.path.join(absolute_path, file)).st_size,
-                'size_human': self.human_filesize(os.stat(os.path.join(absolute_path, file)).st_size)
+        for file in sorted(glob.glob(os.path.join(absolute_path, '**'), recursive=recursive)):
+            if not os.path.isfile(file):
+                continue
+
+            name = file.replace(absolute_path, '').lstrip(os.sep)
+            data[name] = {
+                'name': name,
+                'path': file,
+                'size': os.stat(file).st_size,
+                'size_human': self.human_filesize(os.stat(file).st_size)
             }
 
         return data

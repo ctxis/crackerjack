@@ -23,7 +23,8 @@ class Provider:
     def sessions(self):
         session = SessionManager(
             self.hashcat(),
-            self.screens()
+            self.screens(),
+            self.wordlists()
         )
         return session
 

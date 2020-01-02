@@ -1,10 +1,13 @@
+import os
+
+
 class WordlistManager:
     def __init__(self, filesystem, wordlist_path):
         self.filesystem = filesystem
         self.wordlist_path = wordlist_path
 
     def get_wordlists(self):
-        return self.filesystem.get_files(self.wordlist_path)
+        return self.filesystem.get_files(self.wordlist_path, recursive=True)
 
     def is_valid_wordlist(self, wordlist):
         wordlists = self.get_wordlists()
@@ -17,3 +20,6 @@ class WordlistManager:
         wordlists = self.get_wordlists()
         wordlist = wordlists[wordlist]
         return wordlist['path']
+
+    def get_name_from_path(self, path):
+        return path.replace(self.wordlist_path, '').lstrip(os.sep)
