@@ -45,7 +45,25 @@ deactivate
 Within the folder, run:
 ```
 sudo chown -R www-data:www-data ./instance ./data
-``` 
+```
+
+If you have installed hashcat from source, you will need to create a ".hashcat" within the www-data user's home folder.
+
+To identify the folder, run:
+
+```
+grep www-data /etc/passwd | awk -F':' '{ print $6 }'
+```
+Which will result in something like
+```
+/var/www
+```
+
+And then create the folder and set the right owner.
+```
+sudo mkdir /var/www/.hashcat
+sudo chown -R www-data:www-data /var/www/.hashcat
+```
 
 ## Install systemd service
 Run
