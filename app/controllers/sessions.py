@@ -104,7 +104,7 @@ def setup_hashcat(session_id):
     if len(supported_hashes) == 0:
         home_directory = system.get_system_user_home_directory()
         flash('Could not get the supported hashes from hashcat', 'error')
-        flash('If you have compiled hashcat from source, make sure %s/.hashcat directory exists' % home_directory, 'error')
+        flash('If you have compiled hashcat from source, make sure %s/.hashcat directory exists and is writable' % home_directory, 'error')
 
     password_wordlists = wordlists.get_wordlists()
     hashcat_rules = rules.get_rules()
