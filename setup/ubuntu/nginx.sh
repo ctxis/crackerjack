@@ -64,4 +64,12 @@ sed -i "s/CJ_SSL_PATH/$ESCAPED_PATH/g" "$CJ_CONFIG_NGINX"
 sudo ln -s "$CJ_CONFIG_NGINX" "$CJ_NGINX_HOST"
 sudo systemctl restart nginx
 
+# Create hashcat directory.
+WWW_DATA_HOME=$(eval echo ~www-data)
+if [ ! -z "$WWW_DATA_HOME" ]; then
+  HASHCAT_FOLDER="$WWW_DATA_HOME/.hashcat"
+  sudo mkdir -p "$HASHCAT_FOLDER"
+  sudo chown -R www-data:www-data "$HASHCAT_FOLDER"
+fi
+
 exit 0
