@@ -1,4 +1,5 @@
 import os
+import getpass
 
 
 class SystemManager:
@@ -36,3 +37,12 @@ class SystemManager:
         count = int(self.shell.execute(['git', 'rev-list', '--count', 'master']))
         self.settings.save('git_commit_count', count)
         return True
+
+    def get_system_user(self):
+        return getpass.getuser()
+
+    def get_system_user_home_directory(self, user=""):
+        if len(user) == 0:
+            user = self.get_system_user()
+
+        return self.shell.execute(['/bin/bash', '-c', 'eval echo ~' + user])

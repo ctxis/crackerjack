@@ -89,6 +89,7 @@ def setup_hashcat(session_id):
     hashcat = provider.hashcat()
     wordlists = provider.wordlists()
     rules = provider.rules()
+    system = provider.system()
 
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
@@ -100,6 +101,10 @@ def setup_hashcat(session_id):
     supported_hashes = hashcat.get_supported_hashes()
     # We need to process the array in a way to make it easy for JSON usage.
     supported_hashes = hashcat.compact_hashes(supported_hashes)
+    if len(supported_hashes) == 0:
+        home_directory = system.get_system_user_home_directory()
+        flash('Could not get the supported hashes from hashcat', 'error')
+        flash('If you have compiled hashcat from source, make sure %s/.hashcat directory exists' % home_directory, 'error')
 
     password_wordlists = wordlists.get_wordlists()
     hashcat_rules = rules.get_rules()
