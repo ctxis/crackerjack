@@ -65,15 +65,23 @@ class ScreenManager:
 
     def __load_screen(self, line):
         data = line.split("\t")
-        if len(data) != 2:
+        if len(data) == 2:
+            # v4.07
+            id, name = data[0].split('.')
+            date = ''
+            state = data[1].strip('()')
+        elif len(data) == 3:
+            # v4.06
+            id, name = data[0].split('.')
+            date = data[1].strip('()')
+            state = data[2].strip('()')
+        else:
             return False
-
-        id, name = data[0].split('.')
-        state = data[1].strip('()')
 
         screen = ScreenInstance(self.shell)
         screen.id = id
         screen.name = name
+        screen.datetime = date
         screen.state = state
 
         return screen
