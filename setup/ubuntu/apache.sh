@@ -69,7 +69,7 @@ sudo systemctl restart apache2
 WWW_DATA_HOME=$(eval echo ~www-data)
 if [ ! -z "$WWW_DATA_HOME" ]; then
   HASHCAT_FOLDER="$WWW_DATA_HOME/.hashcat"
-  mkdir -p "$HASHCAT_FOLDER"
+  sudo mkdir -p "$HASHCAT_FOLDER"
   sudo chown -R www-data:www-data "$HASHCAT_FOLDER"
 fi
 
