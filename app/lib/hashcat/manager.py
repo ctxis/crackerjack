@@ -2,9 +2,10 @@ import collections
 
 
 class HashcatManager:
-    def __init__(self, shell, hashcat_binary):
+    def __init__(self, shell, hashcat_binary, status_interval=10):
         self.shell = shell
         self.hashcat_binary = hashcat_binary
+        self.status_interval = 10 if int(status_interval) <= 0 else int(status_interval)
 
     def get_supported_hashes(self):
         output = self.shell.execute([self.hashcat_binary, '--help'], user_id=0)
@@ -83,7 +84,7 @@ class HashcatManager:
             '--outfile': outputfile,
             '--potfile-path': potfile,
             '--status': '',
-            '--status-timer': 10,
+            '--status-timer': self.status_interval,
             hashfile: '',
         }
 
