@@ -39,7 +39,8 @@ class Provider:
         settings = self.settings()
         return HashcatManager(
             self.shell(),
-            settings.get('hashcat_binary', '')
+            settings.get('hashcat_binary', ''),
+            status_interval=int(settings.get('hashcat_status_interval', 10))
         )
 
     def shell(self):

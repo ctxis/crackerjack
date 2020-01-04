@@ -24,7 +24,8 @@ def settings_hashcat():
         settings={
             'hashcat_binary': settings.get('hashcat_binary', ''),
             'wordlists_path': settings.get('wordlists_path', ''),
-            'hashcat_rules_path': settings.get('hashcat_rules_path', '')
+            'hashcat_rules_path': settings.get('hashcat_rules_path', ''),
+            'hashcat_status_interval': settings.get('hashcat_status_interval', 10)
         }
     )
 
@@ -42,6 +43,7 @@ def settings_hashcat_save():
     hashcat_binary = request.form['hashcat_binary'].strip()
     wordlists_path = request.form['wordlists_path'].strip()
     hashcat_rules_path = request.form['hashcat_rules_path'].strip()
+    hashcat_status_interval = request.form['hashcat_status_interval'].strip()
 
     has_errors = False
     if len(hashcat_binary) == 0 or not os.path.isfile(hashcat_binary):
@@ -65,12 +67,21 @@ def settings_hashcat_save():
         has_errors = True
         flash('Hashcat rules directory is not readable', 'error')
 
+    if len(hashcat_status_interval) == 0:
+        has_errors = True
+        flash('Hashcat Status Interval must be set', 'error')
+
+    hashcat_status_interval = int(hashcat_status_interval)
+    if hashcat_status_interval <= 0:
+        hashcat_status_interval = 10
+
     if has_errors:
         return redirect(url_for('admin.settings_hashcat'))
 
     settings.save('hashcat_binary', hashcat_binary)
     settings.save('wordlists_path', wordlists_path)
     settings.save('hashcat_rules_path', hashcat_rules_path)
+    settings.save('hashcat_status_interval', hashcat_status_interval)
 
     # When settings are saved, run system updates.
     system = provider.system()
