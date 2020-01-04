@@ -1,11 +1,12 @@
 {% extends 'layout/base.html' %}
+{% from 'layout/macros.html' import render_pagination with context %}
 
 {% block content %}
 <div class="row mt-5">
     <div class="col">
         <div class="card">
             <h3 class="card-header">Shell Commands</h3>
-            <div class="card-body">
+            <ul class="card-body">
                 <table class="table table-sm table-striped">
                     <thead>
                     <tr>
@@ -19,7 +20,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for shell_log in shell_logs %}
+                    {% for shell_log in shell_logs.items %}
                     <tr>
                         <td>
                             <a href="#" data-id="{{ shell_log.id }}" data-action="expand" class="action-toggle action-expand-{{ shell_log.id }} text-primary" title="expand"><i class="fas fa-plus-square"></i></a>
@@ -53,7 +54,9 @@
                     {% endfor %}
                     </tbody>
                 </table>
-            </div>
+
+                {{ render_pagination(shell_logs, 'admin.shell_logs') }}
+            </ul>
         </div>
     </div>
 </div>

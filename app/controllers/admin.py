@@ -230,9 +230,13 @@ def shell_logs():
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
+    page = int(request.args.get('page', 1))
+    if page <= 0:
+        page = 1
+
     provider = Provider()
     shell = provider.shell()
-    shell_logs = shell.get_logs()
+    shell_logs = shell.get_logs(page=page, per_page=20)
 
     return render_template(
         'admin/shell/logs.html',

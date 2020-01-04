@@ -42,7 +42,7 @@ class ShellManager:
 
         return record
 
-    def get_logs(self, user_id=-1):
+    def get_logs(self, user_id=-1, page=0, per_page=0):
         conditions = and_(1 == 1)
         # 0 is reserved for the system.
         if user_id >= 0:
@@ -60,7 +60,11 @@ class ShellManager:
                 UserModel.username
             ) \
             .filter(conditions) \
-            .order_by(desc(ShellLogModel.id)) \
-            .all()
+            .order_by(desc(ShellLogModel.id))
+
+        if page == 0 and per_page == 0:
+            logs = logs.all()
+        else:
+            logs = logs.paginate(page, per_page, False)
 
         return logs
