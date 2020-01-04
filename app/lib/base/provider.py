@@ -13,6 +13,7 @@ from app.lib.base.users import UserManager
 from app.lib.base.user_settings import UserSettingsManager
 from app.lib.base.template import TemplateManager
 from app.lib.base.api import ApiManager
+from flask_login import current_user
 
 
 class Provider:
@@ -42,7 +43,7 @@ class Provider:
         )
 
     def shell(self):
-        return ShellManager()
+        return ShellManager(user_id=current_user.id)
 
     def wordlists(self):
         settings = self.settings()
