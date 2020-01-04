@@ -31,7 +31,7 @@ class ScreenManager:
             self.get_screenrc_path()
         ]
 
-        output = self.shell.execute(command)
+        output = self.shell.execute(command, user_id=0)
         return self.__find(name)
 
     def __find(self, name):
@@ -46,7 +46,7 @@ class ScreenManager:
         return found_screen
 
     def __load_screens(self):
-        output = self.shell.execute(['screen', '-ls'])
+        output = self.shell.execute(['screen', '-ls'], user_id=0)
         output = self.__split_and_clean(output)
 
         screens = []

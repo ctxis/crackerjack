@@ -7,7 +7,7 @@ class HashcatManager:
         self.hashcat_binary = hashcat_binary
 
     def get_supported_hashes(self):
-        output = self.shell.execute([self.hashcat_binary, '--help'])
+        output = self.shell.execute([self.hashcat_binary, '--help'], user_id=0)
 
         # Split lines using \n and run strip against all elements of the list.
         lines = list(map(str.strip, output.split("\n")))
@@ -168,7 +168,7 @@ class HashcatManager:
             return []
 
         # Return only the command column from the running processes.
-        output = self.shell.execute(['ps', '-www', '-x', '-o', 'cmd'])
+        output = self.shell.execute(['ps', '-www', '-x', '-o', 'cmd'], user_id=0)
         output = output.split("\n")
 
         processes = []

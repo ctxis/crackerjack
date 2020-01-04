@@ -1,0 +1,81 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col">
+        <div class="card">
+            <h3 class="card-header">Shell Commands</h3>
+            <div class="card-body">
+                <table class="table table-sm table-striped">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>#</th>
+                        <th>Username</th>
+                        <th>Command</th>
+                        <th>Output</th>
+                        <th class="text-right">Run At</th>
+                        <th class="text-right">Finished At</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for shell_log in shell_logs %}
+                    <tr>
+                        <td>
+                            <a href="#" data-id="{{ shell_log.id }}" data-action="expand" class="action-toggle action-expand-{{ shell_log.id }} text-primary" title="expand"><i class="fas fa-plus-square"></i></a>
+                            <a href="#" data-id="{{ shell_log.id }}" data-action="collapse" class="action-toggle action-collapse-{{ shell_log.id }} text-primary d-none" title="collapse"><i class="fas fa-minus-square"></i></a>
+                        </td>
+                        <td>{{ shell_log.id }}</td>
+                        <td>{{ shell_log.username }}</td>
+                        <td>{{ shell_log.command|truncate(40, True) }}</td>
+                        <td>{{ shell_log.output|truncate(40, True) }}</td>
+                        <td class="text-right">{{ shell_log.executed_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td class="text-right">{{ shell_log.finished_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    <tr class="d-none action-box-{{ shell_log.id }}">
+                        <td></td>
+                        <td></td>
+                        <td colspan="5">
+                            <div>
+                                <p class="font-weight-bold">Command:</p>
+                                <div class="text-monospace">{{ shell_log.command }}</div>
+                            </div>
+
+                            <div>
+                                <p class="font-weight-bold">Output:</p>
+                                <pre>{{ shell_log.output }}</pre>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <!-- Empty to preserve the striped table -->
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.action-toggle').click(function() {
+            var id = $(this).data('id');
+            var action = $(this).data('action');
+
+            if (action == 'expand') {
+                $('.action-expand-' + id).addClass('d-none');
+                $('.action-collapse-' + id).removeClass('d-none');
+                $('.action-box-' + id).removeClass('d-none');
+            } else {
+                $('.action-expand-' + id).removeClass('d-none');
+                $('.action-collapse-' + id).addClass('d-none');
+                $('.action-box-' + id).addClass('d-none');
+            }
+
+            return false;
+        });
+    });
+</script>
+{% endblock %}

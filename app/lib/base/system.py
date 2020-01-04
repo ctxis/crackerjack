@@ -20,21 +20,21 @@ class SystemManager:
         elif not os.access(hashcat_binary, os.X_OK):
             return False
 
-        version = self.shell.execute([hashcat_binary, '--version'])
+        version = self.shell.execute([hashcat_binary, '--version'], user_id=0)
         self.settings.save('hashcat_version', version)
         return True
 
     def update_git_hash_version(self):
-        git_binary = self.shell.execute(['which', 'git'])
+        git_binary = self.shell.execute(['which', 'git'], user_id=0)
         if len(git_binary) == 0:
             return False
 
         # Save latest commit short hash.
-        version = self.shell.execute(['git', 'rev-parse', '--short', 'HEAD'])
+        version = self.shell.execute(['git', 'rev-parse', '--short', 'HEAD'], user_id=0)
         self.settings.save('git_hash_version', version)
 
         # Save commit count on the master branch (like a version tracker).
-        count = int(self.shell.execute(['git', 'rev-list', '--count', 'master']))
+        count = int(self.shell.execute(['git', 'rev-list', '--count', 'master'], user_id=0))
         self.settings.save('git_commit_count', count)
         return True
 
@@ -45,4 +45,4 @@ class SystemManager:
         if len(user) == 0:
             user = self.get_system_user()
 
-        return self.shell.execute(['/bin/bash', '-c', 'eval echo ~' + user])
+        return self.shell.execute(['/bin/bash', '-c', 'eval echo ~' + user], user_id=0)

@@ -221,3 +221,20 @@ def logins():
         'admin/users/logins.html',
         logins=user_logins
     )
+
+
+@bp.route('/shell/logs', methods=['GET'])
+@login_required
+def shell_logs():
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    provider = Provider()
+    shell = provider.shell()
+    shell_logs = shell.get_logs()
+
+    return render_template(
+        'admin/shell/logs.html',
+        shell_logs=shell_logs
+    )
