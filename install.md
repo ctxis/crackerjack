@@ -52,7 +52,7 @@ If you have installed hashcat from source, you will need to create a ".hashcat" 
 To identify the folder, run:
 
 ```
-grep www-data /etc/passwd | awk -F':' '{ print $6 }'
+eval echo ~www-data
 ```
 Which will result in something like
 ```
