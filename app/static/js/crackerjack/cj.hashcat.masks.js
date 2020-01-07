@@ -254,7 +254,9 @@ var CJ_HashcatMasks = {
         // If a charset is selected, ignore all other selections.
         if (settings['charset'].length > 0) {
             mask['custom'] = true;
-            mask['mask'] = settings['charset'];
+            // As per https://hashcat.net/wiki/doku.php?id=mask_attack#masks
+            // The custom '?' is represented as '??'
+            mask['mask'] = settings['charset'].replace('?', '??');
         } else if (settings.masks.indexOf('binary') >= 0) {
             // If 'all' or 'binary' are checked, they should be on their own as ?l?u < ?a < ?b.
             mask['mask'] = '?b'
@@ -336,6 +338,7 @@ var CJ_HashcatMasks = {
         this.generatePositionElements(data.positions, true);
         $('#mask-max-characters').val(data.positions);
 
+        console.dir(data);
         masks = data.mask.split('?');
         for (var i = 0; i < masks.length; i++) {
             // This is a bit weird as because the first character is '?', the actual data will start coming in from
@@ -347,9 +350,16 @@ var CJ_HashcatMasks = {
             if (this.isInteger(masks[i])) {
                 // It's a custom group.
                 // If there's no question mark it's a custom charset - yes I know this may fail, but I'm too tired now.
-                if (data.groups[masks[i] - 1].indexOf('?') == -1) {
-                    this.setTextValue(i, 'charset', data.groups[masks[i] - 1]);
-                } {
+                var isGrouped = true;
+                if (data.groups[masks[i] - 1].indexOf('?') >= 0) {
+                    // If there is a single question mark, it's a fixed set. If it's 2 then it's a custom one.
+                    if (data.groups[masks[i] - 1].indexOf('??') >= 0) {
+                        this.setTextValue(i, 'charset', data.groups[masks[i] - 1].replace('??', '?'));
+                        isGrouped = false;
+                    }
+                }
+
+                if (isGrouped) {
                     groupedMasks = data.groups[masks[i] - 1].split('?');
                     for (var k = 0; k < groupedMasks.length; k++) {
                         this.setCheckboxValue(i, this.validReverseMasks['?' + groupedMasks[k]], true);
