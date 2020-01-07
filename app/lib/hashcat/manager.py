@@ -96,7 +96,11 @@ class HashcatManager:
                 command['--rules-file'] = rule
         elif mode == 3:
             # Bruteforce.
-            command[mask] = ''
+            parsed_mask = self.parse_mask_from_string(mask)
+            for group in parsed_mask['groups']:
+                command['-' + str(group['position'])] = group['mask']
+
+            command[parsed_mask['mask']] = ''
 
             if increment_min > 0 or increment_max > 0:
                 command['--increment'] = ''
@@ -114,6 +118,70 @@ class HashcatManager:
             command['force'] = ''
 
         return command
+
+    def parse_mask_from_string(self, mask):
+        # This function should be the same as the processCompiledMask() from the frontend.
+
+        # Replace double quotes.
+        compiled = mask.replace('  ', '')
+
+        # Example mask. The last bit is the actual mask and the start is any custom sets.
+        # -1 ?l?s -2 ?l ?u -3 ?d?s -4 ab??d ?1?u?2?3?4?l?u?d
+        info = compiled.split(' ')
+
+        # The last element is the actual mask. Retrieve it and remove it from the array.
+        actual_mask = info.pop().strip()
+
+        """
+        We should be left with an array of:
+                -1
+                ?l?s
+                -2
+                ?l
+                ?u
+                -3
+                ?d?s
+                -4
+                a-b??d
+        """
+        charset = False
+        all_charsets = []
+        while len(info) > 0:
+            part = info.pop(0)
+            if len(part) == 2 and part[0] == '-' and part[1].isdigit():
+                # Save any previously parsed charset.
+                if charset is not False:
+                    charset['mask'] = charset['mask'].strip()
+                    all_charsets.append(charset)
+
+                charset = {
+                    'position': int(part[1]),
+                    'mask': ''
+                }
+            else:
+                if charset is not False:
+                    charset['mask'] = ' ' + part
+
+        if charset is not False:
+            charset['mask'] = charset['mask'].strip()
+            all_charsets.append(charset)
+
+        # Now sort, just in case it's not in the right order.
+        for i in range(len(all_charsets)):
+            for k in range(0, len(all_charsets) - i - 1):
+                if all_charsets[i]['position'] < all_charsets[k]['position']:
+                    swap = all_charsets[i]
+                    all_charsets[i] = all_charsets[k]
+                    all_charsets[k] = swap
+
+        # And now put into the final object. The number of question marks is the number of positions.
+        data = {
+            'mask': actual_mask,
+            'positions': actual_mask.count('?'),
+            'groups': all_charsets
+        }
+
+        return data
 
     def parse_stream(self, stream):
         stream = str(stream)
