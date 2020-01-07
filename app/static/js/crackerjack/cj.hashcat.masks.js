@@ -1,6 +1,8 @@
 var CJ_HashcatMasks = {
     template: null,
 
+    maxCustomCharsets: 4,
+
     validMasks: {
         'lower': '?l',
         'upper': '?u',
@@ -128,14 +130,27 @@ var CJ_HashcatMasks = {
     },
 
     updateMasks: function() {
+        var existingErrors = [];
+        $('.mask-error').text('');
+
         masks = this.calculateMasks();
         compiled = this.compileMasks(masks);
         // Check if all positions have been set.
-        if (!this.checkMasks(masks)) {
-            $('.mask-error').text('Not all positions have a mask assigned to them');
+        var areMasksValid = this.checkMasks(masks);
+
+        var error = $('.mask-error').text();
+        if (error.length > 0) {
+            existingErrors.push(error);
+        }
+
+        if (!areMasksValid) {
+            existingErrors.push('Not all positions have a mask assigned to them');
         } else {
             $('.mask-error').text('');
         }
+
+        $('.mask-error').html(existingErrors.join("<br>"));
+
         $('#compiled-mask').val(compiled);
     },
 
@@ -170,6 +185,12 @@ var CJ_HashcatMasks = {
             } else {
                 mask.push(masks[i].mask);
             }
+        }
+
+        if (groupedMasks.length > CJ_HashcatMasks.maxCustomCharsets) {
+            $('.mask-error').text('You cannot have more than ' + CJ_HashcatMasks.maxCustomCharsets + ' custom charsets (-1, -2, -3, ...etc)');
+        } else {
+            $('.mask-error').text('');
         }
 
         // Compile custom masks.
