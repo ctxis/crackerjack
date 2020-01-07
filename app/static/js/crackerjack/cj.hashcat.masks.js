@@ -338,7 +338,6 @@ var CJ_HashcatMasks = {
         this.generatePositionElements(data.positions, true);
         $('#mask-max-characters').val(data.positions);
 
-        console.dir(data);
         masks = data.mask.split('?');
         for (var i = 0; i < masks.length; i++) {
             // This is a bit weird as because the first character is '?', the actual data will start coming in from
@@ -349,23 +348,30 @@ var CJ_HashcatMasks = {
 
             if (this.isInteger(masks[i])) {
                 // It's a custom group.
-                // If there's no question mark it's a custom charset - yes I know this may fail, but I'm too tired now.
-                var isGrouped = true;
-                if (data.groups[masks[i] - 1].indexOf('?') >= 0) {
-                    // If there is a single question mark, it's a fixed set. If it's 2 then it's a custom one.
-                    if (data.groups[masks[i] - 1].indexOf('??') >= 0) {
-                        this.setTextValue(i, 'charset', data.groups[masks[i] - 1].replace('??', '?'));
-                        isGrouped = false;
+                var hasQuestionMark = false;
+                var groupMask = data.groups[masks[i] - 1];
+                // Remove all instances of official masks, but first check for a double question mark ??.
+                if (groupMask.indexOf('??') >= 0) {
+                    hasQuestionMark = true;
+                    groupMask = groupMask.replace('??', '');
+                }
+                for (var charset in CJ_HashcatMasks.validReverseMasks) {
+                    if (CJ_HashcatMasks.validReverseMasks.hasOwnProperty(charset)) {
+                        if (groupMask.indexOf(charset) >= 0) {
+                            // Exists - set the checkbox.
+                            this.setCheckboxValue(i, this.validReverseMasks[charset], true);
+                            // And remove it.
+                            groupMask = groupMask.replace(charset, '');
+                        }
                     }
                 }
-
-                if (isGrouped) {
-                    groupedMasks = data.groups[masks[i] - 1].split('?');
-                    for (var k = 0; k < groupedMasks.length; k++) {
-                        this.setCheckboxValue(i, this.validReverseMasks['?' + groupedMasks[k]], true);
-                    }
+                // If there's anything left, it's a custom charset.
+                if (hasQuestionMark) {
+                    groupMask = groupMask + '?';
                 }
-
+                if (groupMask.length > 0) {
+                    this.setTextValue(i, 'charset', groupMask);
+                }
             } else {
                 this.setCheckboxValue(i, this.validReverseMasks['?' + masks[i]], true);
             }
@@ -375,43 +381,81 @@ var CJ_HashcatMasks = {
     },
 
     processCompiledMask: function(compiled) {
-        var data = {
-            'mask': '',
-            'positions': 0,
-            'groups': []
-        };
+        // Remove any double spaces.
+        compiled = compiled.replace(/  /g, ' ');
 
-        // I know this will fail if you have a space in your custom charset.
-        var parts = compiled.split(' ');
+        // Example mask. The last bit is the actual mask and the start is any custom sets.
+        // -1 ?l?s -2 ?l ?u -3 ?d?s -4 ab??d ?1?u?2?3?4?l?u?d
+        var info = compiled.split(' ');
 
         // The last element is the actual mask. Retrieve it and remove it from the array.
-        var mask = parts.pop();
+        var actualMask = info.pop().trim();
 
-        // The number of question marks is the number of positions.
-        // https://stackoverflow.com/questions/4009756/how-to-count-string-occurrence-in-string
-        var positions = (mask.match(/\?/g) || []).length;
+        /*
+            We should be left with an array of:
+                -1
+                ?l?s
+                -2
+                ?l
+                ?u
+                -3
+                ?d?s
+                -4
+                a-b??d
+        */
+        var charset = null;
+        var allCharsets = [];
+        while (info.length > 0) {
+            var part = info.shift();
+            if (part.length == 2 && part.charAt(0) == '-' && this.isInteger(part.charAt(1))) {
+                // Save any previously parsed charset.
+                if (charset !== null) {
+                    charset['mask'] = charset['mask'].trim();
+                    allCharsets.push(charset);
+                }
 
-        // Now we need to iterate through the remaining array and assign the custom charsets to the right mask.
-        // All masks are in groups, so it should always be an even number.
-        if (parts.length % 2 != 0) {
-            // Nope, it's even for some reason. Stop parsing it.
-            return data;
-        }
-
-        var groups = new Array(parts.length / 2);
-        for (var i = 0; i < parts.length; i++) {
-            // If the element begins with a "-" and the next character is a digit, it's a placeholder.
-            if (parts[i].charAt(0) == '-' && this.isInteger(parts[i].substr(1))) {
-                var k = parseInt(parts[i].substr(1));
-                k--; // Charsets begin from 1 but the array we're storing it into begins from 0.
-                groups.splice(k, 0, parts[i + 1]);
-                i++; // Skip next iteration.
+                // This is a custom charset.
+                charset = {
+                    position: parseInt(part.charAt(1)),
+                    mask: ''
+                };
+            } else {
+                if (charset !== null) {
+                    charset['mask'] += ' ' + part;
+                }
             }
         }
 
-        data.mask = mask;
-        data.positions = positions;
-        data.groups = groups;
+        if (charset !== null) {
+            charset['mask'] = charset['mask'].trim();
+            allCharsets.push(charset);
+        }
+
+        // Now sort, just in case it's not in the right order.
+        for (var i = 0; i < allCharsets.length; i++) {
+            for (var k = 0; k < allCharsets.length - 1; k++) {
+                if (allCharsets[i]['position'] < allCharsets[k]['position']) {
+                    var swap = allCharsets[i];
+                    allCharsets[i] = allCharsets[k];
+                    allCharsets[k] = swap;
+                }
+            }
+        }
+
+        // And now put into the final object.
+        // The number of question marks is the number of positions.
+        // https://stackoverflow.com/questions/4009756/how-to-count-string-occurrence-in-string
+        var positions = (actualMask.match(/\?/g) || []).length;
+
+        var data = {
+            'mask': actualMask,
+            'positions': positions,
+            'groups': []
+        };
+
+        for (var i = 0; i < allCharsets.length; i++) {
+            data['groups'].push(allCharsets[i].mask);
+        }
 
         return data;
     }
