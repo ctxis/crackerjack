@@ -32,5 +32,7 @@ class TemplateManager:
             text = 'null'
         elif state == 4:
             text = 'warning'
+        elif state == 5:
+            text = 'success'
 
         return text
