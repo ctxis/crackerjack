@@ -13,6 +13,8 @@ class TemplateManager:
             text = 'Finished'
         elif state == 4:
             text = 'Paused'
+        elif state == 5:
+            text = 'Cracked'
 
         return text
 

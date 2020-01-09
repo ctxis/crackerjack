@@ -266,6 +266,7 @@ class SessionManager:
         #   2   STOPPED
         #   3   FINISHED
         #   4   PAUSED
+        #   5   CRACKED
         #   99  UNKNOWN
         if 'Status' in raw:
             if raw['Status'] == 'Running':
@@ -276,6 +277,8 @@ class SessionManager:
                 data['process_state'] = 3
             elif raw['Status'] == 'Paused':
                 data['process_state'] = 4
+            elif raw['Status'] == 'Cracked':
+                data['process_state'] = 5
 
         # progress
         if 'Progress' in raw:
