@@ -138,7 +138,7 @@ class SessionManager:
                     'increment_min': 0 if not hashcat else hashcat.increment_min,
                     'increment_max': 0 if not hashcat else hashcat.increment_max,
                     'data_raw': hashcat_data_raw,
-                    'data': self.process_hashcat_raw_data(hashcat_data_raw),
+                    'data': self.process_hashcat_raw_data(hashcat_data_raw, screen_name=session.screen_name),
                     'hashfile': self.get_hashfile_path(session.user_id, session.id),
                     'hashfile_exists': self.hashfile_exists(session.user_id, session.id)
                 },
@@ -205,6 +205,10 @@ class SessionManager:
         os.rename(path, new_path)
         return True
 
+    def is_process_running(self, screen_name):
+        screens = self.hashcat.get_process_screen_names()
+        return screen_name in screens
+
     def hashcat_action(self, session_id, action):
         # First get the session.
         session = self.get(session_id=session_id)[0]
@@ -267,7 +271,7 @@ class SessionManager:
     def __fix_line_termination(self, data):
         return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
 
-    def process_hashcat_raw_data(self, raw):
+    def process_hashcat_raw_data(self, raw, screen_name=None):
         # Build base dictionary
         data = {
             'process_state': 0,
@@ -298,6 +302,12 @@ class SessionManager:
                 data['process_state'] = 4
             elif raw['Status'] == 'Cracked':
                 data['process_state'] = 5
+
+        # There's a chance that there's no 'status' output displayed yet. In this case, check if the process is running.
+        if data['process_state'] == 0 and screen_name is not None:
+            if self.is_process_running(screen_name):
+                # Set to running.
+                data['process_state'] = 1
 
         # progress
         if 'Progress' in raw:
@@ -392,7 +402,7 @@ class SessionManager:
         data['commands']['all'] = processes
 
         for process in processes:
-            name = self.__extract_session_from_process(process)
+            name = self.hashcat.extract_session_from_process(process)
             found = False
             for session in sessions:
                 if session['screen_name'] == name:
@@ -404,16 +414,6 @@ class SessionManager:
             data['commands'][key].append(process)
 
         return data
-
-    def __extract_session_from_process(self, process):
-        parts = process.split(" ")
-        name = ''
-        for i, item in enumerate(parts):
-            if item == '--session':
-                name = parts[i + 1]
-                break
-
-        return name
 
     def save_hashes(self, user_id, session_id, hashes):
         save_as = self.get_hashfile_path(user_id, session_id)

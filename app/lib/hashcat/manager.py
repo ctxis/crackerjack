@@ -248,3 +248,26 @@ class HashcatManager:
                 processes.append(line)
 
         return processes
+
+    def get_process_screen_names(self):
+        processes = self.get_running_processes_commands()
+        names = []
+
+        for process in processes:
+            name = self.extract_session_from_process(process)
+            if len(name) == 0:
+                continue
+
+            names.append(name)
+
+        return names
+
+    def extract_session_from_process(self, process):
+        parts = process.split(" ")
+        name = ''
+        for i, item in enumerate(parts):
+            if item == '--session':
+                name = parts[i + 1]
+                break
+
+        return name
