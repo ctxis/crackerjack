@@ -2,6 +2,7 @@ from sqlalchemy import desc, and_
 from app.lib.models.user import UserModel, UserLogins
 from app import db
 import flask_bcrypt as bcrypt
+import datetime
 
 
 class UserManager:
@@ -101,7 +102,7 @@ class UserManager:
         return db.session.query(UserModel).count()
 
     def record_login(self, user_id):
-        login = UserLogins(user_id=user_id)
+        login = UserLogins(user_id=user_id, login_at=datetime.datetime.now())
         db.session.add(login)
         db.session.commit()
         return True
