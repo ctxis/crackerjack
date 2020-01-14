@@ -2,6 +2,7 @@ import re
 import random
 import string
 import os
+import time
 from app.lib.models.sessions import SessionModel
 from app.lib.models.user import UserModel
 from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
@@ -81,8 +82,10 @@ class SessionManager:
     def get_potfile_path(self, user_id, session_id):
         return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.potfile')
 
-    def get_screenfile_path(self, user_id, session_id):
-        return os.path.join(self.get_user_data_path(user_id, session_id), 'screen.log')
+    def get_screenfile_path(self, user_id, session_id, name=None):
+        if name is None:
+            name = 'screen.log'
+        return os.path.join(self.get_user_data_path(user_id, session_id), name)
 
     def get_crackedfile_path(self, user_id, session_id):
         return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.cracked')
@@ -193,6 +196,15 @@ class SessionManager:
 
         return record
 
+    def backup_screen_log_file(self, user_id, session_id):
+        path = self.get_screenfile_path(user_id, session_id)
+        if not os.path.isfile(path):
+            return True
+
+        new_path = path + '.' + str(int(time.time()))
+        os.rename(path, new_path)
+        return True
+
     def hashcat_action(self, session_id, action):
         # First get the session.
         session = self.get(session_id=session_id)[0]
@@ -216,6 +228,13 @@ class SessionManager:
                 False
             )
 
+            # Before we start a new session, rename the previous "screen.log" file
+            # so that we can determine errors/state easier.
+            self.backup_screen_log_file(session['user_id'], session_id)
+
+            # Even though we renamed the file, as it is still open the OS handle will now point to the renamed file.
+            # We re-set the screen logfile to the original file.
+            screen.set_logfile(self.get_screenfile_path(session['user_id'], session_id))
             screen.execute(command)
         elif action == 'reset':
             # Close the screen.

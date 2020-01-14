@@ -101,3 +101,15 @@ class ScreenInstance:
         )
 
         return True
+
+    def set_logfile(self, path):
+        output = self.shell.execute(
+            [
+                'screen',
+                '-X',
+                'logfile',
+                path
+            ]
+        )
+
+        return True
