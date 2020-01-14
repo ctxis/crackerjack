@@ -115,7 +115,7 @@ class HashcatManager:
             return {}
 
         if force:
-            command['force'] = ''
+            command['--force'] = ''
 
         return command
 
