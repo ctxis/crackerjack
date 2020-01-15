@@ -121,6 +121,7 @@ def settings_auth_save():
     allow_logins = request.form.get('allow_logins', 0)
 
     ldap_enabled = int(request.form.get('ldap_enabled', 0))
+    ldap_ssl = int(request.form.get('ldap_ssl', 0))
 
     # Put the rest of the ldap options in a dict to make it easier to validate and save.
     ldap_settings = {
@@ -151,6 +152,7 @@ def settings_auth_save():
     settings.save('ldap_mapping_email', request.form['ldap_mapping_email'].strip())
     settings.save('allow_logins', allow_logins)
     settings.save('ldap_enabled', ldap_enabled)
+    settings.save('ldap_ssl', ldap_ssl)
     for key, data in ldap_settings.items():
         settings.save(key, data['value'])
 

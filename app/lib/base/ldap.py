@@ -16,6 +16,15 @@ class LDAPManager:
         self._mapping_firstname = ''
         self._mapping_lastname = ''
         self._mapping_email = ''
+        self._ssl = 0
+
+    @property
+    def ssl(self):
+        return self._ssl
+
+    @ssl.setter
+    def ssl(self, value):
+        self._ssl = int(value)
 
     @property
     def enabled(self):
@@ -101,7 +110,7 @@ class LDAPManager:
         return self._enabled > 0
 
     def authenticate(self, username, password, auto_create_user=False):
-        server = ldap3.Server(self._host, get_info=ldap3.ALL)
+        server = ldap3.Server(self._host, get_info=ldap3.ALL, use_ssl=self._ssl)
         user = self._domain + "\\" + username
         conn = ldap3.Connection(server, user=user, password=password, authentication=ldap3.NTLM)
         result = conn.bind()
