@@ -206,11 +206,12 @@ def user_save(user_id):
     email = request.form['email'].strip() if 'email' in request.form else ''
     admin = int(request.form.get('admin', 0))
     ldap = int(request.form.get('ldap', 0))
+    active = int(request.form.get('active', 0))
 
     provider = Provider()
     users = provider.users()
 
-    if not users.save(user_id, username, password, first_name, last_name, email, admin, ldap):
+    if not users.save(user_id, username, password, first_name, last_name, email, admin, ldap, active):
         flash(users.get_last_error(), 'error')
         return redirect(url_for('admin.user_edit', user_id=user_id))
 

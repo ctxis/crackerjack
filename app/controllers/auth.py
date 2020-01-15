@@ -47,6 +47,11 @@ def login_process():
         flash('Invalid credentials', 'error')
         return redirect(url_for('auth.login'))
 
+    # If we reach this point it means that our user exists. Check if the user is active.
+    if user.active is False:
+        flash('Your account has been disabled by the Administrator.', 'error')
+        return redirect(url_for('auth.login'))
+
     login_user(user)
     users.record_login(user.id)
 

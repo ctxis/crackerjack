@@ -24,6 +24,7 @@
                         <th>E-mail</th>
                         <th>Admin</th>
                         <th>LDAP</th>
+                        <th>Active</th>
                         <th class="text-right">Actions</th>
                     </tr>
                     </thead>
@@ -37,6 +38,7 @@
                         <td>{{ user.email }}</td>
                         <td>{{ 'Yes' if user.admin == 1 else 'No' }}</td>
                         <td>{{ 'Yes' if user.ldap == 1 else 'No' }}</td>
+                        <td>{{ 'Yes' if user.active == 1 else 'No' }}</td>
                         <td class="text-right">
                             <a href="{{ url_for('admin.user_edit', user_id=user.id) }}"><i class="fas fa-edit"></i></a>
                         </td>

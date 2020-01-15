@@ -15,7 +15,7 @@ class UserManager:
     def get_last_error(self):
         return self.last_error
 
-    def save(self, user_id, username, password, first_name, last_name, email, admin, ldap):
+    def save(self, user_id, username, password, first_name, last_name, email, admin, ldap, active):
         if user_id > 0:
             # This is a user-edit.
             user = self.get_by_id(user_id)
@@ -30,6 +30,7 @@ class UserManager:
         # because otherwise it will clear the fields (as the fields are not posted during the submit.
         if user_id > 0 and user.ldap != ldap:
             user.ldap = True if ldap == 1 else False
+            user.active = True if active == 1 else False
             db.session.commit()
             db.session.refresh(user)
             return True
@@ -59,6 +60,7 @@ class UserManager:
 
         user.admin = True if admin == 1 else False
         user.ldap = True if ldap == 1 else False
+        user.active = True if active == 1 else False
 
         if user_id == 0:
             db.session.add(user)

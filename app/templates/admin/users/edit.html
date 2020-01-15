@@ -95,6 +95,14 @@
                     </div>
                     {% endif %}
 
+                    <div class="form-group pt-2">
+                        <label for="active">Active</label>
+                        <div class="custom-control custom-switch float-right">
+                            <input name="active" type="checkbox" class="custom-control-input" id="active" value="1" {{ "checked='checked'" if user.active == 1 else '' }}>
+                            <label class="custom-control-label" for="active"></label>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block">{{ 'create' if user == None else 'update' }}</button>
                     </div>

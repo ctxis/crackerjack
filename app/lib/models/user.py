@@ -13,6 +13,7 @@ class UserModel(db.Model, UserMixin):
     email = db.Column(db.String(255), nullable=True, default='')
     ldap = db.Column(db.Boolean, default=False, index=True)
     admin = db.Column(db.Boolean, default=False, index=True)
+    active = db.Column(db.Boolean, default=True, index=True)
 
 
 class UserSettings(db.Model):
