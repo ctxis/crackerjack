@@ -228,8 +228,7 @@ class SessionManager:
                 self.get_crackedfile_path(session['user_id'], session_id),
                 self.get_potfile_path(session['user_id'], session_id),
                 int(session['hashcat']['increment_min']),
-                int(session['hashcat']['increment_max']),
-                False
+                int(session['hashcat']['increment_max'])
             )
 
             # Before we start a new session, rename the previous "screen.log" file

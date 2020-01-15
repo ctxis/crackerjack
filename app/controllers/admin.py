@@ -25,7 +25,8 @@ def settings_hashcat():
             'hashcat_binary': settings.get('hashcat_binary', ''),
             'wordlists_path': settings.get('wordlists_path', ''),
             'hashcat_rules_path': settings.get('hashcat_rules_path', ''),
-            'hashcat_status_interval': settings.get('hashcat_status_interval', 10)
+            'hashcat_status_interval': settings.get('hashcat_status_interval', 10),
+            'hashcat_force': settings.get('hashcat_force', 0)
         }
     )
 
@@ -44,6 +45,7 @@ def settings_hashcat_save():
     wordlists_path = request.form['wordlists_path'].strip()
     hashcat_rules_path = request.form['hashcat_rules_path'].strip()
     hashcat_status_interval = request.form['hashcat_status_interval'].strip()
+    hashcat_force = int(request.form.get('hashcat_force', 0))
 
     has_errors = False
     if len(hashcat_binary) == 0 or not os.path.isfile(hashcat_binary):
@@ -82,6 +84,7 @@ def settings_hashcat_save():
     settings.save('wordlists_path', wordlists_path)
     settings.save('hashcat_rules_path', hashcat_rules_path)
     settings.save('hashcat_status_interval', hashcat_status_interval)
+    settings.save('hashcat_force', hashcat_force)
 
     # When settings are saved, run system updates.
     system = provider.system()

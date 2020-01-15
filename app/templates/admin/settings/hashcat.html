@@ -25,6 +25,14 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="hashcat_force">Use --force</label>
+                        <div class="custom-control custom-switch float-right">
+                            <input name="hashcat_force" type="checkbox" class="custom-control-input" id="hashcat_force" value="1" {{ "checked='checked'" if setting_get('hashcat_force', '0') == '1' else '' }}>
+                            <label class="custom-control-label" for="hashcat_force"></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label for="wordlists_path">Wordlists Path</label>
                         <input name="wordlists_path" type="text" id="wordlists_path" class="form-control" value="{{ settings.wordlists_path }}" placeholder="/path/to/wordlists" required>
                     </div>

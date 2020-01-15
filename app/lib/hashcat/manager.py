@@ -2,10 +2,11 @@ import collections
 
 
 class HashcatManager:
-    def __init__(self, shell, hashcat_binary, status_interval=10):
+    def __init__(self, shell, hashcat_binary, status_interval=10, force=False):
         self.shell = shell
         self.hashcat_binary = hashcat_binary
         self.status_interval = 10 if int(status_interval) <= 0 else int(status_interval)
+        self.force = force
 
     def get_supported_hashes(self):
         output = self.shell.execute([self.hashcat_binary, '--help'], user_id=0)
@@ -75,7 +76,7 @@ class HashcatManager:
 
         return valid
 
-    def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile, increment_min, increment_max, force):
+    def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile, increment_min, increment_max):
         command = {
             self.hashcat_binary: '',
             '--session': session_name,
@@ -114,7 +115,7 @@ class HashcatManager:
             # Invalid or not implemented yet.
             return {}
 
-        if force:
+        if self.force:
             command['--force'] = ''
 
         return command
