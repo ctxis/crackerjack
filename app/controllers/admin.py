@@ -254,3 +254,35 @@ def shell_logs():
         'admin/shell/logs.html',
         shell_logs=shell_logs
     )
+
+
+@bp.route('/system/messages', methods=['GET'])
+@login_required
+def system_messages():
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    return render_template(
+        'admin/system/messages.html'
+    )
+
+
+@bp.route('/system/messages/save', methods=['POST'])
+@login_required
+def system_messages_save():
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    provider = Provider()
+    settings = provider.settings()
+
+    system_message_login = request.form['system_message_login'].strip()
+    system_message_login_show = int(request.form.get('system_message_login_show', 0))
+
+    settings.save('system_message_login', system_message_login)
+    settings.save('system_message_login_show', system_message_login_show)
+
+    flash('Settings saved', 'success')
+    return redirect(url_for('admin.system_messages'))

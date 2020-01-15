@@ -1,6 +1,12 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
+
+{% set system_message_login_show = setting_get('system_message_login_show', '') %}
+{% if system_message_login_show == '1' %}
+{{ setting_get('system_message_login', '')|safe }}
+{% endif %}
+
 <div class="row mt-5">
     <div class="col"></div>
     <div class="col">
