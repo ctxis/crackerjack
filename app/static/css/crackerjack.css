@@ -1,3 +1,8 @@
 .error {
     color: red;
 }
+
+.session-error-tail {
+    max-width: 840px;
+    overflow: auto;
+}

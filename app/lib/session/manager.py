@@ -144,7 +144,8 @@ class SessionManager:
                 },
                 'user': {
                     'record': UserModel.query.filter(UserModel.id == session.user_id).first()
-                }
+                },
+                'tail_screen': self.__tail_file(self.get_screenfile_path(session.user_id, session.id), 4096).decode()
             }
 
             data.append(item)
@@ -289,6 +290,7 @@ class SessionManager:
         #   3   FINISHED
         #   4   PAUSED
         #   5   CRACKED
+        #   98  ERROR
         #   99  UNKNOWN
         if 'Status' in raw:
             if raw['Status'] == 'Running':
@@ -302,11 +304,21 @@ class SessionManager:
             elif raw['Status'] == 'Cracked':
                 data['process_state'] = 5
 
-        # There's a chance that there's no 'status' output displayed yet. In this case, check if the process is running.
-        if data['process_state'] == 0 and screen_name is not None:
-            if self.is_process_running(screen_name):
-                # Set to running.
-                data['process_state'] = 1
+        if screen_name is not None:
+            if data['process_state'] == 0:
+                # There's a chance that there's no 'status' output displayed yet. In this case, check if the process is running.
+                if self.is_process_running(screen_name):
+                    # Set to running.
+                    data['process_state'] = 1
+            elif data['process_state'] == 1:
+                # Also, if it's running but there's no process, set to error.
+                if not self.is_process_running(screen_name):
+                    # Set to error.
+                    data['process_state'] = 98
+
+        # If it is STILL not running, take the last few output lines, and mark this as an 'error'.
+        if data['process_state'] == 0:
+            data['process_state'] = 98
 
         # progress
         if 'Progress' in raw:
@@ -337,17 +349,16 @@ class SessionManager:
 
         return data
 
-    def get_hashcat_status(self, user_id, session_id):
-        screen_log_file = self.get_screenfile_path(user_id, session_id)
-        if not os.path.isfile(screen_log_file):
-            return {}
+    def __tail_file(self, file, length):
+        if not os.path.isfile(file):
+            return ''
 
         # If we try to read more than the actual size of the file, it will throw an error.
-        filesize = os.path.getsize(screen_log_file)
-        bytes_to_read = filesize if filesize < 4096 else 4096
+        filesize = os.path.getsize(file)
+        bytes_to_read = filesize if filesize < length else length
 
         # Read the last 4KB from the screen log file.
-        with open(screen_log_file, 'rb') as file:
+        with open(file, 'rb') as file:
             file.seek(bytes_to_read * -1, os.SEEK_END)
             stream = file.read()
 
@@ -355,6 +366,14 @@ class SessionManager:
         # Clean the file from escape characters.
         stream = self.__remove_escape_characters(stream)
         stream = self.__fix_line_termination(stream)
+
+        return stream
+
+    def get_hashcat_status(self, user_id, session_id):
+        screen_log_file = self.get_screenfile_path(user_id, session_id)
+        stream = self.__tail_file(screen_log_file, 4096)
+        if len(stream) == 0:
+            return {}
 
         # Pass to hashcat class to parse and return a dict with all the data.
         data = self.hashcat.parse_stream(stream)

@@ -50,7 +50,12 @@
             <tr>
                 <th scope="row" class="table-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</th>
                 <td class="text-right">
-                    <a href="#" title="Click to view raw output" class="raw-progress">{{ session.hashcat.data.progress }}%</a>
+                    <a href="#" title="Click to view raw output" class="raw-progress">
+                        {{ session.hashcat.data.progress }}%
+                        {% if session.hashcat.data.process_state == 98 %}
+                        <span class="ml-2 text-danger"><i class="fas fa-exclamation"></i></span>
+                        {% endif %}
+                    </a>
                 </td>
                 <td class="text-right">
                     <span>{{ session.hashcat.data.cracked_passwords }}/{{ session.hashcat.data.all_passwords }}</span>
@@ -106,6 +111,14 @@
                             <td class="text-right">{{ value }}</td>
                         </tr>
                         {% endfor %}
+                        {% if session.hashcat.data.process_state == 98 %}
+                        <tr>
+                            <td colspan="2">
+                                <div class="session-error-tail">
+                                    <pre class="p-2">{{ session.tail_screen }}</pre>
+                                </div>
+                        </tr>
+                        {% endif %}
                         </tbody>
                     </table>
                 </td>

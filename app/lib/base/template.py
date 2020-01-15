@@ -15,6 +15,8 @@ class TemplateManager:
             text = 'Paused'
         elif state == 5:
             text = 'Cracked'
+        elif state == 98:
+            text = 'Error'
 
         return text
 
@@ -34,5 +36,7 @@ class TemplateManager:
             text = 'warning'
         elif state == 5:
             text = 'success'
+        elif state == 98:
+            text = 'danger'
 
         return text
