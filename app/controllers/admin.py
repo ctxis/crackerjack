@@ -133,11 +133,7 @@ def settings_auth_save():
         'ldap_mapping_username': {'value': request.form['ldap_mapping_username'].strip(),
                                   'error': 'LDAP Mapping Username cannot be empty'},
         'ldap_mapping_firstname': {'value': request.form['ldap_mapping_firstname'].strip(),
-                                   'error': 'LDAP Mapping First Name cannot be empty'},
-        'ldap_mapping_lastname': {'value': request.form['ldap_mapping_lastname'].strip(),
-                                  'error': 'LDAP Mapping Last Name cannot be empty'},
-        'ldap_mapping_email': {'value': request.form['ldap_mapping_email'].strip(),
-                               'error': 'LDAP Mapping E-mail cannot be empty'}
+                                   'error': 'LDAP Mapping First Name cannot be empty'}
     }
 
     has_errors = False
@@ -151,6 +147,8 @@ def settings_auth_save():
     if has_errors:
         return redirect(url_for('admin.settings_auth'))
 
+    settings.save('ldap_mapping_lastname', request.form['ldap_mapping_lastname'].strip())
+    settings.save('ldap_mapping_email', request.form['ldap_mapping_email'].strip())
     settings.save('allow_logins', allow_logins)
     settings.save('ldap_enabled', ldap_enabled)
     for key, data in ldap_settings.items():

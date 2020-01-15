@@ -146,13 +146,23 @@ class LDAPManager:
         if not result:
             return False
 
-        conn.search(self._base_dn, "(&(objectclass=person)(" + self.mapping_username + "=" + username + "))", attributes=[self._mapping_username, self._mapping_firstname, self._mapping_lastname, self._mapping_email])
+        # Mandatory fields
+        attributes = [self._mapping_username, self._mapping_firstname]
+
+        # Optional fields
+        if len(self._mapping_lastname) > 0:
+            attributes.append(self._mapping_lastname)
+
+        if len(self._mapping_email) > 0:
+            attributes.append(self._mapping_email)
+
+        conn.search(self._base_dn, "(&(objectclass=person)(" + self.mapping_username + "=" + username + "))", attributes=attributes)
         if len(conn.entries) != 1:
             return False
 
         return self.__create_user(
             conn.entries[0][self._mapping_username].value,
             conn.entries[0][self._mapping_firstname].value,
-            conn.entries[0][self._mapping_lastname].value,
-            conn.entries[0][self._mapping_email].value,
+            conn.entries[0][self._mapping_lastname].value if len(self._mapping_lastname) > 0 else '',
+            conn.entries[0][self._mapping_email].value if len(self._mapping_email) > 0 else ''
         )
