@@ -377,6 +377,12 @@ var CJ_HashcatMasks = {
             }
         }
 
+        if (data.groups.length > CJ_HashcatMasks.maxCustomCharsets) {
+            $('.mask-error').text('You cannot have more than ' + CJ_HashcatMasks.maxCustomCharsets + ' custom charsets (-1, -2, -3, ...etc)');
+        } else {
+            $('.mask-error').text('');
+        }
+
         CJ_HashcatMasks.disableEvents = false;
     },
 

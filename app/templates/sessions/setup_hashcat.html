@@ -213,6 +213,19 @@
 
         CJ_HashcatMasks.init();
         CJ_HashcatMasks.parseFromString($('#compiled-mask').val());
+
+        $('#setup-hashcat').submit(function() {
+            mode = $("input[name='mode']:checked").val();
+            if (mode == 3) {
+                // Check for any errors.
+                var maskError = $('.mask-error').text().trim();
+                if (maskError.length > 0) {
+                    alert('It appears that your mask is incorrect. Please correct any errors before saving the form');
+                    return false;
+                }
+            }
+            return true;
+        });
     });
 </script>
 {% endblock %}
