@@ -351,7 +351,7 @@ class SessionManager:
 
     def __tail_file(self, file, length):
         if not os.path.isfile(file):
-            return ''
+            return b''
 
         # If we try to read more than the actual size of the file, it will throw an error.
         filesize = os.path.getsize(file)
