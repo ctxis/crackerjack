@@ -118,6 +118,7 @@ class SessionManager:
         for session in sessions:
             hashcat = self.get_hashcat_settings(session.id)
             hashcat_data_raw = self.get_hashcat_status(session.user_id, session.id)
+            tail_screen = self.__tail_file(self.get_screenfile_path(session.user_id, session.id), 4096).decode()
 
             item = {
                 'id': session.id,
@@ -138,14 +139,14 @@ class SessionManager:
                     'increment_min': 0 if not hashcat else hashcat.increment_min,
                     'increment_max': 0 if not hashcat else hashcat.increment_max,
                     'data_raw': hashcat_data_raw,
-                    'data': self.process_hashcat_raw_data(hashcat_data_raw, screen_name=session.screen_name),
+                    'data': self.process_hashcat_raw_data(hashcat_data_raw, session.screen_name, tail_screen),
                     'hashfile': self.get_hashfile_path(session.user_id, session.id),
                     'hashfile_exists': self.hashfile_exists(session.user_id, session.id)
                 },
                 'user': {
                     'record': UserModel.query.filter(UserModel.id == session.user_id).first()
                 },
-                'tail_screen': self.__tail_file(self.get_screenfile_path(session.user_id, session.id), 4096).decode()
+                'tail_screen': tail_screen
             }
 
             data.append(item)
@@ -271,18 +272,7 @@ class SessionManager:
     def __fix_line_termination(self, data):
         return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
 
-    def process_hashcat_raw_data(self, raw, screen_name=None):
-        # Build base dictionary
-        data = {
-            'process_state': 0,
-            'all_passwords': 0,
-            'cracked_passwords': 0,
-            'time_remaining': '',
-            'estimated_completion_time': '',
-            'progress': 0
-        }
-
-        # process_state
+    def __detect_session_status(self, raw, screen_name, tail_screen):
         # States are:
         #   0   NOT_STARTED
         #   1   RUNNING
@@ -292,33 +282,44 @@ class SessionManager:
         #   5   CRACKED
         #   98  ERROR
         #   99  UNKNOWN
+        status = 0
         if 'Status' in raw:
             if raw['Status'] == 'Running':
-                data['process_state'] = 1
-            elif raw['Status'] == 'Quit':
-                data['process_state'] = 2
-            if raw['Status'] == 'Exhausted':
-                data['process_state'] = 3
-            elif raw['Status'] == 'Paused':
-                data['process_state'] = 4
-            elif raw['Status'] == 'Cracked':
-                data['process_state'] = 5
-
-        if screen_name is not None:
-            if data['process_state'] == 0:
-                # There's a chance that there's no 'status' output displayed yet. In this case, check if the process is running.
-                if self.is_process_running(screen_name):
-                    # Set to running.
-                    data['process_state'] = 1
-            elif data['process_state'] == 1:
-                # Also, if it's running but there's no process, set to error.
+                status = 1
+                # However, if there's no process then it's probably an error.
                 if not self.is_process_running(screen_name):
                     # Set to error.
-                    data['process_state'] = 98
+                    status = 98
+            elif raw['Status'] == 'Quit':
+                status = 2
+            if raw['Status'] == 'Exhausted':
+                status = 3
+            elif raw['Status'] == 'Paused':
+                status = 4
+            elif raw['Status'] == 'Cracked':
+                status = 5
+        else:
+            # There's a chance that there's no 'status' output displayed yet. In this case, check if the process is running.
+            if self.is_process_running(screen_name):
+                # Set to running.
+                status = 1
 
         # If it is STILL not running, take the last few output lines, and mark this as an 'error'.
-        if data['process_state'] == 0:
-            data['process_state'] = 98
+        if status == 0 and len(tail_screen) > 0:
+            status = 98
+
+        return status
+
+    def process_hashcat_raw_data(self, raw, screen_name, tail_screen):
+        # Build base dictionary
+        data = {
+            'process_state': self.__detect_session_status(raw, screen_name, tail_screen),
+            'all_passwords': 0,
+            'cracked_passwords': 0,
+            'time_remaining': '',
+            'estimated_completion_time': '',
+            'progress': 0
+        }
 
         # progress
         if 'Progress' in raw:
