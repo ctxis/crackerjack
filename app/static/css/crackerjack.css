@@ -6,3 +6,8 @@
     max-width: 840px;
     overflow: auto;
 }
+
+.shell-log-view {
+    max-width: 900px;
+    overflow: auto;
+}
