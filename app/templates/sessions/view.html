@@ -4,160 +4,170 @@
 <div class="row mt-5">
     <div class="col-1"></div>
     <div class="col">
-        <h1>{{ session.name }}</h1>
-        <hr>
-    </div>
-    <div class="col-1"></div>
-</div>
-
-{% if session.hashcat.data.process_state == 1 %}
-<div class="row">
-    <div class="col-1"></div>
-    <div class="col">
-        <div class="float-right">
-            <label for="autorefresh" class="mr-2">Auto Refresh Page While Running</label>
-            <div class="custom-control custom-switch float-right">
-                <input type="checkbox" class="custom-control-input" id="autorefresh" value="1" checked>
-                <label class="custom-control-label" for="autorefresh"></label>
+        <div class="row">
+            <div class="col-8">
+                <div>
+                    <h1 class="d-inline-block">{{ session.name }}</h1>
+                    <span class="badge badge-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}" style="vertical-align: top">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</span>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="col-1"></div>
-</div>
-{% endif %}
+            <div class="col text-right">
+                <form method="post" action="{{ url_for('sessions.action', session_id=session.id) }}" id="form-action">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="action" id="action" value="">
 
-<div class="row">
-    <div class="col-1"></div>
-    <div class="col">
-        <div class="clearfix">
-            <div class="float-right">
-                <a href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}" class="btn btn-primary"><i class="fas fa-hashtag mr-1"></i>Hashes</a>
-                <a href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}" class="btn btn-primary"><i class="fas fa-cat mr-1"></i> Hashcat</a>
-            </div>
-        </div>
-
-        <table class="table mt-3">
-            <thead>
-            <tr class="table-primary">
-                <th>State</th>
-                <th class="text-right">Progress</th>
-                <th class="text-right">Cracked</th>
-                <th class="text-right">Estimated Time</th>
-                <th class="text-right">Manage</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <th scope="row" class="table-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</th>
-                <td class="text-right">
-                    <a href="#" title="Click to view raw output" class="raw-progress">
-                        {{ session.hashcat.data.progress }}%
-                        {% if session.hashcat.data.process_state == 98 %}
-                        <span class="ml-2 text-danger"><i class="fas fa-exclamation"></i></span>
-                        {% endif %}
-                    </a>
-                </td>
-                <td class="text-right">
-                    <span>{{ session.hashcat.data.cracked_passwords }}/{{ session.hashcat.data.all_passwords }}</span>
-                    {% if session.hashcat.data.cracked_passwords > 0 %}
-                    <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
+                    {%
+                        if session.hashcat.data.process_state == 0 or
+                            session.hashcat.data.process_state == 2 or
+                            session.hashcat.data.process_state == 3
+                    %}
+                    <a href="#" data-action="start" title="Start" class="form-action ml-2"><i class="fas fa-3x fa-play text-success"></i></a>
+                    <a href="#" data-action="reset" title="Reset - If the session won't start click this link" class="form-action ml-2"><i class="fas fa-3x fa-sync text-danger"></i></a>
                     {% endif %}
-                </td>
-                <td class="text-right"><abbr title="{{ session.hashcat.data.estimated_completion_time }}">{{ session.hashcat.data.time_remaining }}</abbr></td>
-                <td class="text-right">
-                    <form method="post" action="{{ url_for('sessions.action', session_id=session.id) }}" id="form-action">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="action" id="action" value="">
 
-                        {%
-                            if session.hashcat.data.process_state == 0 or
-                                session.hashcat.data.process_state == 2 or
-                                session.hashcat.data.process_state == 3
-                        %}
-                        <a href="#" data-action="start" title="Start" class="form-action ml-2"><i class="fas fa-lg fa-play text-success"></i></a>
-                        <a href="#" data-action="reset" title="Reset - If the session won't start click this link" class="form-action ml-2"><i class="fas fa-lg fa-sync text-danger"></i></a>
-                        {% endif %}
+                    {% if session.hashcat.data.process_state == 4 %}
+                    <a href="#" data-action="resume" title="Resume" class="form-action ml-2"><i class="fas fa-3x fa-play text-success"></i></a>
+                    {% endif %}
 
-                        {% if session.hashcat.data.process_state == 4 %}
-                        <a href="#" data-action="resume" title="Resume" class="form-action ml-2"><i class="fas fa-lg fa-play text-success"></i></a>
-                        {% endif %}
+                    {% if session.hashcat.data.process_state == 1 %}
+                    <a href="#" data-action="pause" title="Pause" class="form-action ml-2"><i class="fas fa-3x fa-pause text-warning"></i></a>
+                    {% endif %}
 
-                        {% if session.hashcat.data.process_state == 1 %}
-                        <a href="#" data-action="pause" title="Pause" class="form-action ml-2"><i class="fas fa-lg fa-pause text-warning"></i></a>
-                        {% endif %}
-
-                        {% if session.hashcat.data.process_state == 1 or session.hashcat.data.process_state == 4 %}
-                        <a href="#" data-action="stop" title="Stop" class="form-action ml-2"><i class="fas fa-lg fa-stop text-danger"></i></a>
-                        {% endif %}
-                    </form>
-                </td>
-            </tr>
-            {% if session.hashcat.data.progress|int > 0 and session.hashcat.data.progress|int < 100 and session.hashcat.data.process_state == 1 %}
-            <tr>
-                <td class="p-0" colspan="6">
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" aria-valuenow="{{ session.hashcat.data.progress|int }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ session.hashcat.data.progress|int }}%"></div>
+                    {% if session.hashcat.data.process_state == 1 or session.hashcat.data.process_state == 4 %}
+                    <a href="#" data-action="stop" title="Stop" class="form-action ml-2"><i class="fas fa-3x fa-stop text-danger"></i></a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+        {% if session.hashcat.data.progress|int > 0 and session.hashcat.data.progress|int < 100 and session.hashcat.data.process_state == 1 %}
+        <div class="row">
+            <div class="col">
+                <div class="progress" style="height: 30px; font-size: 1.2em">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success text-primary" role="progressbar" aria-valuenow="{{ session.hashcat.data.progress|int }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ session.hashcat.data.progress|int }}%">{{ session.hashcat.data.progress }}%</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if session.hashcat.data.process_state == 1 %}
+        <div class="row">
+            <div class="col">Estimated Time: <abbr title="{{ session.hashcat.data.estimated_completion_time }}">{{ session.hashcat.data.time_remaining }}</abbr></div>
+            <div class="col">
+                <div class="float-right">
+                    <label for="autorefresh" class="mr-2">Auto Refresh Page While Running</label>
+                    <div class="custom-control custom-switch float-right">
+                        <input type="checkbox" class="custom-control-input" id="autorefresh" value="1" checked>
+                        <label class="custom-control-label" for="autorefresh"></label>
                     </div>
-                </td>
-            </tr>
-            {% endif %}
-            <tr id="raw-progress" class="d-none">
-                <td colspan="6">
-                    <table class="table table-sm table-striped">
-                        <tbody>
-                        {% for key, value in session.hashcat.data_raw.items() %}
-                        <tr>
-                            <th scope="row">{{ key }}</th>
-                            <td class="text-right">{{ value }}</td>
-                        </tr>
-                        {% endfor %}
-                        {% if session.hashcat.data.process_state == 98 %}
-                        <tr>
-                            <td colspan="2">
-                                <div class="session-error-tail">
-                                    <pre class="p-2">{{ session.tail_screen }}</pre>
-                                </div>
-                        </tr>
-                        {% endif %}
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
     <div class="col-1"></div>
 </div>
 
-<div class="row">
+<div class="row mt-5">
     <div class="col-1"></div>
-    <div class="col">
-        <table class="table">
-            <thead>
-            <tr class="table-primary">
-                <th>Cracking Mode</th>
-                <th>Hash Type</th>
-                <th>Wordlist</th>
-                <th>Rule</th>
-                <th>Mask</th>
-                <th>Increments</th>
-            </tr>
-            </thead>
+    <div class="col-5">
+        {% if session.hashcat.data.process_state != 1 %}
+        <div>
+            <a href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}" class="btn btn-primary btn-sm btn-block"><i class="fas fa-cat mr-1"></i>Configure Hashcat</a>
+        </div>
+        {% endif %}
+        <table class="table table-striped mt-3">
             <tbody>
             <tr>
+                <th scope="row">Cracking Mode</th>
                 <td>{{ 'Wordlist' if session.hashcat.mode == 0 else 'Brute Force' }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Hash Type</th>
                 <td><abbr title="{{ supported_hashes[session.hashcat.hashtype] }}">{{ session.hashcat.hashtype }}</abbr></td>
+            </tr>
+            {% if session.hashcat.mode == 0 %}
+            <tr>
+                <th scope="row">Wordlist</th>
                 <td><abbr title="{{ session.hashcat.wordlist_path }}">{{ session.hashcat.wordlist if session.hashcat.mode == 0 else '' }}</abbr></td>
+            </tr>
+            <tr>
+                <th scope="row">Rule</th>
                 <td><abbr title="{{ session.hashcat.rule_path }}">{{ session.hashcat.rule if session.hashcat.mode == 0 else '' }}</abbr></td>
+            </tr>
+            {% else %}
+            <tr>
+                <th scope="row">Mask</th>
                 <td>{{ session.hashcat.mask if session.hashcat.mode == 3 else '' }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Increments</th>
                 <td>
                     {% if session.hashcat.increment_min|int > 0 or session.hashcat.increment_max|int > 0 %}
                     {{ session.hashcat.increment_min }} - {{ session.hashcat.increment_max }}
                     {% endif %}
                 </td>
             </tr>
+            {% endif %}
             </tbody>
         </table>
+    </div>
+    <div class="col-5">
+        {% if session.hashcat.data.process_state != 1 %}
+        <div>
+            <a href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}" class="btn btn-primary btn-sm btn-block"><i class="fas fa-hashtag mr-1"></i>Configure Hashes</a>
+        </div>
+        {% endif %}
+        <table class="table table-striped mt-3">
+            <tbody>
+            <tr>
+                <th scope="row">Hashes Uploaded</th>
+                <td class="text-right">{{ session.hashes_in_file }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Cracked</th>
+                <td class="text-right">
+                    <span>{{ session.hashcat.data.cracked_passwords }}/{{ session.hashcat.data.all_passwords }}</span>
+                    {% if session.hashcat.data.cracked_passwords > 0 %}
+                    <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
+                    {% endif %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-1"></div>
+</div>
+
+<div class="row">
+    <div class="col-1"></div>
+    <div class="col">
+        <div>
+            <a href="#" class="raw-progress">
+                Click here to view raw/debug information
+                {% if session.hashcat.data.process_state == 98 %}
+                <span class="ml-2 text-danger"><i class="fas fa-exclamation"></i></span>
+                {% endif %}
+            </a>
+        </div>
+        <div id="raw-progress" class="d-none">
+            <table class="table table-sm table-striped">
+                <tbody>
+                {% for key, value in session.hashcat.data_raw.items() %}
+                <tr>
+                    <th scope="row">{{ key }}</th>
+                    <td class="text-right">{{ value }}</td>
+                </tr>
+                {% endfor %}
+                {% if session.hashcat.data.process_state == 98 %}
+                <tr>
+                    <td colspan="2">
+                        <div class="session-error-tail">
+                            <pre class="p-2">{{ session.tail_screen }}</pre>
+                        </div>
+                </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="col-1"></div>
 </div>

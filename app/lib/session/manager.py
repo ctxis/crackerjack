@@ -146,12 +146,25 @@ class SessionManager:
                 'user': {
                     'record': UserModel.query.filter(UserModel.id == session.user_id).first()
                 },
-                'tail_screen': tail_screen
+                'tail_screen': tail_screen,
+                'hashes_in_file': self.__count_hashes_in_file(self.get_hashfile_path(session.user_id, session.id))
             }
 
             data.append(item)
 
         return data
+
+    def __count_hashes_in_file(self, hashfile):
+        if not os.path.isfile(hashfile):
+            return 0
+
+        count = 0
+        with open(hashfile, 'r') as f:
+            for line in f:
+                if line.strip():
+                    count += 1
+
+        return count
 
     def set_hashcat_setting(self, session_id, name, value):
         record = self.get_hashcat_settings(session_id)
