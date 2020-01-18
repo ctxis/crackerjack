@@ -225,8 +225,6 @@ def view(session_id):
     # We need to process the array in a way to make it easy for JSON usage.
     supported_hashes = hashcat.compact_hashes(supported_hashes)
 
-    print(session['tail_screen'])
-
     return render_template(
         'sessions/view.html',
         session=session,
