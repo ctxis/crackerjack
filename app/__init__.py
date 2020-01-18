@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
+from flask_crontab import Crontab
 
 
 db = SQLAlchemy()
@@ -12,6 +13,7 @@ migrate = Migrate()
 login = LoginManager()
 login.login_view = 'auth.login'
 csrf = CSRFProtect()
+crontab = Crontab()
 
 
 def create_app(config_class=None):
@@ -39,6 +41,7 @@ def create_app(config_class=None):
     migrate.init_app(app, db)
     login.init_app(app)
     csrf.init_app(app)
+    crontab.init_app(app)
 
     from app.controllers.home import bp as home_bp
     app.register_blueprint(home_bp, url_prefix='/')
@@ -94,6 +97,10 @@ def create_app(config_class=None):
     @app.errorhandler(404)
     def page_not_found(error):
         return render_template('errors/404.html'), 404
+
+    @crontab.job(minute="*/5")
+    def cron():
+        pass
 
     return app
 
