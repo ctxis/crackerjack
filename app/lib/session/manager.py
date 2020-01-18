@@ -269,6 +269,10 @@ class SessionManager:
         elif action == 'stop':
             # Hashcat only needs 'q' to pause.
             screen.execute({'q': ''})
+        elif action == 'restore':
+            # To restore a session we need a command line like 'hashcat --session NAME --restore'.
+            command = self.hashcat.build_restore_command(session['screen_name'])
+            screen.execute(command)
         else:
             return False
 

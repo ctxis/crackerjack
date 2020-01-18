@@ -21,20 +21,23 @@
                             session.hashcat.data.process_state == 2 or
                             session.hashcat.data.process_state == 3
                     %}
-                    <a href="#" data-action="start" title="Start" class="form-action ml-2"><i class="fas fa-3x fa-play text-success"></i></a>
-                    <a href="#" data-action="reset" title="Reset - If the session won't start click this link" class="form-action ml-2"><i class="fas fa-3x fa-sync text-danger"></i></a>
+                    <a href="#" data-action="start" title="Start" class="form-action ml-2 btn btn-success"><i class="fas fa-play-circle"></i> Start</a>
+                    {% if session.hashcat.data.process_state == 2 %}
+                    <a href="#" data-action="restore" title="Restore" class="form-action ml-2 btn btn-info"><i class="fas fa-redo"></i> Restore</a>
+                    {% endif %}
+                    <a href="#" data-action="reset" title="Reset - If the session won't start click this link" class="form-action ml-2 btn btn-danger"><i class="fas fa-sync"></i> Rebuild</a>
                     {% endif %}
 
                     {% if session.hashcat.data.process_state == 4 %}
-                    <a href="#" data-action="resume" title="Resume" class="form-action ml-2"><i class="fas fa-3x fa-play text-success"></i></a>
+                    <a href="#" data-action="resume" title="Resume" class="form-action ml-2 btn btn-success"><i class="fas fa-play-circle"></i> Continue</a>
                     {% endif %}
 
                     {% if session.hashcat.data.process_state == 1 %}
-                    <a href="#" data-action="pause" title="Pause" class="form-action ml-2"><i class="fas fa-3x fa-pause text-warning"></i></a>
+                    <a href="#" data-action="pause" title="Pause" class="form-action ml-2 btn btn-warning"><i class="fas fa-pause-circle"></i> Pause</a>
                     {% endif %}
 
                     {% if session.hashcat.data.process_state == 1 or session.hashcat.data.process_state == 4 %}
-                    <a href="#" data-action="stop" title="Stop" class="form-action ml-2"><i class="fas fa-3x fa-stop text-danger"></i></a>
+                    <a href="#" data-action="stop" title="Stop" class="form-action ml-2 btn btn-danger"><i class="fas fa-stop-circle"></i> Stop</a>
                     {% endif %}
                 </form>
             </div>

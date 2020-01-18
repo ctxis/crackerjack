@@ -120,6 +120,18 @@ class HashcatManager:
 
         return command
 
+    def build_restore_command(self, session_name):
+        command = {
+            self.hashcat_binary: '',
+            '--session': session_name,
+            '--restore': ''
+        }
+
+        if self.force:
+            command['--force'] = ''
+
+        return command
+
     def parse_mask_from_string(self, mask):
         # This function should be the same as the processCompiledMask() from the frontend.
 
