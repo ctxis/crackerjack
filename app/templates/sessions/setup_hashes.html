@@ -16,7 +16,7 @@
         {% if session.hashcat.hashfile_exists %}
         <div class="clearfix mb-3">
             <div class="float-right">
-                <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}" class="btn btn-primary">Download Uploaded Hashes</a>
+                <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}" class="btn btn-primary">Download Uploaded Hashes<i class="fas fa-file-download ml-2"></i></a>
             </div>
         </div>
         {% endif %}
