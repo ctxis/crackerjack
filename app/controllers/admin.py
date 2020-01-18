@@ -289,3 +289,15 @@ def system_messages_save():
 
     flash('Settings saved', 'success')
     return redirect(url_for('admin.system_messages'))
+
+
+@bp.route('/', methods=['GET'])
+@login_required
+def index():
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    return render_template(
+        'admin/index.html'
+    )
