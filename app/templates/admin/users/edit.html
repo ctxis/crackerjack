@@ -40,25 +40,12 @@
 
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-4"><label for="first_name">First Name</label></div>
+                            <div class="col-4"><label for="full_name">Full Name</label></div>
                             <div class="col">
                                 {% if user and user.ldap == 1 %}
-                                {{ user.first_name }}
+                                {{ user.full_name }}
                                 {% else %}
-                                <input name="first_name" type="text" id="first_name" class="form-control" value="{{ '' if user == None else user.first_name }}" placeholder="">
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-4"><label for="last_name">Last Name</label></div>
-                            <div class="col">
-                                {% if user and user.ldap == 1 %}
-                                {{ user.last_name }}
-                                {% else %}
-                                <input name="last_name" type="text" id="last_name" class="form-control" value="{{ '' if user == None else user.last_name }}" placeholder="">
+                                <input name="full_name" type="text" id="full_name" class="form-control" value="{{ '' if user == None else user.full_name }}" placeholder="">
                                 {% endif %}
                             </div>
                         </div>

@@ -15,7 +15,7 @@ class UserManager:
     def get_last_error(self):
         return self.last_error
 
-    def save(self, user_id, username, password, first_name, last_name, email, admin, ldap, active):
+    def save(self, user_id, username, password, full_name, email, admin, ldap, active):
         if user_id > 0:
             # This is a user-edit.
             user = self.get_by_id(user_id)
@@ -54,8 +54,7 @@ class UserManager:
             # There is no point in updating these if it's an LDAP user.
             user.username = username
             user.password = password
-            user.first_name = first_name
-            user.last_name = last_name
+            user.full_name = full_name
             user.email = email
 
         user.admin = True if admin == 1 else False

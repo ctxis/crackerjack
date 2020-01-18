@@ -106,18 +106,9 @@
 
                             <div class="form-group pt-2">
                                 <div class="row">
-                                    <div class="col-4"><label for="ldap_mapping_firstname">First Name</label></div>
+                                    <div class="col-4"><label for="ldap_mapping_fullname">Full Name</label></div>
                                     <div class="col">
-                                        <input name="ldap_mapping_firstname" type="text" id="ldap_mapping_firstname" class="form-control" value="{{ setting_get('ldap_mapping_firstname', '') }}" placeholder="givenName">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group pt-2">
-                                <div class="row">
-                                    <div class="col-4"><label for="ldap_mapping_lastname">Last Name</label></div>
-                                    <div class="col">
-                                        <input name="ldap_mapping_lastname" type="text" id="ldap_mapping_lastname" class="form-control" value="{{ setting_get('ldap_mapping_lastname', '') }}" placeholder="sn">
+                                        <input name="ldap_mapping_fullname" type="text" id="ldap_mapping_fullname" class="form-control" value="{{ setting_get('ldap_mapping_fullname', '') }}" placeholder="givenName">
                                     </div>
                                 </div>
                             </div>

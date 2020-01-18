@@ -133,8 +133,8 @@ def settings_auth_save():
                            'error': 'LDAP Bind Password cannot be empty'},
         'ldap_mapping_username': {'value': request.form['ldap_mapping_username'].strip(),
                                   'error': 'LDAP Mapping Username cannot be empty'},
-        'ldap_mapping_firstname': {'value': request.form['ldap_mapping_firstname'].strip(),
-                                   'error': 'LDAP Mapping First Name cannot be empty'}
+        'ldap_mapping_fullname': {'value': request.form['ldap_mapping_fullname'].strip(),
+                                   'error': 'LDAP Mapping Full Name cannot be empty'}
     }
 
     has_errors = False
@@ -148,7 +148,6 @@ def settings_auth_save():
     if has_errors:
         return redirect(url_for('admin.settings_auth'))
 
-    settings.save('ldap_mapping_lastname', request.form['ldap_mapping_lastname'].strip())
     settings.save('ldap_mapping_email', request.form['ldap_mapping_email'].strip())
     settings.save('allow_logins', allow_logins)
     settings.save('ldap_enabled', ldap_enabled)
@@ -203,8 +202,7 @@ def user_save(user_id):
 
     username = request.form['username'].strip() if 'username' in request.form else ''
     password = request.form['password'].strip() if 'password' in request.form else ''
-    first_name = request.form['first_name'].strip() if 'first_name' in request.form else ''
-    last_name = request.form['last_name'].strip() if 'last_name' in request.form else ''
+    full_name = request.form['full_name'].strip() if 'full_name' in request.form else ''
     email = request.form['email'].strip() if 'email' in request.form else ''
     admin = int(request.form.get('admin', 0))
     ldap = int(request.form.get('ldap', 0))
@@ -213,7 +211,7 @@ def user_save(user_id):
     provider = Provider()
     users = provider.users()
 
-    if not users.save(user_id, username, password, first_name, last_name, email, admin, ldap, active):
+    if not users.save(user_id, username, password, full_name, email, admin, ldap, active):
         flash(users.get_last_error(), 'error')
         return redirect(url_for('admin.user_edit', user_id=user_id))
 

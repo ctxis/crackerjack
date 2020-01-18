@@ -13,8 +13,7 @@ class LDAPManager:
         self._bind_user = ''
         self._bind_pass = ''
         self._mapping_username = ''
-        self._mapping_firstname = ''
-        self._mapping_lastname = ''
+        self._mapping_fullname = ''
         self._mapping_email = ''
         self._ssl = 0
 
@@ -83,20 +82,12 @@ class LDAPManager:
         self._mapping_username = value
 
     @property
-    def mapping_firstname(self):
-        return self._mapping_firstname
+    def mapping_fullname(self):
+        return self._mapping_fullname
 
-    @mapping_firstname.setter
-    def mapping_firstname(self, value):
-        self._mapping_firstname = value
-
-    @property
-    def mapping_lastname(self):
-        return self._mapping_lastname
-
-    @mapping_lastname.setter
-    def mapping_lastname(self, value):
-        self._mapping_lastname = value
+    @mapping_fullname.setter
+    def mapping_fullname(self, value):
+        self._mapping_fullname = value
 
     @property
     def mapping_email(self):
@@ -122,14 +113,13 @@ class LDAPManager:
 
         return result
 
-    def __create_user(self, username, first_name, last_name, email):
+    def __create_user(self, username, full_name, email):
         user = UserModel.query.filter(and_(UserModel.username == username, UserModel.ldap == 1)).first()
         if not user:
             user = UserModel(
                 username=username,
                 password='',
-                first_name=first_name,
-                last_name=last_name,
+                full_name=full_name,
                 email=email,
                 ldap=True,
                 admin=False
@@ -137,8 +127,7 @@ class LDAPManager:
 
             db.session.add(user)
         else:
-            user.first_name = first_name
-            user.last_name = last_name
+            user.full_name = full_name
             user.email = email
 
         db.session.commit()
@@ -156,12 +145,9 @@ class LDAPManager:
             return False
 
         # Mandatory fields
-        attributes = [self._mapping_username, self._mapping_firstname]
+        attributes = [self._mapping_username, self._mapping_fullname]
 
         # Optional fields
-        if len(self._mapping_lastname) > 0:
-            attributes.append(self._mapping_lastname)
-
         if len(self._mapping_email) > 0:
             attributes.append(self._mapping_email)
 
@@ -171,7 +157,6 @@ class LDAPManager:
 
         return self.__create_user(
             conn.entries[0][self._mapping_username].value,
-            conn.entries[0][self._mapping_firstname].value,
-            conn.entries[0][self._mapping_lastname].value if len(self._mapping_lastname) > 0 else '',
+            conn.entries[0][self._mapping_fullname].value,
             conn.entries[0][self._mapping_email].value if len(self._mapping_email) > 0 else ''
         )

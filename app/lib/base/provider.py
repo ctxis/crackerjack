@@ -76,8 +76,7 @@ class Provider:
         manager.bind_pass = settings.get('ldap_bind_pass', '')
         manager.ssl = settings.get('ldap_ssl', 0)
         manager.mapping_username = settings.get('ldap_mapping_username', '')
-        manager.mapping_firstname = settings.get('ldap_mapping_firstname', '')
-        manager.mapping_lastname = settings.get('ldap_mapping_lastname', '')
+        manager.mapping_fullname = settings.get('ldap_mapping_fullname', '')
         manager.mapping_email = settings.get('ldap_mapping_email', '')
 
         return manager

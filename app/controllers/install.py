@@ -31,15 +31,14 @@ def save():
 
     username = request.form['username'].strip()
     password = request.form['password'].strip()
-    first_name = request.form['first_name'].strip()
-    last_name = request.form['last_name'].strip()
+    full_name = request.form['full_name'].strip()
     email = request.form['email'].strip()
 
-    if len(username) == 0 or len(password) == 0 or len(first_name) == 0 or len(last_name) == 0 or len(email) == 0:
+    if len(username) == 0 or len(password) == 0 or len(full_name) == 0 or len(email) == 0:
         flash('Please fill in all the fields', 'error')
         return redirect(url_for('install.index'))
 
-    if not users.save(0, username, password, first_name, last_name, email, 1, 0):
+    if not users.save(0, username, password, full_name, email, 1, 0, 1):
         flash('Could not create user - make sure the database file is writable', 'error')
         return redirect(url_for('install.index'))
 
