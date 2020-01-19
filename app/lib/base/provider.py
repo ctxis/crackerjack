@@ -13,6 +13,7 @@ from app.lib.base.users import UserManager
 from app.lib.base.user_settings import UserSettingsManager
 from app.lib.base.template import TemplateManager
 from app.lib.base.api import ApiManager
+from app.lib.base.cron import CronManager
 from flask_login import current_user
 
 
@@ -45,7 +46,9 @@ class Provider:
         )
 
     def shell(self):
-        return ShellManager(user_id=current_user.id)
+        # If there is no current_user it means we're in the cron job.
+        user_id = current_user.id if current_user else 0
+        return ShellManager(user_id=user_id)
 
     def wordlists(self):
         settings = self.settings()
@@ -92,3 +95,6 @@ class Provider:
 
     def api(self):
         return ApiManager(self.sessions())
+
+    def cron(self):
+        return CronManager(self.sessions())

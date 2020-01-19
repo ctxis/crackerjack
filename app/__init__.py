@@ -100,7 +100,9 @@ def create_app(config_class=None):
 
     @crontab.job(minute="*/5")
     def cron():
-        pass
+        provider = Provider()
+        cron = provider.cron()
+        cron.run()
 
     return app
 

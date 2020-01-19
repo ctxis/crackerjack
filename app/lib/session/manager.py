@@ -494,3 +494,23 @@ class SessionManager:
 
     def __is_past_date(self, date):
         return datetime.datetime.now() > date
+
+    def terminate_past_sessions(self):
+        # Get all sessions which have terminate_at set as a past datetime.
+        print("Trying to get past sessions...")
+        past_sessions = SessionModel.query.filter(SessionModel.terminate_at < datetime.datetime.now()).all()
+        for past_session in past_sessions:
+            # Check if session is currently running.
+            print("Loading session %d" % past_session.id)
+            session = self.get(past_session.user_id, past_session.id)
+            if len(session) == 0:
+                print("Session %d does not exist" % past_session.id)
+                continue
+            print("Session % loaded" % past_session.id)
+            session = session[0]
+
+            status = session['hashcat']['data']['process_state']
+            if status == 1 or status == 4:
+                # If it's running or paused, terminate.
+                print("Terminating session %d" % past_session.id)
+                self.hashcat_action(session['id'], 'stop')
