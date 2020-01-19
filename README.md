@@ -53,3 +53,7 @@ CrackerJack has only been tested on Ubuntu, for installation instructions please
 ### Mask Generator GUI
 
 ![](screenshots/cj-maskgenerator.png)
+
+## Contribute
+
+If you wish to contribute, please raise an issue before submitting a pull request.
