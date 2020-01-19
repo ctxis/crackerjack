@@ -2,7 +2,7 @@
     <div class="col-2"></div>
     <div class="col">
         <div class="row">
-            <div class="col-8">
+            <div class="col-6">
                 <div>
                     <h1 class="d-inline-block">{{ session.name }}</h1>
                     <span class="badge badge-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}" style="vertical-align: top">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</span>

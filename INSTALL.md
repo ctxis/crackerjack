@@ -3,7 +3,7 @@
 - [Requirements](#requirements)
 - [Installation](#installation)
   - [Base Software](#base-software-requirement)
-  - [Clone](#clone-repo)
+  - [Clone Repository](#clone-repo)
   - [Virtual Environment](#virtual-environment)
     - [Permissions](#virtual-environment-permissions)
     - [Crontab](#install-crontab)
