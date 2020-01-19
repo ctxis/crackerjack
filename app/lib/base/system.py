@@ -34,7 +34,10 @@ class SystemManager:
         self.settings.save('git_hash_version', version)
 
         # Save commit count on the master branch (like a version tracker).
-        count = int(self.shell.execute(['git', 'rev-list', '--count', 'master'], user_id=0))
+        try:
+            count = int(self.shell.execute(['git', 'rev-list', '--count', 'master'], user_id=0))
+        except ValueError:
+            count = 0
         self.settings.save('git_commit_count', count)
         return True
 
