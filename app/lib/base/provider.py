@@ -14,6 +14,7 @@ from app.lib.base.user_settings import UserSettingsManager
 from app.lib.base.template import TemplateManager
 from app.lib.base.api import ApiManager
 from app.lib.base.cron import CronManager
+from app.lib.base.hashid import HashIdentifier
 from flask_login import current_user
 
 
@@ -26,7 +27,8 @@ class Provider:
         session = SessionManager(
             self.hashcat(),
             self.screens(),
-            self.wordlists()
+            self.wordlists(),
+            self.hashid()
         )
         return session
 
@@ -98,3 +100,6 @@ class Provider:
 
     def cron(self):
         return CronManager(self.sessions())
+
+    def hashid(self):
+        return HashIdentifier()

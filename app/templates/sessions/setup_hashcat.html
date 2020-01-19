@@ -23,6 +23,19 @@
             <div class="card">
                 <h4 class="card-header">Hashcat Setup</h4>
                 <div class="card-body">
+                    {% if session.guess_hashtype|length > 0 %}
+                    <div class="form-group">
+                        <div class="text-info">
+                            Possible Hash Type:
+                            <ul>
+                                {% for hashtype in session.guess_hashtype %}
+                                <li>{{ hashtype }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     <div class="form-group">
                         <label for="hash-type">Hash Type</label>
                         <select name="hash-type" id="hash-type" class="form-control" required>

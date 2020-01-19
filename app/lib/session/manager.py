@@ -14,10 +14,11 @@ from flask import current_app, send_file
 
 
 class SessionManager:
-    def __init__(self, hashcat, screens, wordlists):
+    def __init__(self, hashcat, screens, wordlists, hashid):
         self.hashcat = hashcat
         self.screens = screens
         self.wordlists = wordlists
+        self.hashid = hashid
 
     def sanitise_name(self, name):
         return re.sub(r'\W+', '', name)
@@ -152,7 +153,8 @@ class SessionManager:
                     'record': UserModel.query.filter(UserModel.id == session.user_id).first()
                 },
                 'tail_screen': tail_screen,
-                'hashes_in_file': self.__count_hashes_in_file(self.get_hashfile_path(session.user_id, session.id))
+                'hashes_in_file': self.__count_hashes_in_file(self.get_hashfile_path(session.user_id, session.id)),
+                'guess_hashtype': self.guess_hashtype(session.user_id, session.id)
             }
 
             data.append(item)
@@ -514,3 +516,14 @@ class SessionManager:
                 # If it's running or paused, terminate.
                 print("Terminating session %d" % past_session.id)
                 self.hashcat_action(session['id'], 'stop')
+
+    def guess_hashtype(self, user_id, session_id):
+        hashfile = self.get_hashfile_path(user_id, session_id)
+        if not os.path.isfile(hashfile):
+            return []
+
+        # Get the first hash from the file
+        with open(hashfile, 'r') as f:
+            hash = f.readline().strip()
+
+        return self.hashid.guess(hash)
