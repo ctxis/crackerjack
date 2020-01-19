@@ -12,7 +12,7 @@
 ## Basic Software Requirement
 Install basic packages using:
 ```
-sudo apt install vim git screen python3-venv python-pip
+sudo apt install vim git screen python3-venv python-pip sqlite3
 ```
 
 If you want to use nginx:
@@ -31,6 +31,8 @@ git clone [[this-repo]]
 ```
 
 ## Virtual Environment
+Navigate to the path you cloned crackerjack into, and run the following commands:
+
 ```
 python3 -m venv venv
 . venv/bin/activate
@@ -41,10 +43,10 @@ flask db upgrade
 deactivate
 ```
 
-## Folder permissions
-Within the folder, run:
+## Set Permissions
+As the web server will be running under www-data, the application should be owned by that user.
 ```
-sudo chown -R www-data:www-data ./instance ./data
+sudo chown -R www-data:www-data /path/to/crackerjack
 ```
 
 If you have installed hashcat from source, you will need to create a ".hashcat" within the www-data user's home folder.
@@ -58,11 +60,37 @@ Which will result in something like
 ```
 /var/www
 ```
+If `/var/www` doesn't exist it means that neither nginx or apache are installed.
 
-And then create the folder and set the right owner.
+Now create the folder and set the right owner.
 ```
 sudo mkdir /var/www/.hashcat
+
+or
+
+sudo mkdir $(eval echo ~www-data)/.hashcat
+```
+Set permissions
+```
 sudo chown -R www-data:www-data /var/www/.hashcat
+```
+
+### Install Crontab
+
+This functionality is required to auto-terminate jobs when they exceed their allowed run time, and for general housekeeping.
+
+Navigate to CrackerJack and run the following:
+
+```
+sudo -u www-data /bin/bash  # Login as www-data before executing the following commands.
+. venv/bin/activate
+flask crontab add
+deactivate
+```
+
+Confirm that the job has been added by running:
+```
+crontab -l
 ```
 
 ## Install systemd service
