@@ -3,6 +3,7 @@ import random
 import string
 import os
 import time
+import datetime
 from app.lib.models.sessions import SessionModel
 from app.lib.models.user import UserModel
 from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
@@ -38,6 +39,9 @@ class SessionManager:
                 SessionModel.active == active
             )
         ).first()
+
+    def __get_by_id(self, session_id):
+        return SessionModel.query.filter(SessionModel.id == session_id).first()
 
     def create(self, user_id, name):
         session = self.__get(user_id, name, True)
@@ -126,6 +130,7 @@ class SessionManager:
                 'screen_name': session.screen_name,
                 'user_id': session.user_id,
                 'created_at': session.created_at,
+                'terminate_at': session.terminate_at,
                 'active': session.active,
                 'hashcat': {
                     'configured': True if hashcat else False,
@@ -455,5 +460,26 @@ class SessionManager:
         save_as = self.get_hashfile_path(user_id, session_id)
         with open(save_as, 'w') as f:
             f.write(hashes)
+
+        return True
+
+    def set_termination_datetime(self, session_id, date, time):
+        date_string = date + ' ' + time
+
+        # Check if the format is valid.
+        try:
+            fulldate = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M')
+        except ValueError:
+            return False
+
+        # Check if the date is in the past.
+        if fulldate < datetime.datetime.now():
+            return False
+
+        session = self.__get_by_id(session_id)
+        session.terminate_at = fulldate
+        db.session.commit()
+        # In order to get the created object, we need to refresh it.
+        db.session.refresh(session)
 
         return True

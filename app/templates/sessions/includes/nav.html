@@ -11,6 +11,6 @@
     </li>
     {% endif %}
     <li class="nav-item">
-        <a class="nav-link {{ 'active' if active_nav == 'settings' }}" href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}"><i class="fas fa-cog mr-1"></i>Settings</a>
+        <a class="nav-link {{ 'active' if active_nav == 'settings' }}" href="{{ url_for('sessions.settings', session_id=session.id) }}"><i class="fas fa-cog mr-1"></i>Settings</a>
     </li>
 </ul>

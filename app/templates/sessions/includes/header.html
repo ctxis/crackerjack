@@ -18,10 +18,10 @@
                             session.hashcat.data.process_state == 2 or
                             session.hashcat.data.process_state == 3
                     %}
-                    <a href="#" data-action="start" title="Start" class="form-action ml-2 btn btn-success"><i class="fas fa-play-circle"></i> Start</a>
                     {% if session.hashcat.data.process_state == 2 %}
                     <a href="#" data-action="restore" title="Restore" class="form-action ml-2 btn btn-info"><i class="fas fa-redo"></i> Restore</a>
                     {% endif %}
+                    <a href="#" data-action="start" title="Start" class="form-action ml-2 btn btn-success"><i class="fas fa-play-circle"></i> Start</a>
                     <a href="#" data-action="reset" title="Reset - If the session won't start click this link" class="form-action ml-2 btn btn-danger"><i class="fas fa-sync"></i> Rebuild</a>
                     {% endif %}
 
@@ -50,7 +50,10 @@
         {% endif %}
         {% if session.hashcat.data.process_state == 1 %}
         <div class="row">
-            <div class="col">Estimated Time: <abbr title="{{ session.hashcat.data.estimated_completion_time }}">{{ session.hashcat.data.time_remaining }}</abbr></div>
+            <div class="col">
+                <div>Estimated Time: <abbr title="{{ session.hashcat.data.estimated_completion_time }}">{{ session.hashcat.data.time_remaining }}</abbr></div>
+                <div>Termination Time: <abbr title="You can set this from the session's settings menu on the left">{{ session.terminate_at }}</abbr></div>
+            </div>
             <div class="col">
                 <div class="float-right">
                     <label for="autorefresh" class="mr-2">Auto Refresh Page While Running</label>

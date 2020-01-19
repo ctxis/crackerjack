@@ -9,4 +9,5 @@ class SessionModel(db.Model):
     name = db.Column(db.String, default='', index=True, nullable=True)
     screen_name = db.Column(db.String, default='', index=True, nullable=True)
     active = db.Column(db.Boolean, default=False, index=True, nullable=True)
+    terminate_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now())

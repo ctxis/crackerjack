@@ -260,3 +260,51 @@ def download_file(session_id, which_file):
         return redirect(url_for('home.index'))
 
     return sessions.download_file(session_id, which_file)
+
+
+@bp.route('/<int:session_id>/settings', methods=['GET'])
+@login_required
+def settings(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    user_id = 0 if current_user.admin else current_user.id
+    session = sessions.get(user_id, session_id)[0]
+
+    return render_template(
+        'sessions/settings.html',
+        session=session
+    )
+
+
+@bp.route('/<int:session_id>/settings/save', methods=['POST'])
+@login_required
+def settings_save(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    termination_date = request.form['termination_date'].strip()
+    termination_time = request.form['termination_time'].strip()
+
+    if len(termination_date) == 0:
+        flash('Please enter a termination date', 'error')
+        return redirect(url_for('sessions.settings', session_id=session_id))
+
+    if len(termination_time) == 0:
+        # Default to 23:59.
+        termination_time = '23:59'
+
+    if not sessions.set_termination_datetime(session_id, termination_date, termination_time):
+        flash('Invalid termination date/time entered', 'error')
+        return redirect(url_for('sessions.settings', session_id=session_id))
+
+    flash('Settings saved', 'success')
+    return redirect(url_for('sessions.settings', session_id=session_id))

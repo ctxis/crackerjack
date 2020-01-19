@@ -1,0 +1,74 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+{% include 'sessions/includes/header.html' %}
+
+<div class="row mt-5">
+    <div class="col-2">
+        {% set active_nav = 'settings' %}
+        {% include 'sessions/includes/nav.html' %}
+    </div>
+    <div class="col">
+        <div class="card">
+            <h4 class="card-header">Settings</h4>
+            <div class="card-body">
+                <form method="post" action="{{ url_for('sessions.settings_save', session_id=session.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="row">
+                        <div class="col-4">
+                            Session will terminate on
+                        </div>
+                        <div class="col-1">
+                            Date
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div class="input-group date" id="termination-date" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input" name="termination_date" data-target="#termination-date">
+                                    <div class="input-group-append" data-target="#termination-date" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            Time
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <div class="input-group date" id="termination-time" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input" name="termination_time" data-target="#termination-time">
+                                    <div class="input-group-append" data-target="#termination-time" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-clock"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <button type="submit" class="btn btn-primary btn-block">save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#termination-date').datetimepicker({
+            format: 'Y-MM-DD',
+            date: '{{ session.terminate_at }}'
+        });
+
+        $('#termination-time').datetimepicker({
+            format: 'HH:mm',
+            date: '{{ session.terminate_at }}'
+        });
+    });
+</script>
+
+{% endblock %}
