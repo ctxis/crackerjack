@@ -1,8 +1,9 @@
 var CJ_SessionsHeader = {
     autoRefreshInterval: 5000,
+    terminateAt: new Date(),
 
-    init: function(terminatedAt) {
-        this.terminatedAt = new Date(terminatedAt);
+    init: function(terminateAt) {
+        this.terminateAt = new Date(terminateAt);
 
         this.bindFormAction();
         this.bindRawProgress();
