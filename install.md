@@ -1,3 +1,23 @@
+# Table of Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+  - [Base Software](#base-software-requirement)
+  - [Clone](#clone-repo)
+  - [Virtual Environment](#virtual-environment)
+    - [Permissions](#virtual-environment-permissions)
+    - [Crontab](#install-crontab)
+  - System Configuration
+    - [Install Service](#install-systemd-service)
+    - Web Server Setup
+      - [nginx](#install-nginx-host)
+      - [apache2](#install-apache2-host)
+- [Third Party Software](#third-party-software)
+  - [Screen](#screen)
+    - [Compile](#compile)
+  - [Hashcat](#hashcat)
+- [Configuration](#crackerjack-configuration)
+
 # Requirements
 
 * python >= 3.6
@@ -9,7 +29,7 @@
 
 # Installation
 
-## Basic Software Requirement
+## Base Software Requirement
 Install basic packages using:
 ```
 sudo apt install vim git screen python3-venv python-pip sqlite3
@@ -43,7 +63,7 @@ flask db upgrade
 deactivate
 ```
 
-## Set Permissions
+## Virtual Environment Permissions
 As the web server will be running under www-data, the application should be owned by that user.
 ```
 sudo chown -R www-data:www-data /path/to/crackerjack
