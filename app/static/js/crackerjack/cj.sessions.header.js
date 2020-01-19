@@ -1,7 +1,9 @@
-var CJ_SessionsView = {
+var CJ_SessionsHeader = {
     autoRefreshInterval: 5000,
 
-    init: function() {
+    init: function(terminatedAt) {
+        this.terminatedAt = new Date(terminatedAt);
+
         this.bindFormAction();
         this.bindRawProgress();
         this.bindAutoRefresh();
@@ -15,6 +17,18 @@ var CJ_SessionsView = {
                     return false;
                 }
             }
+
+            switch ($(this).data('action')) {
+                case 'start':
+                case 'restore':
+                case 'resume':
+                    if (CJ_SessionsHeader.terminateAt < new Date()) {
+                        alert("The termination date for this session has passed. If you want to keep using this session please set a future date in the session's settings");
+                        return false;
+                    }
+                    break;
+            }
+
             $('#action').val($(this).data('action'));
             $('#form-action').submit();
             return false;

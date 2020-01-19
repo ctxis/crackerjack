@@ -244,6 +244,9 @@ def action(session_id):
 
     action = request.form['action'].strip()
     result = sessions.hashcat_action(session_id, action)
+    if result is False:
+        flash('Could not execute action. Please check that all settings have been configured and try again.', 'error')
+        return redirect(url_for('sessions.view', session_id=session_id))
 
     flash('If the STATE is not updated instantly, try refreshing this page in about 20-30 seconds.', 'success')
     return redirect(url_for('sessions.view', session_id=session_id))

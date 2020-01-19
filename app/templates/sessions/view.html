@@ -64,6 +64,10 @@
                             {% endif %}
                         </td>
                     </tr>
+                    <tr>
+                        <th scope="row">Terminate At</th>
+                        <td class="text-right">{{ session.terminate_at }}</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -104,12 +108,4 @@
         </div>
     </div>
 </div>
-
-<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.sessions.view.js') }}"></script>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        CJ_SessionsView.init();
-    });
-</script>
 {% endblock %}

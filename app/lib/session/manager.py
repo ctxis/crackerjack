@@ -237,6 +237,9 @@ class SessionManager:
         screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
 
         if action == 'start':
+            if self.__is_past_date(session['terminate_at']):
+                return False
+
             command = self.hashcat.build_command_line(
                 session['screen_name'],
                 int(session['hashcat']['mode']),
@@ -266,6 +269,9 @@ class SessionManager:
             # Create it again.
             screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
         elif action == 'resume':
+            if self.__is_past_date(session['terminate_at']):
+                return False
+
             # Hashcat only needs 'r' to resume.
             screen.execute({'r': ''})
         elif action == 'pause':
@@ -275,6 +281,9 @@ class SessionManager:
             # Hashcat only needs 'q' to pause.
             screen.execute({'q': ''})
         elif action == 'restore':
+            if self.__is_past_date(session['terminate_at']):
+                return False
+
             # To restore a session we need a command line like 'hashcat --session NAME --restore'.
             command = self.hashcat.build_restore_command(session['screen_name'])
             screen.execute(command)
@@ -472,8 +481,7 @@ class SessionManager:
         except ValueError:
             return False
 
-        # Check if the date is in the past.
-        if fulldate < datetime.datetime.now():
+        if self.__is_past_date(fulldate):
             return False
 
         session = self.__get_by_id(session_id)
@@ -483,3 +491,6 @@ class SessionManager:
         db.session.refresh(session)
 
         return True
+
+    def __is_past_date(self, date):
+        return datetime.datetime.now() > date
