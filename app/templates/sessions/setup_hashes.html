@@ -18,19 +18,17 @@
         {% include 'sessions/includes/nav.html' %}
     </div>
     <div class="col">
-        {% if session.hashcat.hashfile_exists %}
-        <div class="clearfix mb-3">
-            <div class="float-right">
-                <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}" class="btn btn-primary">Download Uploaded Hashes<i class="fas fa-file-download ml-2"></i></a>
-            </div>
-        </div>
-        {% endif %}
-
         <div class="card">
             <h4 class="card-header">Hashes</h4>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_hashes_save', session_id=session.id) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    {% if session.hashcat.hashfile_exists %}
+                    <div class="form-group">
+                        <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}" class="text-info">Hashes have already been uploaded. Click here to download them.</a>
+                    </div>
+                    {% endif %}
 
                     <div class="form-group">
                         <label for="hashfile">Upload file with hashes</label>
