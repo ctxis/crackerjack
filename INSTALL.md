@@ -17,6 +17,7 @@
     - [Compile](#compile)
   - [Hashcat](#hashcat)
 - [Configuration](#crackerjack-configuration)
+- [Run Locally](#run-locally)
 
 # Requirements
 
@@ -186,3 +187,41 @@ It's recommended to compile hashcat from source - instructions are at https://gi
 To set your own Flask configuration:
  
 Copy `config.py` from `./setup/config.py` to `./instance/config.py`
+
+# Run Locally
+
+You can also run CrackerJack locally without using Apache/nginx:
+
+```
+git clone [[this-repo]]
+```
+
+Navigate inside the cloned directory and run:
+
+```
+python3 -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+flask db init
+flask db migrate
+flask db upgrade
+
+export FLASK_ENV=development
+export FLASK_APP=app
+flask run
+```
+
+After the last command you should see something like:
+
+```
+(venv) $ flask run
+ * Serving Flask app "app" (lazy loading)
+ * Environment: development
+ * Debug mode: on
+ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 182-315-751
+```
+
+To access CrackerJack navigate to `http://127.0.0.1:5000/` 
