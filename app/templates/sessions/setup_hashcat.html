@@ -2,6 +2,14 @@
 
 {% block content %}
 
+{% if session.hashcat.data.process_state == 1 %}
+<div class="row mt-5">
+    <div class="col">
+        <div class="alert alert-warning">This session is currently running. Any changes you make on this page will not have any effect on it unless it is restarted.</div>
+    </div>
+</div>
+{% endif %}
+
 {% include 'sessions/includes/header.html' %}
 
 <div class="row mt-5">
