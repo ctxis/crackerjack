@@ -1,0 +1,66 @@
+<div class="row mt-5">
+    <div class="col-2"></div>
+    <div class="col">
+        <div class="row">
+            <div class="col-8">
+                <div>
+                    <h1 class="d-inline-block">{{ session.name }}</h1>
+                    <span class="badge badge-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}" style="vertical-align: top">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</span>
+                </div>
+            </div>
+            <div class="col text-right">
+                <form method="post" action="{{ url_for('sessions.action', session_id=session.id) }}" id="form-action">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="action" id="action" value="">
+
+                    {%
+                        if session.hashcat.data.process_state == 0 or
+                            session.hashcat.data.process_state == 2 or
+                            session.hashcat.data.process_state == 3
+                    %}
+                    <a href="#" data-action="start" title="Start" class="form-action ml-2 btn btn-success"><i class="fas fa-play-circle"></i> Start</a>
+                    {% if session.hashcat.data.process_state == 2 %}
+                    <a href="#" data-action="restore" title="Restore" class="form-action ml-2 btn btn-info"><i class="fas fa-redo"></i> Restore</a>
+                    {% endif %}
+                    <a href="#" data-action="reset" title="Reset - If the session won't start click this link" class="form-action ml-2 btn btn-danger"><i class="fas fa-sync"></i> Rebuild</a>
+                    {% endif %}
+
+                    {% if session.hashcat.data.process_state == 4 %}
+                    <a href="#" data-action="resume" title="Resume" class="form-action ml-2 btn btn-success"><i class="fas fa-play-circle"></i> Continue</a>
+                    {% endif %}
+
+                    {% if session.hashcat.data.process_state == 1 %}
+                    <a href="#" data-action="pause" title="Pause" class="form-action ml-2 btn btn-warning"><i class="fas fa-pause-circle"></i> Pause</a>
+                    {% endif %}
+
+                    {% if session.hashcat.data.process_state == 1 or session.hashcat.data.process_state == 4 %}
+                    <a href="#" data-action="stop" title="Stop" class="form-action ml-2 btn btn-danger"><i class="fas fa-stop-circle"></i> Stop</a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+        {% if session.hashcat.data.progress|int > 0 and session.hashcat.data.progress|int < 100 and session.hashcat.data.process_state == 1 %}
+        <div class="row">
+            <div class="col">
+                <div class="progress" style="height: 30px; font-size: 1.2em">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success text-primary" role="progressbar" aria-valuenow="{{ session.hashcat.data.progress|int }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ session.hashcat.data.progress|int }}%" title="{{ session.hashcat.data.progress }}%">{{ session.hashcat.data.progress }}%</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% if session.hashcat.data.process_state == 1 %}
+        <div class="row">
+            <div class="col">Estimated Time: <abbr title="{{ session.hashcat.data.estimated_completion_time }}">{{ session.hashcat.data.time_remaining }}</abbr></div>
+            <div class="col">
+                <div class="float-right">
+                    <label for="autorefresh" class="mr-2">Auto Refresh Page While Running</label>
+                    <div class="custom-control custom-switch float-right">
+                        <input type="checkbox" class="custom-control-input" id="autorefresh" value="1" checked>
+                        <label class="custom-control-label" for="autorefresh"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>

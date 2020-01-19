@@ -1,18 +1,15 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-<div class="row mt-5">
-    <div class="col-2"></div>
-    <div class="col-8">
-        <h2><a href="{{ url_for('sessions.view', session_id=session.id) }}">{{ session.name }}</a></h2>
-        <hr>
-    </div>
-    <div class="col-2"></div>
-</div>
+
+{% include 'sessions/includes/header.html' %}
 
 <div class="row mt-5">
-    <div class="col-2"></div>
-    <div class="col-8">
+    <div class="col-2">
+        {% set active_nav = 'hashcat' %}
+        {% include 'sessions/includes/nav.html' %}
+    </div>
+    <div class="col">
         <form id="setup-hashcat" method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_hashcat_save', session_id=session.id) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="card">
@@ -199,7 +196,6 @@
             </div>
         </form>
     </div>
-    <div class="col-2"></div>
 </div>
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.sessions.setup.js') }}"></script>
