@@ -16,6 +16,8 @@ CrackerJack is a Web GUI for [Hashcat](https://hashcat.net/hashcat/) developed i
 
 This web application is designed to run on a single machine, rather than a distributed cracking rig.
 
+Also, CrackerJack is not meant to be a replacement for the command-line. It's been created only to make the most common wordlist/bruteforce attacks more accessible. 
+
 ### Assumptions
 
 The main assumption is that you already have Hashcat installed on a machine, as these instructions will not guide you through compiling Hashcat or setting up GPU drivers. 
