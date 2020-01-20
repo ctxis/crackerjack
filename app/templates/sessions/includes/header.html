@@ -16,7 +16,8 @@
                     {%
                         if session.hashcat.data.process_state == 0 or
                             session.hashcat.data.process_state == 2 or
-                            session.hashcat.data.process_state == 3
+                            session.hashcat.data.process_state == 3 or
+                            session.hashcat.data.process_state == 98
                     %}
                     {% if session.hashcat.data.process_state == 2 %}
                     <a href="#" data-action="restore" title="Restore" class="form-action ml-2 btn btn-info"><i class="fas fa-redo"></i> Restore</a>

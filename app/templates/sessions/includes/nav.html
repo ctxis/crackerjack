@@ -4,10 +4,10 @@
     </li>
     {% if session.hashcat.data.process_state != 1 %}
     <li class="nav-item">
-        <a class="nav-link {{ 'active' if active_nav == 'hashcat' }}" href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}"><i class="fas fa-cat mr-1"></i>Hashcat</a>
+        <a class="nav-link {{ 'active' if active_nav == 'hashes' }}" href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}"><i class="fas fa-hashtag mr-1"></i>Hashes</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link {{ 'active' if active_nav == 'hashes' }}" href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}"><i class="fas fa-hashtag mr-1"></i>Hashes</a>
+        <a class="nav-link {{ 'active' if active_nav == 'hashcat' }}" href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}"><i class="fas fa-cat mr-1"></i>Hashcat</a>
     </li>
     {% endif %}
     <li class="nav-item">
