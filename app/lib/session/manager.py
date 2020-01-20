@@ -2,15 +2,14 @@ import re
 import random
 import string
 import os
-import time
 import datetime
 from app.lib.models.sessions import SessionModel
 from app.lib.models.user import UserModel
 from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
+from app.lib.session.filesystem import SessionFileSystem
 from app import db
-from pathlib import Path
 from sqlalchemy import and_, desc
-from flask import current_app, send_file
+from flask import send_file
 
 
 class SessionManager:
@@ -19,6 +18,7 @@ class SessionManager:
         self.screens = screens
         self.wordlists = wordlists
         self.hashid = hashid
+        self.session_filesystem = SessionFileSystem()
 
     def sanitise_name(self, name):
         return re.sub(r'\W+', '', name)
@@ -27,7 +27,7 @@ class SessionManager:
         return prefix + ''.join(random.choice(string.ascii_letters + string.digits) for i in range(12))
 
     def __generate_screen_name(self, user_id, name):
-        return str(user_id) + '_' + name;
+        return str(user_id) + '_' + name
 
     def exists(self, user_id, name, active=True):
         return self.__get(user_id, name, active) is not None
@@ -63,38 +63,6 @@ class SessionManager:
 
         return session
 
-    def get_data_path(self):
-        path = Path(current_app.root_path)
-        return os.path.join(str(path.parent), 'data')
-
-    def get_user_data_path(self, user_id, session_id):
-        path = os.path.join(self.get_data_path(), str(user_id))
-        if session_id > 0:
-            path = os.path.join(path, str(session_id))
-
-        if not os.path.isdir(path):
-            os.makedirs(path)
-
-        return path
-
-    def get_hashfile_path(self, user_id, session_id):
-        return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.txt')
-
-    def hashfile_exists(self, user_id, session_id):
-        path = self.get_hashfile_path(user_id, session_id)
-        return os.path.isfile(path)
-
-    def get_potfile_path(self, user_id, session_id):
-        return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.potfile')
-
-    def get_screenfile_path(self, user_id, session_id, name=None):
-        if name is None:
-            name = 'screen.log'
-        return os.path.join(self.get_user_data_path(user_id, session_id), name)
-
-    def get_crackedfile_path(self, user_id, session_id):
-        return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.cracked')
-
     def can_access(self, user, session_id):
         if user.admin:
             return True
@@ -123,7 +91,7 @@ class SessionManager:
         for session in sessions:
             hashcat = self.get_hashcat_settings(session.id)
             hashcat_data_raw = self.get_hashcat_status(session.user_id, session.id)
-            tail_screen = self.__tail_file(self.get_screenfile_path(session.user_id, session.id), 4096).decode()
+            tail_screen = self.session_filesystem.tail_file(self.session_filesystem.get_screenfile_path(session.user_id, session.id), 4096).decode()
 
             item = {
                 'id': session.id,
@@ -146,32 +114,20 @@ class SessionManager:
                     'increment_max': 0 if not hashcat else hashcat.increment_max,
                     'data_raw': hashcat_data_raw,
                     'data': self.process_hashcat_raw_data(hashcat_data_raw, session.screen_name, tail_screen),
-                    'hashfile': self.get_hashfile_path(session.user_id, session.id),
-                    'hashfile_exists': self.hashfile_exists(session.user_id, session.id)
+                    'hashfile': self.session_filesystem.get_hashfile_path(session.user_id, session.id),
+                    'hashfile_exists': self.session_filesystem.hashfile_exists(session.user_id, session.id)
                 },
                 'user': {
                     'record': UserModel.query.filter(UserModel.id == session.user_id).first()
                 },
                 'tail_screen': tail_screen,
-                'hashes_in_file': self.__count_hashes_in_file(self.get_hashfile_path(session.user_id, session.id)),
+                'hashes_in_file': self.session_filesystem.count_non_empty_lines_in_file(self.session_filesystem.get_hashfile_path(session.user_id, session.id)),
                 'guess_hashtype': self.guess_hashtype(session.user_id, session.id)
             }
 
             data.append(item)
 
         return data
-
-    def __count_hashes_in_file(self, hashfile):
-        if not os.path.isfile(hashfile):
-            return 0
-
-        count = 0
-        with open(hashfile, 'r') as f:
-            for line in f:
-                if line.strip():
-                    count += 1
-
-        return count
 
     def set_hashcat_setting(self, session_id, name, value):
         record = self.get_hashcat_settings(session_id)
@@ -218,15 +174,6 @@ class SessionManager:
 
         return record
 
-    def backup_screen_log_file(self, user_id, session_id):
-        path = self.get_screenfile_path(user_id, session_id)
-        if not os.path.isfile(path):
-            return True
-
-        new_path = path + '.' + str(int(time.time()))
-        os.rename(path, new_path)
-        return True
-
     def is_process_running(self, screen_name):
         screens = self.hashcat.get_process_screen_names()
         return screen_name in screens
@@ -236,7 +183,7 @@ class SessionManager:
         session = self.get(session_id=session_id)[0]
 
         # Make sure the screen is running.
-        screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
+        screen = self.screens.get(session['screen_name'], log_file=self.session_filesystem.get_screenfile_path(session['user_id'], session_id))
 
         if action == 'start':
             if self.__is_past_date(session['terminate_at']):
@@ -247,29 +194,29 @@ class SessionManager:
                 int(session['hashcat']['mode']),
                 session['hashcat']['mask'],
                 session['hashcat']['hashtype'],
-                self.get_hashfile_path(session['user_id'], session_id),
+                self.session_filesystem.get_hashfile_path(session['user_id'], session_id),
                 session['hashcat']['wordlist_path'],
                 session['hashcat']['rule_path'],
-                self.get_crackedfile_path(session['user_id'], session_id),
-                self.get_potfile_path(session['user_id'], session_id),
+                self.session_filesystem.get_crackedfile_path(session['user_id'], session_id),
+                self.session_filesystem.get_potfile_path(session['user_id'], session_id),
                 int(session['hashcat']['increment_min']),
                 int(session['hashcat']['increment_max'])
             )
 
             # Before we start a new session, rename the previous "screen.log" file
             # so that we can determine errors/state easier.
-            self.backup_screen_log_file(session['user_id'], session_id)
+            self.session_filesystem.backup_screen_log_file(session['user_id'], session_id)
 
             # Even though we renamed the file, as it is still open the OS handle will now point to the renamed file.
             # We re-set the screen logfile to the original file.
-            screen.set_logfile(self.get_screenfile_path(session['user_id'], session_id))
+            screen.set_logfile(self.session_filesystem.get_screenfile_path(session['user_id'], session_id))
             screen.execute(command)
         elif action == 'reset':
             # Close the screen.
             screen.quit()
 
             # Create it again.
-            screen = self.screens.get(session['screen_name'], log_file=self.get_screenfile_path(session['user_id'], session_id))
+            screen = self.screens.get(session['screen_name'], log_file=self.session_filesystem.get_screenfile_path(session['user_id'], session_id))
         elif action == 'resume':
             if self.__is_past_date(session['terminate_at']):
                 return False
@@ -296,14 +243,6 @@ class SessionManager:
 
     def get_used_wordlists(self, session_id):
         return UsedWordlistModel.query.filter(UsedWordlistModel.session_id == session_id).all()
-
-    def __remove_escape_characters(self, data):
-        # https://stackoverflow.com/questions/14693701/how-can-i-remove-the-ansi-escape-sequences-from-a-string-in-python
-        ansi_escape_8bit = re.compile(br'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
-        return ansi_escape_8bit.sub(b'', data)
-
-    def __fix_line_termination(self, data):
-        return data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
 
     def __detect_session_status(self, raw, screen_name, tail_screen):
         # States are:
@@ -383,29 +322,9 @@ class SessionManager:
 
         return data
 
-    def __tail_file(self, file, length):
-        if not os.path.isfile(file):
-            return b''
-
-        # If we try to read more than the actual size of the file, it will throw an error.
-        filesize = os.path.getsize(file)
-        bytes_to_read = filesize if filesize < length else length
-
-        # Read the last 4KB from the screen log file.
-        with open(file, 'rb') as file:
-            file.seek(bytes_to_read * -1, os.SEEK_END)
-            stream = file.read()
-
-        # Replace \r\n with \n, and any rebel \r to \n. We only like \n in here!
-        # Clean the file from escape characters.
-        stream = self.__remove_escape_characters(stream)
-        stream = self.__fix_line_termination(stream)
-
-        return stream
-
     def get_hashcat_status(self, user_id, session_id):
-        screen_log_file = self.get_screenfile_path(user_id, session_id)
-        stream = self.__tail_file(screen_log_file, 4096)
+        screen_log_file = self.session_filesystem.get_screenfile_path(user_id, session_id)
+        stream = self.session_filesystem.tail_file(screen_log_file, 4096)
         if len(stream) == 0:
             return {}
 
@@ -419,10 +338,10 @@ class SessionManager:
 
         save_as = session['name']
         if which_file == 'cracked':
-            file = self.get_crackedfile_path(session['user_id'], session_id)
+            file = self.session_filesystem.get_crackedfile_path(session['user_id'], session_id)
             save_as = save_as + '.cracked'
         elif which_file == 'hashes':
-            file = self.get_hashfile_path(session['user_id'], session_id)
+            file = self.session_filesystem.get_hashfile_path(session['user_id'], session_id)
             save_as = save_as + '.hashes'
         else:
             return 'Error'
@@ -466,13 +385,6 @@ class SessionManager:
             data['commands'][key].append(process)
 
         return data
-
-    def save_hashes(self, user_id, session_id, hashes):
-        save_as = self.get_hashfile_path(user_id, session_id)
-        with open(save_as, 'w') as f:
-            f.write(hashes)
-
-        return True
 
     def set_termination_datetime(self, session_id, date, time):
         date_string = date + ' ' + time
@@ -518,7 +430,7 @@ class SessionManager:
                 self.hashcat_action(session['id'], 'stop')
 
     def guess_hashtype(self, user_id, session_id):
-        hashfile = self.get_hashfile_path(user_id, session_id)
+        hashfile = self.session_filesystem.get_hashfile_path(user_id, session_id)
         if not os.path.isfile(hashfile):
             return []
 

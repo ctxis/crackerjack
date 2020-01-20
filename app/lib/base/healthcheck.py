@@ -58,7 +58,7 @@ class HealthCheck:
             errors.append(screenrc_path + ' is not readable')
 
     def check_datapath(self, sessions, errors):
-        datapath = sessions.get_data_path()
+        datapath = sessions.session_filesystem.get_data_path()
 
         if not os.path.isdir(datapath):
             errors.append(datapath + ' does not exist')

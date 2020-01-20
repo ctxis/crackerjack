@@ -59,7 +59,7 @@ def session_hashes(session_id):
     if 'hashes' not in data:
         return api.response(False, 'Hashes not found in request')
 
-    sessions.save_hashes(user.id, session_id, data['hashes'])
+    sessions.session_filesystem.save_hashes(user.id, session_id, data['hashes'])
 
     return api.response(True)
 

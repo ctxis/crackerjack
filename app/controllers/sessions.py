@@ -62,10 +62,10 @@ def setup_hashes_save(session_id):
 
     hashes = request.form['hashes'].strip()
 
-    save_as = sessions.get_hashfile_path(current_user.id, session_id)
+    save_as = sessions.session_filesystem.get_hashfile_path(current_user.id, session_id)
 
     if len(hashes) > 0:
-        sessions.save_hashes(current_user.id, session_id, hashes)
+        sessions.session_filesystem.save_hashes(current_user.id, session_id, hashes)
     else:
         if len(request.files) != 1:
             flash('Uploaded file could not be found', 'error')
