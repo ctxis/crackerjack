@@ -1,4 +1,5 @@
 import collections
+import re
 
 
 class HashcatManager:
@@ -284,3 +285,85 @@ class HashcatManager:
                 break
 
         return name
+
+    def is_process_running(self, screen_name):
+        screens = self.get_process_screen_names()
+        return screen_name in screens
+
+    def __detect_session_status(self, raw, screen_name, tail_screen):
+        # States are:
+        #   0   NOT_STARTED
+        #   1   RUNNING
+        #   2   STOPPED
+        #   3   FINISHED
+        #   4   PAUSED
+        #   5   CRACKED
+        #   98  ERROR
+        #   99  UNKNOWN
+        status = 0
+        if 'Status' in raw:
+            if raw['Status'] == 'Running':
+                status = 1
+                # However, if there's no process then it's probably an error.
+                if not self.is_process_running(screen_name):
+                    # Set to error.
+                    status = 98
+            elif raw['Status'] == 'Quit':
+                status = 2
+            if raw['Status'] == 'Exhausted':
+                status = 3
+            elif raw['Status'] == 'Paused':
+                status = 4
+            elif raw['Status'] == 'Cracked':
+                status = 5
+        else:
+            # There's a chance that there's no 'status' output displayed yet. In this case, check if the process is running.
+            if self.is_process_running(screen_name):
+                # Set to running.
+                status = 1
+
+        # If it is STILL not running, take the last few output lines, and mark this as an 'error'.
+        if status == 0 and len(tail_screen) > 0:
+            status = 98
+
+        return status
+
+    def process_hashcat_raw_data(self, raw, screen_name, tail_screen):
+        # Build base dictionary
+        data = {
+            'process_state': self.__detect_session_status(raw, screen_name, tail_screen),
+            'all_passwords': 0,
+            'cracked_passwords': 0,
+            'time_remaining': '',
+            'estimated_completion_time': '',
+            'progress': 0
+        }
+
+        # progress
+        if 'Progress' in raw:
+            matches = re.findall('\((\d+.\d+)', raw['Progress'])
+            if len(matches) == 1:
+                data['progress'] = matches[0]
+
+        # passwords
+        if 'Recovered' in raw:
+            matches = re.findall('(\d+/\d+)', raw['Recovered'])
+            if len(matches) > 0:
+                passwords = matches[0].split('/')
+                if len(passwords) == 2:
+                    data['all_passwords'] = int(passwords[1])
+                    data['cracked_passwords'] = int(passwords[0])
+
+        # time remaining
+        if 'Time.Estimated' in raw:
+            matches = re.findall('\((.*)\)', raw['Time.Estimated'])
+            if len(matches) == 1:
+                data['time_remaining'] = 'Finished' if matches[0] == '0 secs' else matches[0].strip()
+
+        # estimated completion time
+        if 'Time.Estimated' in raw:
+            matches = re.findall('(.*)\(', raw['Time.Estimated'])
+            if len(matches) == 1:
+                data['estimated_completion_time'] = matches[0].strip()
+
+        return data
