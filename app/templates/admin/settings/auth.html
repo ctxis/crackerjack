@@ -88,7 +88,7 @@
                                 <div class="row">
                                     <div class="col-4"><label for="ldap_bind_pass">Bind Password</label></div>
                                     <div class="col">
-                                        <input name="ldap_bind_pass" type="password" id="ldap_bind_pass" class="form-control" value="{{ setting_get('ldap_bind_pass', '') }}" placeholder="readonlypass">
+                                        <input name="ldap_bind_pass" type="password" id="ldap_bind_pass" class="form-control" value="{{ '********' if setting_get('ldap_bind_pass', '')|length > 0 else '' }}" placeholder="readonlypass">
                                     </div>
                                 </div>
                             </div>
