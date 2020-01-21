@@ -31,7 +31,7 @@ class TemplateManager:
         elif state == 2:
             text = 'danger'
         elif state == 3:
-            text = 'null'
+            text = 'info'
         elif state == 4:
             text = 'warning'
         elif state == 5:
