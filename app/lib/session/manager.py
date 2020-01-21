@@ -3,6 +3,7 @@ import random
 import string
 import os
 import datetime
+import time
 from app.lib.models.sessions import SessionModel
 from app.lib.models.user import UserModel
 from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
@@ -19,6 +20,7 @@ class SessionManager:
         self.wordlists = wordlists
         self.hashid = hashid
         self.session_filesystem = SessionFileSystem()
+        self.cmd_sleep = 2
 
     def sanitise_name(self, name):
         return re.sub(r'\W+', '', name)
@@ -223,10 +225,34 @@ class SessionManager:
 
             # Hashcat only needs 'r' to resume.
             screen.execute({'r': ''})
+
+            # Wait a couple of seconds.
+            time.sleep(self.cmd_sleep)
+
+            # Send an "s" command to show current status.
+            screen.execute({'s': ''})
+
+            # Wain a second.
+            time.sleep(1)
         elif action == 'pause':
             # Hashcat only needs 'p' to pause.
             screen.execute({'p': ''})
+
+            # Wait a couple of seconds.
+            time.sleep(self.cmd_sleep)
+
+            # Send an "s" command to show current status.
+            screen.execute({'s': ''})
+
+            # Wain a second.
+            time.sleep(1)
         elif action == 'stop':
+            # Send an "s" command to show current status.
+            screen.execute({'s': ''})
+
+            # Wain a second.
+            time.sleep(1)
+
             # Hashcat only needs 'q' to pause.
             screen.execute({'q': ''})
         elif action == 'restore':
@@ -236,6 +262,15 @@ class SessionManager:
             # To restore a session we need a command line like 'hashcat --session NAME --restore'.
             command = self.hashcat.build_restore_command(session['screen_name'])
             screen.execute(command)
+
+            # Wait a couple of seconds.
+            time.sleep(self.cmd_sleep)
+
+            # Send an "s" command to show current status.
+            screen.execute({'s': ''})
+
+            # Wain a second.
+            time.sleep(1)
         else:
             return False
 
