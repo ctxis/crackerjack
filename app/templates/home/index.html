@@ -73,7 +73,7 @@
                     <tr>
                         <td>{{ session.id }}</td>
                         <td>{{ session.user.record.username }}</td>
-                        <td><a href="{{ url_for('sessions.view', session_id=session.id) }}">{{ session.description }}</a></td>
+                        <td><a href="{{ url_for('sessions.view', session_id=session.id) }}">{{ session.description if (session.description and session.description|length > 0) else session.name }}</a></td>
                         <td class="table-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</td>
                         <td class="text-right">{{ session.hashcat.data.progress }}%</td>
                         <td class="text-right">
