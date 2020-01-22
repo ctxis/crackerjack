@@ -6,6 +6,9 @@ from flask import current_app
 
 
 class SessionFileSystem:
+    def __init__(self, filesystem):
+        self.filesystem = filesystem
+
     def get_data_path(self):
         path = Path(current_app.root_path)
         return os.path.join(str(path.parent), 'data')
@@ -93,3 +96,26 @@ class SessionFileSystem:
             f.write(hashes)
 
         return True
+
+    def find_latest_screenlog(self, user_id, session_id):
+        # Sometimes when a backup of screen.log is made, a new "screen.log" doesn't appear, making it look like it's a brand new session.
+        # This function will try and find any historical screen.log.TIMESTAMP files in the event of this edge case.
+        filepath = self.get_screenfile_path(user_id, session_id)
+        if os.path.isfile(filepath):
+            return filepath
+
+        path = os.path.dirname(filepath)
+        files = self.filesystem.get_files(path)
+
+        screen_files = []
+        for name, data in files.items():
+            if name[:11] == 'screen.log.':
+                screen_files.append(name)
+
+        if len(screen_files) == 0:
+            # Return the original path if no historic files exist.
+            return filepath
+
+        screen_files.sort(reverse=True)
+
+        return os.path.join(path, screen_files[0])

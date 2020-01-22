@@ -28,7 +28,8 @@ class Provider:
             self.hashcat(),
             self.screens(),
             self.wordlists(),
-            self.hashid()
+            self.hashid(),
+            self.filesystem()
         )
         return session
 
