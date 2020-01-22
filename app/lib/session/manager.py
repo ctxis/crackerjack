@@ -8,6 +8,7 @@ from app.lib.models.sessions import SessionModel
 from app.lib.models.user import UserModel
 from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
 from app.lib.session.filesystem import SessionFileSystem
+from app.lib.session.validation import SessionValidation
 from app import db
 from sqlalchemy import and_, desc
 from flask import send_file
@@ -21,6 +22,7 @@ class SessionManager:
         self.hashid = hashid
         self.filesystem = filesystem
         self.session_filesystem = SessionFileSystem(filesystem)
+        self.session_validation = SessionValidation()
         self.cmd_sleep = 2
 
     def sanitise_name(self, name):
@@ -132,8 +134,11 @@ class SessionManager:
                 },
                 'tail_screen': tail_screen,
                 'hashes_in_file': self.session_filesystem.count_non_empty_lines_in_file(self.session_filesystem.get_hashfile_path(session.user_id, session.id)),
-                'guess_hashtype': self.guess_hashtype(session.user_id, session.id)
+                'guess_hashtype': self.guess_hashtype(session.user_id, session.id),
+                'validation': {} # This will be set outside to prevent a deadlock as it uses the session itself as input.
             }
+
+            item['validation'] = self.session_validation.validate(item)
 
             data.append(item)
 

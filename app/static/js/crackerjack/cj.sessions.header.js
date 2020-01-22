@@ -8,6 +8,13 @@ var CJ_SessionsHeader = {
         this.bindFormAction();
         this.bindRawProgress();
         this.bindAutoRefresh();
+        this.bindPopOver()
+    },
+
+    bindPopOver: function() {
+        $('[data-toggle="popover"]').popover({
+            html: true
+        });
     },
 
     bindFormAction: function() {

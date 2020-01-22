@@ -9,6 +9,9 @@
                 </div>
             </div>
             <div class="col text-right">
+                {% if session.validation|length > 0 %}
+                <button type="button" class="btn btn-warning" title="" data-container="body" data-toggle="popover" data-placement="left" data-content="* {{ session.validation|join('<br>* ') }}<br><br>Once you have fixed all the above issues, you will be able to start your session." data-original-title="Missing Configuration">Click here to identify missing configuration</button>
+                {% else %}
                 <form method="post" action="{{ url_for('sessions.action', session_id=session.id) }}" id="form-action">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="action" id="action" value="">
@@ -38,6 +41,7 @@
                     <a href="#" data-action="stop" title="Stop" class="form-action ml-2 btn btn-danger"><i class="fas fa-stop-circle"></i> Stop</a>
                     {% endif %}
                 </form>
+                {% endif %}
             </div>
         </div>
         {% if session.hashcat.data.progress|int > 0 and session.hashcat.data.progress|int < 100 and session.hashcat.data.process_state == 1 %}

@@ -205,8 +205,7 @@ def setup_hashcat_save(session_id):
     sessions.set_hashcat_setting(session_id, 'increment_min', increment_min)
     sessions.set_hashcat_setting(session_id, 'increment_max', increment_max)
 
-    flash('All settings saved. You can now start the session.', 'success')
-    return redirect(url_for('sessions.view', session_id=session_id))
+    return redirect(url_for('sessions.settings', session_id=session_id))
 
 
 @bp.route('/<int:session_id>/view', methods=['GET'])
@@ -243,6 +242,13 @@ def action(session_id):
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
+
+    user_id = 0 if current_user.admin else current_user.id
+    session = sessions.get(user_id, session_id)[0]
+
+    if len(session['validation']) > 0:
+        flash('Please configure all required settings and try again.', 'error')
+        return redirect(url_for('sessions.view', session_id=session_id))
 
     action = request.form['action'].strip()
     result = sessions.hashcat_action(session_id, action)
