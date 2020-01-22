@@ -104,12 +104,14 @@ class SessionFileSystem:
         if os.path.isfile(filepath):
             return filepath
 
+        filename = os.path.basename(filepath)
         path = os.path.dirname(filepath)
         files = self.filesystem.get_files(path)
 
         screen_files = []
+        len_to_look_for = len(filename) + 1
         for name, data in files.items():
-            if name[:11] == 'screen.log.':
+            if name[:len_to_look_for] == (filename + '.'):
                 screen_files.append(name)
 
         if len(screen_files) == 0:
