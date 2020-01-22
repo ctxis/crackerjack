@@ -13,17 +13,19 @@ def create():
     provider = Provider()
     sessions = provider.sessions()
 
-    name = request.form['name'].strip()
-    name = sessions.sanitise_name(name)
-    if len(name) == 0:
-        # Either the name contained only invalid characters, or no name was supplied.
-        name = sessions.generate_name()
+    description = request.form['description'].strip()
+    if len(description) == 0:
+        flash('Please enter a session description', 'error')
+        return redirect(url_for('home.index'))
+
+    prefix = sessions.sanitise_name(current_user.username) + '_'
+    name = sessions.generate_name(prefix=prefix, length=4)
 
     if sessions.exists(current_user.id, name):
         flash('You already have an active session with this name. Either delete or use that one instead.', 'error')
         return redirect(url_for('home.index'))
 
-    session = sessions.create(current_user.id, name)
+    session = sessions.create(current_user.id, name, description)
     if session is None:
         flash('Could not create session', 'error')
         return redirect(url_for('home.index'))

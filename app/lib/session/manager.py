@@ -26,8 +26,8 @@ class SessionManager:
     def sanitise_name(self, name):
         return re.sub(r'\W+', '', name)
 
-    def generate_name(self, prefix=''):
-        return prefix + ''.join(random.choice(string.ascii_letters + string.digits) for i in range(12))
+    def generate_name(self, length=12, prefix=''):
+        return prefix + ''.join(random.choice(string.ascii_letters + string.digits) for i in range(length))
 
     def __generate_screen_name(self, user_id, name):
         return str(user_id) + '_' + name
@@ -47,7 +47,7 @@ class SessionManager:
     def __get_by_id(self, session_id):
         return SessionModel.query.filter(SessionModel.id == session_id).first()
 
-    def create(self, user_id, name):
+    def create(self, user_id, name, description):
         session = self.__get(user_id, name, True)
         if session:
             # Return existing session if there is one.
@@ -56,6 +56,7 @@ class SessionManager:
         session = SessionModel(
             user_id=user_id,
             name=name,
+            description=description,
             active=True,
             screen_name=self.__generate_screen_name(user_id, name)
         )
@@ -104,6 +105,7 @@ class SessionManager:
             item = {
                 'id': session.id,
                 'name': session.name,
+                'description': session.description,
                 'screen_name': session.screen_name,
                 'user_id': session.user_id,
                 'created_at': session.created_at,

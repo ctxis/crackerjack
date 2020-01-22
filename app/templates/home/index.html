@@ -37,7 +37,7 @@
             <div class="row">
                 <div class="col-9">
                     <div class="form-group">
-                        <input type="text" name="name" id="name" class="form-control" placeholder="Enter Session Name here. This will be auto-generated if left empty">
+                        <input type="text" name="description" id="description" class="form-control" placeholder="Enter your new session's description here." required>
                     </div>
                 </div>
                 <div class="col-3">
@@ -73,7 +73,7 @@
                     <tr>
                         <td>{{ session.id }}</td>
                         <td>{{ session.user.record.username }}</td>
-                        <td><a href="{{ url_for('sessions.view', session_id=session.id) }}">{{ session.name }}</a></td>
+                        <td><a href="{{ url_for('sessions.view', session_id=session.id) }}">{{ session.description }}</a></td>
                         <td class="table-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</td>
                         <td class="text-right">{{ session.hashcat.data.progress }}%</td>
                         <td class="text-right">
