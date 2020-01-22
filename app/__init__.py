@@ -82,7 +82,10 @@ def create_app(config_class=None):
             provider = Provider()
             return provider.template()
 
-        return dict(setting_get=setting_get, user_setting_get=user_setting_get, template=template)
+        def basename(path):
+            return os.path.basename(path)
+
+        return dict(setting_get=setting_get, user_setting_get=user_setting_get, template=template, basename=basename)
 
     @app.before_request
     def before_request():

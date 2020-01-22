@@ -111,14 +111,11 @@ def setup_hashcat(session_id):
     password_wordlists = wordlists.get_wordlists()
     hashcat_rules = rules.get_rules()
 
-    used_wordlists = sessions.get_used_wordlists(session_id)
-
     return render_template(
         'sessions/setup_hashcat.html',
         session=session,
         hashes_json=json.dumps(supported_hashes),
         wordlists_json=json.dumps(password_wordlists),
-        used_wordlists=used_wordlists,
         rules=hashcat_rules
     )
 

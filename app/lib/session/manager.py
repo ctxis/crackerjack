@@ -6,7 +6,7 @@ import datetime
 import time
 from app.lib.models.sessions import SessionModel
 from app.lib.models.user import UserModel
-from app.lib.models.hashcat import HashcatModel, UsedWordlistModel
+from app.lib.models.hashcat import HashcatModel, HashcatHistoryModel
 from app.lib.session.filesystem import SessionFileSystem
 from app.lib.session.validation import SessionValidation
 from app import db
@@ -135,6 +135,7 @@ class SessionManager:
                 'tail_screen': tail_screen,
                 'hashes_in_file': self.session_filesystem.count_non_empty_lines_in_file(self.session_filesystem.get_hashfile_path(session.user_id, session.id)),
                 'guess_hashtype': self.guess_hashtype(session.user_id, session.id),
+                'hashcat_history': self.__get_hashcat_history(session_id),
                 'validation': {} # This will be set outside to prevent a deadlock as it uses the session itself as input.
             }
 
@@ -143,6 +144,11 @@ class SessionManager:
             data.append(item)
 
         return data
+
+    def __get_hashcat_history(self, session_id):
+        return HashcatHistoryModel.query.filter(
+            HashcatHistoryModel.session_id == session_id
+        ).order_by(desc(HashcatHistoryModel.id)).all()
 
     def set_hashcat_setting(self, session_id, name, value):
         record = self.get_hashcat_settings(session_id)
@@ -154,14 +160,6 @@ class SessionManager:
         elif name == 'hashtype':
             record.hashtype = value
         elif name == 'wordlist':
-            # When the wordlist is updated, add the previous wordlist to the "used_wordlists" table.
-            if record.wordlist != value and record.wordlist != '':
-                used = UsedWordlistModel(
-                    session_id=session_id,
-                    wordlist=record.wordlist
-                )
-                db.session.add(used)
-
             record.wordlist = value
         elif name == 'rule':
             record.rule = value
@@ -222,6 +220,9 @@ class SessionManager:
             # We re-set the screen logfile to the original file.
             screen.set_logfile(self.session_filesystem.get_screenfile_path(session['user_id'], session_id))
             screen.execute(command)
+
+            # Every time we start a session, we make a copy of the settings and put them in the hashcat_history table.
+            self.__save_hashcat_history(session_id)
         elif action == 'reset':
             # Close the screen.
             screen.quit()
@@ -285,8 +286,25 @@ class SessionManager:
 
         return True
 
-    def get_used_wordlists(self, session_id):
-        return UsedWordlistModel.query.filter(UsedWordlistModel.session_id == session_id).all()
+    def __save_hashcat_history(self, session_id):
+        record = HashcatModel.query.filter(HashcatModel.session_id == session_id).first()
+        new_record = HashcatHistoryModel(
+            session_id=record.session_id,
+            mode=record.mode,
+            hashtype=record.hashtype,
+            wordlist=record.wordlist,
+            rule=record.rule,
+            mask=record.mask,
+            increment_min=record.increment_min,
+            increment_max=record.increment_max,
+            created_at=datetime.datetime.now(),
+        )
+
+        db.session.add(new_record)
+        db.session.commit()
+        # In order to get the created object, we need to refresh it.
+        db.session.refresh(new_record)
+        return True
 
     def get_hashcat_status(self, user_id, session_id):
         screen_log_file = self.session_filesystem.find_latest_screenlog(user_id, session_id)

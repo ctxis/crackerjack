@@ -139,7 +139,6 @@ var CJ_SessionsSetup = {
         this.bindHashType(supported_hashes, selected_hashtype);
         this.bindWordlists(wordlists, selected_wordlist);
         this.bindRules(selected_rule);
-        this.bindUsedWordlists();
         this.bindModes();
         this.bindForm();
         this.bindIncrements();
@@ -205,21 +204,6 @@ var CJ_SessionsSetup = {
             templateSelection: CJ_Select2_Wordlists.templateSelection,
             matcher: CJ_Select2_Wordlists.matcher
         }).val(selected_wordlist).trigger('change');
-    },
-
-    bindUsedWordlists: function() {
-        $('.used_wordlists').click(function() {
-            if ($('.box-used_wordlists').hasClass('d-none')) {
-                $('.used_expand').addClass('d-none');
-                $('.used_collapse').removeClass('d-none');
-                $('.box-used_wordlists').removeClass('d-none');
-            } else {
-                $('.used_expand').removeClass('d-none');
-                $('.used_collapse').addClass('d-none');
-                $('.box-used_wordlists').addClass('d-none');
-            }
-            return false;
-        });
     },
 
     processSupportedHashes: function(supported_hashes) {

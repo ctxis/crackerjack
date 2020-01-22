@@ -6,7 +6,8 @@ var CJ_SessionsHeader = {
         this.terminateAt = new Date(terminateAt);
 
         this.bindFormAction();
-        this.bindRawProgress();
+        this.bindToggleTable('hashcat-history');
+        this.bindToggleTable('raw-progress');
         this.bindAutoRefresh();
         this.bindPopOver()
     },
@@ -43,12 +44,12 @@ var CJ_SessionsHeader = {
         });
     },
 
-    bindRawProgress: function() {
-        $('.raw-progress').click(function() {
-            if ($('#raw-progress').hasClass('d-none')) {
-                $('#raw-progress').removeClass('d-none');
+    bindToggleTable: function(elementName) {
+        $('.' + elementName).click(function() {
+            if ($('#' + elementName).hasClass('d-none')) {
+                $('#' + elementName).removeClass('d-none');
             } else {
-                $('#raw-progress').addClass('d-none');
+                $('#' + elementName).addClass('d-none');
             }
             return false;
         });

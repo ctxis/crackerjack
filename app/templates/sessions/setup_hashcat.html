@@ -66,23 +66,6 @@
                             <select name="wordlist" id="wordlist" class="form-control" required>
                                 <option value=""></option>
                             </select>
-
-                            {% if used_wordlists|length > 0 %}
-                            <div class="mt-2">
-                                <a href="#" class="used_wordlists">
-                                    <span class="used_expand"><i class="fas fa-plus-square"></i></span>
-                                    <span class="used_collapse d-none"><i class="fas fa-minus-square"></i></span>
-                                    <span class="pl-1">Already Used Wordlists</span>
-                                </a>
-                                <div class="box-used_wordlists d-none">
-                                    <ul class="list-group">
-                                        {% for used_wordlist in used_wordlists %}
-                                        <li class="list-group-item">{{ used_wordlist.wordlist }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            </div>
-                            {% endif %}
                         </div>
 
                         <div class="form-group">

@@ -79,14 +79,54 @@
     <div class="col-2"></div>
     <div class="col">
         <div>
-            <a href="#" class="raw-progress">
-                Click here to view raw/debug information
+            <a href="#" class="raw-progress btn btn-warning">
                 {% if session.hashcat.data.process_state == 98 %}
-                <span class="ml-2 text-danger"><i class="fas fa-exclamation"></i></span>
+                <span class="mr-2 text-danger"><i class="fas fa-exclamation"></i></span>
                 {% endif %}
+                View Raw/Debug Information
             </a>
+            {% if session.hashcat_history|length > 0 %}
+            <a href="#" class="hashcat-history btn btn-info">
+                <span class="mr-2"><i class="fas fa-history"></i></span>
+                View Session History
+            </a>
+            {% endif %}
         </div>
-        <div id="raw-progress" class="d-none">
+        {% if session.hashcat_history|length > 0 %}
+        <div id="hashcat-history" class="d-none mt-4">
+            <table class="table table-sm table-striped">
+                <thead>
+                <tr>
+                    <th>Mode</th>
+                    <th class="text-right">Hash Type</th>
+                    <th>Wordlist</th>
+                    <th>Rule</th>
+                    <th>Mask</th>
+                    <th class="text-right">Increments</th>
+                    <th class="text-right">Run At</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for history in session.hashcat_history %}
+                <tr>
+                    <td>{{ 'Wordlist' if history.mode == 0 else 'Brute Force' }}</td>
+                    <td class="text-right"><abbr title="{{ supported_hashes[history.hashtype] }}">{{ history.hashtype }}</abbr></td>
+                    <td><abbr title="{{ history.wordlist_path }}">{{ basename(history.wordlist) if history.mode == 0 else '' }}</abbr></td>
+                    <td><abbr title="{{ history.rule_path }}">{{ basename(history.rule) if history.mode == 0 else '' }}</abbr></td>
+                    <td>{{ history.mask if history.mode == 3 else '' }}</td>
+                    <td class="text-right">
+                        {% if history.increment_min|int > 0 or history.increment_max|int > 0 %}
+                        {{ history.increment_min }} - {{ history.increment_max }}
+                        {% endif %}
+                    </td>
+                    <td class="text-right">{{ history.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        <div id="raw-progress" class="d-none mt-4">
             <table class="table table-sm table-striped">
                 <tbody>
                 {% for key, value in session.hashcat.data_raw.items() %}
