@@ -7,6 +7,12 @@ import json
 bp = Blueprint('sessions', __name__)
 
 
+# https://stackoverflow.com/questions/19574694/flask-hit-decorator-before-before-request-signal-fires
+def dont_update_session(func):
+    func._dont_update_session = True
+    return func
+
+
 @bp.route('/create', methods=['POST'])
 @login_required
 def create():
@@ -337,3 +343,22 @@ def history_apply(session_id, history_id):
         flash('Historical settings applied', 'success')
 
     return redirect(url_for('sessions.view', session_id=session_id))
+
+
+@bp.route('/<int:session_id>/status', methods=['GET'])
+@dont_update_session
+@login_required
+def status(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    response = {'success': False, 'status': -1}
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return json.dumps(response)
+
+    user_id = 0 if current_user.admin else current_user.id
+    session = sessions.get(user_id, session_id)[0]
+
+    return json.dumps({'result': True, 'status': session['hashcat']['data']['process_state']})

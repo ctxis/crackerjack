@@ -1,5 +1,5 @@
 var CJ_SessionsHeader = {
-    autoRefreshInterval: 5000,
+    autoRefreshInterval: 10000,
     terminateAt: new Date(),
 
     init: function(terminateAt) {

@@ -116,7 +116,7 @@
                     <td><abbr title="{{ history.rule_path }}">{{ basename(history.rule) if history.mode == 0 else '' }}</abbr></td>
                     <td>{{ history.mask if history.mode == 3 else '' }}</td>
                     <td class="text-right">
-                        {% if history.increment_min|int > 0 or history.increment_max|int > 0 %}
+                        {% if history.mode == 3 and (history.increment_min|int > 0 or history.increment_max|int > 0) %}
                         {{ history.increment_min }} - {{ history.increment_max }}
                         {% endif %}
                     </td>
@@ -156,15 +156,11 @@
     </div>
 </div>
 
+<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.sessions.view.js') }}"></script>
+
 <script type="text/javascript">
     $(document).ready(function() {
-        $('.apply-history-settings').click(function() {
-            if (confirm("Are you sure you want to apply these settings to your current session?")) {
-                $('#form-apply-history-' + $(this).data('id')).submit();
-                return false;
-            }
-            return false;
-        });
+        CJ_SessionsView.init("{{ url_for('sessions.status', session_id=session.id) }}", {{ session.hashcat.data.process_state }});
     });
 </script>
 {% endblock %}

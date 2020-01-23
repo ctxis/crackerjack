@@ -1,6 +1,6 @@
 import os
 import datetime
-from flask import Flask, session, render_template
+from flask import Flask, session, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -89,9 +89,20 @@ def create_app(config_class=None):
 
     @app.before_request
     def before_request():
-        session.permanent = True
-        app.permanent_session_lifetime = datetime.timedelta(minutes=20)
-        session.modified = True
+        skip_session_update = False
+
+        if '/static/' in request.path:
+            # Exclude session updates for /static/ URLs
+            skip_session_update = True
+        elif skip_session_update is False and request.endpoint in app.view_functions:
+            # Exclude session updates for views that have @dont_update_session (is status checked in sessions).
+            view_function = app.view_functions[request.endpoint]
+            skip_session_update = hasattr(view_function, '_dont_update_session')
+
+        if skip_session_update is False:
+            session.permanent = True
+            app.permanent_session_lifetime = datetime.timedelta(minutes=20)
+            session.modified = True
 
     @app.errorhandler(500)
     def internal_error(error):
