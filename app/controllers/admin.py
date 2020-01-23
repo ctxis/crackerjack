@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, current_app
 from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, flash, request
 import os
@@ -296,8 +296,14 @@ def settings_general():
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
+    provider = Provider()
+    filesystem = provider.filesystem()
+
+    themes = filesystem.get_files(os.path.join(current_app.root_path, 'static', 'css', 'themes'))
+
     return render_template(
-        'admin/settings/general.html'
+        'admin/settings/general.html',
+        themes=themes
     )
 
 
@@ -306,12 +312,14 @@ def settings_general():
 def settings_general_save():
     provider = Provider()
     settings = provider.settings()
+    filesystem = provider.filesystem()
 
     if not current_user.admin:
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
     wordlists_path = request.form['wordlists_path'].strip()
+    theme = request.form['theme'].strip()
 
     has_errors = False
     if len(wordlists_path) == 0 or not os.path.isdir(wordlists_path):
@@ -321,10 +329,17 @@ def settings_general_save():
         has_errors = True
         flash('Wordlist directory is not readable', 'error')
 
+    themes = filesystem.get_files(os.path.join(current_app.root_path, 'static', 'css', 'themes'))
+
+    if not (theme + '.css') in themes:
+        flash('Invalid theme', 'error')
+        return redirect(url_for('admin.settings_general'))
+
     if has_errors:
         return redirect(url_for('admin.settings_general'))
 
     settings.save('wordlists_path', wordlists_path)
+    settings.save('theme', theme)
 
     flash('Settings saved', 'success')
     return redirect(url_for('admin.settings_general'))

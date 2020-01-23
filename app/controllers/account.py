@@ -109,10 +109,11 @@ def theme(user_id):
     users = provider.users()
     filesystem = provider.filesystem()
     user_settings = provider.user_settings()
+    settings = provider.settings()
 
     user = users.get_by_id(current_user.id)
     themes = filesystem.get_files(os.path.join(current_app.root_path, 'static', 'css', 'themes'))
-    theme = user_settings.get(user_id, 'theme', 'lumen')
+    theme = user_settings.get(user_id, 'theme', settings.get('theme', 'lumen'))
 
     return render_template(
         'account/theme.html',

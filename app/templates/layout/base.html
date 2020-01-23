@@ -9,7 +9,7 @@
     <link rel="icon" href="/static/images/favicon.png" type="image/x-icon">
 
     <title>CrackerJack</title>
-    {% set user_theme = user_setting_get(current_user.id if current_user.id else 0, 'theme', 'lumen') %}
+    {% set user_theme = user_setting_get(current_user.id if current_user.id else 0, 'theme', setting_get('theme', 'lumen')) %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/themes/'~user_theme~'.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/select2.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/tempusdominus-bootstrap-4.css') }}">

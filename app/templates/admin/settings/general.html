@@ -14,6 +14,18 @@
                     <input name="wordlists_path" type="text" id="wordlists_path" class="form-control" value="{{ setting_get('wordlists_path', '') }}" placeholder="/path/to/wordlists" required>
                 </div>
 
+                <div class="form-group clearfix">
+                    <label for="theme">Default Theme</label>
+                    <select name="theme" id="theme" class="form-control custom-select">
+                        <option value=""></option>
+                        {% for name, theme in themes.items() %}
+                        {% set t = name|replace('.css', '') %}
+                        <option value="{{ t }}" {{ 'selected' if setting_get('theme', 'lumen') == t else '' }}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                    <small class="font-italic float-right">themes are from <a href="https://bootswatch.com/">https://bootswatch.com/</a></small>
+                </div>
+
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary btn-block">save</button>
                 </div>
