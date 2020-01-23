@@ -17,17 +17,9 @@ def settings_hashcat():
         return redirect(url_for('home.index'))
 
     provider = Provider()
-    settings = provider.settings()
 
     return render_template(
-        'admin/settings/hashcat.html',
-        settings={
-            'hashcat_binary': settings.get('hashcat_binary', ''),
-            'wordlists_path': settings.get('wordlists_path', ''),
-            'hashcat_rules_path': settings.get('hashcat_rules_path', ''),
-            'hashcat_status_interval': settings.get('hashcat_status_interval', 10),
-            'hashcat_force': settings.get('hashcat_force', 0)
-        }
+        'admin/settings/hashcat.html'
     )
 
 
@@ -42,7 +34,6 @@ def settings_hashcat_save():
     settings = provider.settings()
 
     hashcat_binary = request.form['hashcat_binary'].strip()
-    wordlists_path = request.form['wordlists_path'].strip()
     hashcat_rules_path = request.form['hashcat_rules_path'].strip()
     hashcat_status_interval = request.form['hashcat_status_interval'].strip()
     hashcat_force = int(request.form.get('hashcat_force', 0))
@@ -54,13 +45,6 @@ def settings_hashcat_save():
     elif not os.access(hashcat_binary, os.X_OK):
         has_errors = True
         flash('Hashcat file is not executable', 'error')
-
-    if len(wordlists_path) == 0 or not os.path.isdir(wordlists_path):
-        has_errors = True
-        flash('Wordlist directory does not exist', 'error')
-    elif not os.access(wordlists_path, os.R_OK):
-        has_errors = True
-        flash('Wordlist directory is not readable', 'error')
 
     if len(hashcat_rules_path) == 0 or not os.path.isdir(hashcat_rules_path):
         has_errors = True
@@ -81,7 +65,6 @@ def settings_hashcat_save():
         return redirect(url_for('admin.settings_hashcat'))
 
     settings.save('hashcat_binary', hashcat_binary)
-    settings.save('wordlists_path', wordlists_path)
     settings.save('hashcat_rules_path', hashcat_rules_path)
     settings.save('hashcat_status_interval', hashcat_status_interval)
     settings.save('hashcat_force', hashcat_force)
@@ -304,3 +287,44 @@ def index():
     return render_template(
         'admin/index.html'
     )
+
+
+@bp.route('/settings/general', methods=['GET'])
+@login_required
+def settings_general():
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    return render_template(
+        'admin/settings/general.html'
+    )
+
+
+@bp.route('/settings/general/save', methods=['POST'])
+@login_required
+def settings_general_save():
+    provider = Provider()
+    settings = provider.settings()
+
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    wordlists_path = request.form['wordlists_path'].strip()
+
+    has_errors = False
+    if len(wordlists_path) == 0 or not os.path.isdir(wordlists_path):
+        has_errors = True
+        flash('Wordlist directory does not exist', 'error')
+    elif not os.access(wordlists_path, os.R_OK):
+        has_errors = True
+        flash('Wordlist directory is not readable', 'error')
+
+    if has_errors:
+        return redirect(url_for('admin.settings_general'))
+
+    settings.save('wordlists_path', wordlists_path)
+
+    flash('Settings saved', 'success')
+    return redirect(url_for('admin.settings_general'))

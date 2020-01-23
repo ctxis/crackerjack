@@ -1,0 +1,25 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-3"></div>
+    <div class="col">
+        <h3 class="card-header">General Settings</h3>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('admin.settings_general_save') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-group">
+                    <label for="wordlists_path">Wordlists Path</label>
+                    <input name="wordlists_path" type="text" id="wordlists_path" class="form-control" value="{{ setting_get('wordlists_path', '') }}" placeholder="/path/to/wordlists" required>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-3"></div>
+</div>
+{% endblock %}

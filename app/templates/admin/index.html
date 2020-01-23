@@ -9,6 +9,13 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col">
+                        <a href="{{ url_for('admin.settings_general') }}" class="text-center">
+                            <div><i class="fas fa-hammer fa-3x text-primary"></i></div>
+                            <div class="pt-2">Settings</div>
+                        </a>
+                    </div>
+
+                    <div class="col">
                         <a href="{{ url_for('admin.settings_hashcat') }}" class="text-center">
                             <div>
                                 <i class="fas fa-cat fa-3x text-primary"></i>
@@ -24,7 +31,9 @@
                             <div class="pt-2">Authentication</div>
                         </a>
                     </div>
+                </div>
 
+                <div class="row mt-5">
                     <div class="col">
                         <a href="{{ url_for('admin.users') }}" class="text-center">
                             <div><i class="fas fa-users fa-3x text-primary"></i></div>

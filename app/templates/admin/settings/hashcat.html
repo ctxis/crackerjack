@@ -12,14 +12,14 @@
 
                     <div class="form-group">
                         <label for="hashcat_binary">Hashcat Executable Path</label>
-                        <input name="hashcat_binary" type="text" id="hashcat_binary" class="form-control" value="{{ settings.hashcat_binary }}" placeholder="/path/to/hashcat" required>
+                        <input name="hashcat_binary" type="text" id="hashcat_binary" class="form-control" value="{{ setting_get('hashcat_binary', '') }}" placeholder="/path/to/hashcat" required>
                     </div>
 
                     <div class="form-group">
                         <div class="row">
                             <div class="col-8"><label for="hashcat_status_interval">Hashcat Status Interval</label></div>
                             <div class="col">
-                                <input type="number" id="hashcat_status_interval" name="hashcat_status_interval" class="form-control text-right" value="{{ settings.hashcat_status_interval }}">
+                                <input type="number" id="hashcat_status_interval" name="hashcat_status_interval" class="form-control text-right" value="{{ setting_get('hashcat_status_interval', 10) }}">
                             </div>
                         </div>
                     </div>
@@ -33,13 +33,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="wordlists_path">Wordlists Path</label>
-                        <input name="wordlists_path" type="text" id="wordlists_path" class="form-control" value="{{ settings.wordlists_path }}" placeholder="/path/to/wordlists" required>
-                    </div>
-
-                    <div class="form-group">
                         <label for="hashcat_rules_path">Hashcat Rules Path</label>
-                        <input name="hashcat_rules_path" type="text" id="hashcat_rules_path" class="form-control" value="{{ settings.hashcat_rules_path }}" placeholder="/path/to/hashcat/rules" required>
+                        <input name="hashcat_rules_path" type="text" id="hashcat_rules_path" class="form-control" value="{{ setting_get('hashcat_rules_path', '') }}" placeholder="/path/to/hashcat/rules" required>
                     </div>
 
                     <div class="form-group">
