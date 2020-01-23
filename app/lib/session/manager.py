@@ -82,6 +82,19 @@ class SessionManager:
 
         return True if session else False
 
+    def can_access_history(self, user, session_id, history_id):
+        if user.admin:
+            return True
+
+        history = HashcatHistoryModel.query.filter(
+            and_(
+                HashcatHistoryModel.id == history_id,
+                HashcatHistoryModel.session_id == session_id
+            )
+        ).first()
+
+        return True if history else False
+
     def get(self, user_id=0, session_id=0):
         conditions = and_(1 == 1)
         if user_id > 0 and session_id > 0:
@@ -149,6 +162,24 @@ class SessionManager:
         return HashcatHistoryModel.query.filter(
             HashcatHistoryModel.session_id == session_id
         ).order_by(desc(HashcatHistoryModel.id)).all()
+
+    def restore_hashcat_history(self, session_id, history_id):
+        history = HashcatHistoryModel.query.filter(HashcatHistoryModel.id == history_id).first()
+        current = HashcatModel.query.filter(HashcatModel.session_id == session_id).first()
+
+        if not history or not current:
+            return False
+
+        current.mode = history.mode
+        current.hashtype = history.hashtype
+        current.wordlist = history.wordlist
+        current.rule = history.rule
+        current.mask = history.mask
+        current.increment_min = history.increment_min
+        current.increment_max = history.increment_max
+
+        db.session.commit()
+        return True
 
     def set_hashcat_setting(self, session_id, name, value):
         record = self.get_hashcat_settings(session_id)

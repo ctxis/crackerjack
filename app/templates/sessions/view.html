@@ -104,6 +104,7 @@
                     <th>Mask</th>
                     <th class="text-right">Increments</th>
                     <th class="text-right">Run At</th>
+                    <th class="text-center">Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -120,6 +121,12 @@
                         {% endif %}
                     </td>
                     <td class="text-right">{{ history.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td class="text-center">
+                        <form action="{{ url_for('sessions.history_apply', session_id=history.session_id, history_id=history.id) }}" method="post" id="form-apply-history-{{ history.id }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <a href="{{ url_for('sessions.history_apply', session_id=history.session_id, history_id=history.id) }}" data-id="{{ history.id }}" title="Apply these settings to the current session" class="apply-history-settings"><i class="fas fa-redo"></i></a>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -148,4 +155,16 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.apply-history-settings').click(function() {
+            if (confirm("Are you sure you want to apply these settings to your current session?")) {
+                $('#form-apply-history-' + $(this).data('id')).submit();
+                return false;
+            }
+            return false;
+        });
+    });
+</script>
 {% endblock %}

@@ -316,3 +316,24 @@ def settings_save(session_id):
 
     flash('Settings saved', 'success')
     return redirect(url_for('sessions.settings', session_id=session_id))
+
+
+@bp.route('/<int:session_id>/history/apply/<int:history_id>', methods=['POST'])
+@login_required
+def history_apply(session_id, history_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+    elif not sessions.can_access_history(current_user, session_id, history_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    if not sessions.restore_hashcat_history(session_id, history_id):
+        flash('Could not apply historical settings to the current session', 'error')
+    else:
+        flash('Historical settings applied', 'success')
+
+    return redirect(url_for('sessions.view', session_id=session_id))
