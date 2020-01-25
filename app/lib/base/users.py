@@ -121,3 +121,10 @@ class UserManager:
             .all()
 
         return logins
+
+    def get_admins(self, only_active):
+        conditions = and_(UserModel.admin == 1)
+        if only_active:
+            conditions = and_(UserModel.admin == 1, UserModel.active == 1)
+
+        return UserModel.query.filter(conditions).order_by(UserModel.id).all()

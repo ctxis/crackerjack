@@ -320,6 +320,9 @@ def settings_general_save():
 
     wordlists_path = request.form['wordlists_path'].strip()
     theme = request.form['theme'].strip()
+    webpush_enabled = int(request.form.get('webpush_enabled', 0))
+    vapid_private = request.form['vapid_private'].strip()
+    vapid_public = request.form['vapid_public'].strip()
 
     has_errors = False
     if len(wordlists_path) == 0 or not os.path.isdir(wordlists_path):
@@ -340,6 +343,11 @@ def settings_general_save():
 
     settings.save('wordlists_path', wordlists_path)
     settings.save('theme', theme)
+    # Only update if it's not '********' because we don't show it in the UI.
+    if vapid_private != '********':
+        settings.save('vapid_private', vapid_private)
+    settings.save('vapid_public', vapid_public)
+    settings.save('webpush_enabled', webpush_enabled)
 
     flash('Settings saved', 'success')
     return redirect(url_for('admin.settings_general'))

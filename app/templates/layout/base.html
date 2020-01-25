@@ -24,6 +24,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/lib/moment.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/lib/tempusdominus-bootstrap-4.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='fontawesome/js/all.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/webpush/main.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.utils.js') }}"></script>
 </head>
 <body class="d-flex flex-column h-100">
@@ -104,6 +105,19 @@
         </span>
     </div>
 </footer>
+
+{% if current_user.is_authenticated and setting_get('webpush_enabled', '0')|int == 1 %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        WebPush.init(
+            '{{ csrf_token() }}',
+            '{{ setting_get('vapid_public', '') }}',
+            '{{ url_for('static', filename='js/webpush/sw.js') }}',
+            '{{ url_for('webpush.register') }}'
+        );
+    });
+</script>
+{% endif %}
 
 </body>
 </html>

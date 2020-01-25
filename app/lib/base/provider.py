@@ -15,6 +15,7 @@ from app.lib.base.template import TemplateManager
 from app.lib.base.api import ApiManager
 from app.lib.base.cron import CronManager
 from app.lib.base.hashid import HashIdentifier
+from app.lib.base.webpush import WebPushManager
 from flask_login import current_user
 
 
@@ -104,3 +105,14 @@ class Provider:
 
     def hashid(self):
         return HashIdentifier()
+
+    def webpush(self):
+        admins = self.users().get_admins(True)
+        email = 'error@example.com'  # This should never happen.
+        if len(admins) > 0:
+            # Get the first one.
+            email = admins[0].email
+
+        vapid_private = self.settings().get('vapid_private', '')
+
+        return WebPushManager(vapid_private, email, '/static/images/favicon.png')

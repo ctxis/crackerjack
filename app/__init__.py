@@ -65,6 +65,9 @@ def create_app(config_class=None):
     app.register_blueprint(api_bp, url_prefix='/api/v1')
     csrf.exempt(api_bp)
 
+    from app.controllers.webpush import bp as webpush_bp
+    app.register_blueprint(webpush_bp, url_prefix='/webpush')
+
     from app.lib.base.provider import Provider
 
     # This is to be able to access settings from any template (shared variables).
@@ -122,4 +125,4 @@ def create_app(config_class=None):
 
 
 # This has to be at the bottom.
-from app.lib.models import user, config, sessions, hashcat, api, system
+from app.lib.models import user, config, sessions, hashcat, api, system, webpush

@@ -4,10 +4,12 @@
 <div class="row mt-5">
     <div class="col-3"></div>
     <div class="col">
-        <h3 class="card-header">General Settings</h3>
+        <h3 class="card-header">Settings</h3>
         <div class="card-body">
             <form method="post" action="{{ url_for('admin.settings_general_save') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <h2>General</h2>
 
                 <div class="form-group">
                     <label for="wordlists_path">Wordlists Path</label>
@@ -24,6 +26,32 @@
                         {% endfor %}
                     </select>
                     <small class="font-italic float-right">themes are from <a href="https://bootswatch.com/">https://bootswatch.com/</a></small>
+                </div>
+
+                <h2>Web Push Notifications</h2>
+
+                <p><small>To generate a VAPID key please go to: <a href="https://web-push-codelab.glitch.me/">https://web-push-codelab.glitch.me/</a></small></p>
+
+                <div class="form-group">
+                    <label for="webpush_enabled">Enable</label>
+                    <div class="custom-control custom-switch float-right">
+                        <input name="webpush_enabled" type="checkbox" class="custom-control-input" id="webpush_enabled" value="1" {{ "checked='checked'" if setting_get('webpush_enabled', '0') == '1' else '' }}>
+                        <label class="custom-control-label" for="webpush_enabled"></label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="vapid_private">VAPID Private Key</label>
+                    {% set vapid_private = setting_get('vapid_private', '') %}
+                    {% if vapid_private|length > 0 %}
+                        {% set vapid_private = '********' %}
+                    {% endif %}
+                    <input name="vapid_private" type="password" id="vapid_private" class="form-control" value="{{ vapid_private }}" placeholder="">
+                </div>
+
+                <div class="form-group">
+                    <label for="vapid_public">VAPID Public Key</label>
+                    <input name="vapid_public" type="text" id="vapid_public" class="form-control" value="{{ setting_get('vapid_public', '') }}" placeholder="">
                 </div>
 
                 <div class="form-group">
