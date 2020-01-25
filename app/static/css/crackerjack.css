@@ -11,3 +11,8 @@
     max-width: 900px;
     overflow: auto;
 }
+
+/* Fix for select2 foreground colour on dark themes. */
+.select2-container {
+    color: black;
+}
