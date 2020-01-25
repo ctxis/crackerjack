@@ -491,7 +491,11 @@ class SessionManager:
             cracked = int(full_session['hashcat']['data']['cracked_passwords'])
 
             # Get the last sent notification.
-            sent = SessionNotificationModel.query.filter(SessionNotificationModel.session_id == session.id).first()
+            sent = SessionNotificationModel.query.filter(
+                SessionNotificationModel.session_id == session.id
+            ).order_by(
+                desc(SessionNotificationModel.id)
+            ).first()
             previously_cracked = sent.cracked if sent else 0
 
             # Check if the currently cracked passwords are more than the ones previously sent.
