@@ -4,23 +4,24 @@ import string
 import os
 import datetime
 import time
-from app.lib.models.sessions import SessionModel
+from app.lib.models.sessions import SessionModel, SessionNotificationModel
 from app.lib.models.user import UserModel
 from app.lib.models.hashcat import HashcatModel, HashcatHistoryModel
 from app.lib.session.filesystem import SessionFileSystem
 from app.lib.session.validation import SessionValidation
 from app import db
 from sqlalchemy import and_, desc
-from flask import send_file
+from flask import send_file, url_for
 
 
 class SessionManager:
-    def __init__(self, hashcat, screens, wordlists, hashid, filesystem):
+    def __init__(self, hashcat, screens, wordlists, hashid, filesystem, webpush):
         self.hashcat = hashcat
         self.screens = screens
         self.wordlists = wordlists
         self.hashid = hashid
         self.filesystem = filesystem
+        self.webpush = webpush
         self.session_filesystem = SessionFileSystem(filesystem)
         self.session_validation = SessionValidation()
         self.cmd_sleep = 2
@@ -436,7 +437,7 @@ class SessionManager:
             if len(session) == 0:
                 print("Session %d does not exist" % past_session.id)
                 continue
-            print("Session % loaded" % past_session.id)
+            print("Session %d loaded" % past_session.id)
             session = session[0]
 
             status = session['hashcat']['data']['process_state']
@@ -462,4 +463,61 @@ class SessionManager:
 
         db.session.commit()
 
+        return True
+
+    def send_notifications(self):
+        # Get all sessions with enabled notifications.
+        print("Loading sessions with notifications enabled.")
+        sessions = SessionModel.query.filter(
+            and_(
+                SessionModel.active == 1,
+                SessionModel.notifications_enabled == 1
+            )
+        ).all()
+
+        if not sessions or len(sessions) == 0:
+            print("No sessions loaded")
+            return True
+
+        print("Loaded %d sessions" % len(sessions))
+        for session in sessions:
+            full_session = self.get(session_id=session.id)[0]
+            if not full_session:
+                print("Could not get the actual session's details")
+                continue
+
+            # Get the currently cracked passwords.
+            all_passwords = int(full_session['hashcat']['data']['all_passwords'])
+            cracked = int(full_session['hashcat']['data']['cracked_passwords'])
+
+            # Get the last sent notification.
+            sent = SessionNotificationModel.query.filter(SessionNotificationModel.session_id == session.id).first()
+            previously_cracked = sent.cracked if sent else 0
+
+            # Check if the currently cracked passwords are more than the ones previously sent.
+            if previously_cracked >= cracked:
+                print("Skipping notification - cracked are less or equal than previously cracked")
+                continue
+
+            # Send notification.
+            title = 'Progress Update'
+            body = '%d/%d Hashes Recovered' % (cracked, all_passwords)
+            url = '/sessions/%d/view' % session.id
+
+            print("Sending notification to user %d for session %d" % (full_session['user_id'], session.id))
+            if self.webpush.send(session.user_id, title, body, url):
+                print("Notification sent")
+                # Save current notification
+                log = SessionNotificationModel(
+                    session_id=session.id,
+                    cracked=cracked,
+                    sent_at=datetime.datetime.now()
+                )
+
+                db.session.add(log)
+                db.session.commit()
+            else:
+                print("Could not send notification")
+
+        print("Finished sending notifications")
         return True

@@ -30,7 +30,8 @@ class Provider:
             self.screens(),
             self.wordlists(),
             self.hashid(),
-            self.filesystem()
+            self.filesystem(),
+            self.webpush()
         )
         return session
 
