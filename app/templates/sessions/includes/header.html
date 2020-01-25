@@ -5,7 +5,7 @@
             <div class="col-6">
                 <div>
                     <h1 class="d-inline-block">{{ session.description if (session.description and session.description|length > 0) else session.name }}</h1>
-                    <span class="badge badge-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}" style="vertical-align: top">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</span>
+                    <span class="badge badge-pill badge-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}" style="vertical-align: top">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</span>
                 </div>
             </div>
             <div class="col text-right">
