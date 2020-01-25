@@ -15,6 +15,7 @@
             <div class="card-body">
                 <form method="post" action="{{ url_for('auth.login_process') }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="next" value="{{ next }}">
 
                     <div class="form-group">
                         <input name="username" type="text" class="form-control" placeholder="Username" required autofocus>

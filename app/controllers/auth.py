@@ -4,6 +4,8 @@ from flask import render_template, redirect, url_for, flash, request
 from app.lib.models.user import UserModel
 from sqlalchemy import and_, func
 from app.lib.base.provider import Provider
+from werkzeug.urls import url_parse
+import urllib
 
 
 bp = Blueprint('auth', __name__)
@@ -14,7 +16,7 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('home.index'))
 
-    return render_template('auth/login.html')
+    return render_template('auth/login.html', next=request.args.get('next', ''))
 
 
 @bp.route('/login', methods=['POST'])
@@ -29,6 +31,7 @@ def login_process():
 
     username = request.form['username']
     password = request.form['password']
+    next = urllib.parse.unquote_plus(request.form['next'].strip())
 
     allow_logins = int(settings.get('allow_logins', 0))
 
@@ -37,20 +40,20 @@ def login_process():
     if user:
         if not users.validate_password(user.password, password):
             flash('Invalid credentials', 'error')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.login', next=next))
     elif ldap.is_enabled() and allow_logins == 1:
         if not ldap.authenticate(username, password, True):
             flash('Invalid credentials', 'error')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.login', next=next))
         user = UserModel.query.filter(and_(func.lower(UserModel.username) == func.lower(username), UserModel.ldap == 1)).first()
     else:
         flash('Invalid credentials', 'error')
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.login', next=next))
 
     # If we reach this point it means that our user exists. Check if the user is active.
     if user.active is False:
         flash('Your account has been disabled by the Administrator.', 'error')
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.login', next=next))
 
     login_user(user)
     users.record_login(user.id)
@@ -58,6 +61,9 @@ def login_process():
     # On every login we get the hashcat version and the git hash version.
     system = provider.system()
     system.run_updates()
+
+    if next and url_parse(next).netloc == '':
+        return redirect(next)
 
     return redirect(url_for('home.index'))
 
