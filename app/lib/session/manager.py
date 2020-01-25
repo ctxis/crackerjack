@@ -126,6 +126,7 @@ class SessionManager:
                 'created_at': session.created_at,
                 'terminate_at': session.terminate_at,
                 'active': session.active,
+                'notifications_enabled': session.notifications_enabled,
                 'hashcat': {
                     'configured': True if hashcat else False,
                     'mode': '' if not hashcat else hashcat.mode,
@@ -454,3 +455,11 @@ class SessionManager:
             hash = f.readline().strip()
 
         return self.hashid.guess(hash)
+
+    def set_notifications(self, session_id, enabled):
+        session = self.__get_by_id(session_id)
+        session.notifications_enabled = enabled
+
+        db.session.commit()
+
+        return True

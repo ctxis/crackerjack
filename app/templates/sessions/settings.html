@@ -16,35 +16,35 @@
                 <form method="post" action="{{ url_for('sessions.settings_save', session_id=session.id) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
+                    <label>Session will terminate on</label>
                     <div class="row">
-                        <div class="col-4">
-                            Session will terminate on
-                        </div>
-                        <div class="col-1">
-                            Date
-                        </div>
-                        <div class="col-3">
+                        <div class="col">
                             <div class="form-group">
                                 <div class="input-group date" id="termination-date" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" name="termination_date" data-target="#termination-date">
+                                    <input type="text" class="form-control datetimepicker-input text-right" name="termination_date" data-target="#termination-date" placeholder="date">
                                     <div class="input-group-append" data-target="#termination-date" data-toggle="datetimepicker">
                                         <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-1">
-                            Time
-                        </div>
-                        <div class="col-3">
+                        <div class="col">
                             <div class="form-group">
                                 <div class="input-group date" id="termination-time" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" name="termination_time" data-target="#termination-time">
+                                    <input type="text" class="form-control datetimepicker-input text-right" name="termination_time" data-target="#termination-time" placeholder="time">
                                     <div class="input-group-append" data-target="#termination-time" data-toggle="datetimepicker">
                                         <div class="input-group-text"><i class="fa fa-clock"></i></div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notifications_enabled">Enable Push Notifications</label>
+                        <div class="custom-control custom-switch float-right">
+                            <input name="notifications_enabled" type="checkbox" class="custom-control-input" id="notifications_enabled" value="1" {{ "checked='checked'" if session.notifications_enabled else '' }}>
+                            <label class="custom-control-label" for="notifications_enabled"></label>
                         </div>
                     </div>
 
@@ -55,6 +55,8 @@
             </div>
         </div>
     </div>
+
+    <div class="col"></div>
 </div>
 
 <script type="text/javascript">

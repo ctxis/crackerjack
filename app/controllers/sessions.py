@@ -307,6 +307,7 @@ def settings_save(session_id):
 
     termination_date = request.form['termination_date'].strip()
     termination_time = request.form['termination_time'].strip()
+    notifications_enabled = int(request.form.get('notifications_enabled', 0))
 
     if len(termination_date) == 0:
         flash('Please enter a termination date', 'error')
@@ -319,6 +320,8 @@ def settings_save(session_id):
     if not sessions.set_termination_datetime(session_id, termination_date, termination_time):
         flash('Invalid termination date/time entered', 'error')
         return redirect(url_for('sessions.settings', session_id=session_id))
+
+    sessions.set_notifications(session_id, notifications_enabled)
 
     flash('Settings saved', 'success')
     return redirect(url_for('sessions.settings', session_id=session_id))
