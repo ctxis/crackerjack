@@ -71,28 +71,30 @@ def settings_save(user_id):
 
     provider = Provider()
     users = provider.users()
+    user = users.get_by_id(current_user.id)
 
-    existing_password = request.form['existing_password'].strip()
-    new_password = request.form['new_password'].strip()
-    confirm_password = request.form['confirm_password'].strip()
+    if not user.ldap:
+        existing_password = request.form['existing_password'].strip()
+        new_password = request.form['new_password'].strip()
+        confirm_password = request.form['confirm_password'].strip()
 
-    if len(existing_password) == 0:
-        flash('Please enter your existing password', 'error')
-        return redirect(url_for('account.password', user_id=user_id))
-    elif len(new_password) == 0:
-        flash('Please enter your new password', 'error')
-        return redirect(url_for('account.password', user_id=user_id))
-    elif len(confirm_password) == 0:
-        flash('Please confirm your new password', 'error')
-        return redirect(url_for('account.password', user_id=user_id))
-    elif new_password != confirm_password:
-        flash('Passwords do not match', 'error')
-        return redirect(url_for('account.password', user_id=user_id))
-    elif not users.validate_user_password(user_id, existing_password):
-        flash('Existing password is invalid', 'error')
-        return redirect(url_for('account.password', user_id=user_id))
+        if len(existing_password) == 0:
+            flash('Please enter your existing password', 'error')
+            return redirect(url_for('account.password', user_id=user_id))
+        elif len(new_password) == 0:
+            flash('Please enter your new password', 'error')
+            return redirect(url_for('account.password', user_id=user_id))
+        elif len(confirm_password) == 0:
+            flash('Please confirm your new password', 'error')
+            return redirect(url_for('account.password', user_id=user_id))
+        elif new_password != confirm_password:
+            flash('Passwords do not match', 'error')
+            return redirect(url_for('account.password', user_id=user_id))
+        elif not users.validate_user_password(user_id, existing_password):
+            flash('Existing password is invalid', 'error')
+            return redirect(url_for('account.password', user_id=user_id))
 
-    users.update_password(user_id, new_password)
+        users.update_password(user_id, new_password)
 
     flash('Settings updated', 'success')
     return redirect(url_for('account.settings', user_id=user_id))

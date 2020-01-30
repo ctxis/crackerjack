@@ -8,12 +8,14 @@
             <h3 class="card-header">{{ user.full_name }}</h3>
             <div class="card-body">
                 <div class="row">
+                    {% if not user.ldap %}
                     <div class="col">
                         <a href="{{ url_for('account.settings', user_id=user.id) }}" class="text-center">
                             <div><i class="fas fa-user-cog fa-3x"></i></div>
                             <div class="pt-2">Account Settings</div>
                         </a>
                     </div>
+                    {% endif %}
 
                     <div class="col">
                         <a href="{{ url_for('account.theme', user_id=user.id) }}" class="text-center">
