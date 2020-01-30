@@ -46,6 +46,10 @@ def login_process():
             flash('Invalid credentials', 'error')
             return redirect(url_for('auth.login', next=next))
         user = UserModel.query.filter(and_(func.lower(UserModel.username) == func.lower(username), UserModel.ldap == 1)).first()
+
+        if not user:
+            flash('Could not create your local account. Please contact the administrator.', 'error')
+            return redirect(url_for('auth.login', next=next))
     else:
         flash('Invalid credentials', 'error')
         return redirect(url_for('auth.login', next=next))
