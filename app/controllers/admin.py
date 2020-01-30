@@ -140,7 +140,7 @@ def settings_auth_save():
         settings.save(key, data['value'])
 
     # If the password is not '********' then save it. This is because we show that value instead of the actual password.
-    if len(ldap_bind_pass) > 0:
+    if len(ldap_bind_pass) > 0 and ldap_bind_pass != '********':
         settings.save('ldap_bind_pass', ldap_bind_pass)
 
     # When settings are saved, run system updates.
