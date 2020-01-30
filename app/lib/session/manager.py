@@ -112,11 +112,15 @@ class SessionManager:
             hashcat = self.get_hashcat_settings(session.id)
             hashcat_data_raw = self.get_hashcat_status(session.user_id, session.id)
             screen_log_file = self.session_filesystem.find_latest_screenlog(session.user_id, session.id)
+            tail_screen = ''
             try:
                 tail_screen = self.session_filesystem.tail_file(screen_log_file, 4096).decode()
             except UnicodeDecodeError:
                 # This means that we probably got half a unicode sequence. Increase the buffer and try again.
-                tail_screen = self.session_filesystem.tail_file(screen_log_file, 5120).decode()
+                try:
+                    tail_screen = self.session_filesystem.tail_file(screen_log_file, 5120).decode()
+                except UnicodeDecodeError:
+                    pass
 
             item = {
                 'id': session.id,
