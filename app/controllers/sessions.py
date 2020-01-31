@@ -24,14 +24,7 @@ def create():
         flash('Please enter a session description', 'error')
         return redirect(url_for('home.index'))
 
-    prefix = sessions.sanitise_name(current_user.username) + '_'
-    name = sessions.generate_name(prefix=prefix, length=4)
-
-    if sessions.exists(current_user.id, name):
-        flash('You already have an active session with this name. Either delete or use that one instead.', 'error')
-        return redirect(url_for('home.index'))
-
-    session = sessions.create(current_user.id, name, description)
+    session = sessions.create(current_user.id, description, current_user.username)
     if session is None:
         flash('Could not create session', 'error')
         return redirect(url_for('home.index'))

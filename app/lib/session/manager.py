@@ -50,10 +50,13 @@ class SessionManager:
     def __get_by_id(self, session_id):
         return SessionModel.query.filter(SessionModel.id == session_id).first()
 
-    def create(self, user_id, name, description):
+    def create(self, user_id, description, prefix):
+        prefix = self.sanitise_name(prefix) + '_'
+        name = self.generate_name(prefix=prefix, length=4)
+
+        # If it exists (shouldn't), return it.
         session = self.__get(user_id, name, True)
         if session:
-            # Return existing session if there is one.
             return session
 
         session = SessionModel(
@@ -61,9 +64,18 @@ class SessionManager:
             name=name,
             description=description,
             active=True,
-            screen_name=self.__generate_screen_name(user_id, name)
+            screen_name=''
         )
         db.session.add(session)
+        db.session.commit()
+        # In order to get the created object, we need to refresh it.
+        db.session.refresh(session)
+
+        # We need to append the session_id to the session name.
+        name = name + '_' + str(session.id)
+        session.name = name
+        session.screen_name = self.__generate_screen_name(user_id, name)
+
         db.session.commit()
         # In order to get the created object, we need to refresh it.
         db.session.refresh(session)
