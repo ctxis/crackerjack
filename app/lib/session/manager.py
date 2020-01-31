@@ -363,7 +363,7 @@ class SessionManager:
     def download_file(self, session_id, which_file):
         session = self.get(session_id=session_id)[0]
 
-        save_as = session['name']
+        save_as = session['description']
         if which_file == 'cracked':
             file = self.session_filesystem.get_crackedfile_path(session['user_id'], session_id)
             save_as = save_as + '.cracked'
@@ -371,7 +371,12 @@ class SessionManager:
             file = self.session_filesystem.get_hashfile_path(session['user_id'], session_id)
             save_as = save_as + '.hashes'
         else:
-            return 'Error'
+            # It means it's a raw/screen log file.
+            files = self.get_data_files(session['user_id'], session_id)
+            if not which_file in files:
+                return 'Error'
+            file = files[which_file]['path']
+            save_as = which_file
 
         if not os.path.exists(file):
             return 'Error'
@@ -466,6 +471,10 @@ class SessionManager:
             hash = f.readline().strip()
 
         return self.hashid.guess(hash)
+
+    def get_data_files(self, user_id, session_id):
+        user_data_path = self.session_filesystem.get_user_data_path(user_id, session_id)
+        return self.filesystem.get_files(user_data_path)
 
     def set_notifications(self, session_id, enabled):
         session = self.__get_by_id(session_id)

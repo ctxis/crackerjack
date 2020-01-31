@@ -1,0 +1,42 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+{% include 'sessions/includes/header.html' %}
+
+<div class="row mt-5">
+    <div class="col-2">
+        {% set active_nav = 'files' %}
+        {% include 'sessions/includes/nav.html' %}
+    </div>
+    <div class="col">
+        <div class="card">
+            <h4 class="card-header">Files</h4>
+            <div class="card-body">
+                <table class="table table-sm table-striped">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th class="text-right">Date</th>
+                        <th class="text-right">Size</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for filename, file in files.items() %}
+                    <tr>
+                        <td>{{ filename }}</td>
+                        <td class="text-right">{{ file.created_at }}</td>
+                        <td class="text-right">{{ file.size_human }}</td>
+                        <td class="text-right"><a href="{{ url_for('sessions.download_file', session_id=session.id, which_file=filename) }}" class="text-warning" title="Download"><i class="fas fa-file-download"></i></a></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-3"></div>
+</div>
+{% endblock %}

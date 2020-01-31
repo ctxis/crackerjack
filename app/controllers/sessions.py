@@ -367,3 +367,24 @@ def status(session_id):
     session = sessions.get(user_id, session_id)[0]
 
     return json.dumps({'result': True, 'status': session['hashcat']['data']['process_state']})
+
+
+@bp.route('/<int:session_id>/files', methods=['GET'])
+@login_required
+def files(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    user_id = 0 if current_user.admin else current_user.id
+    session = sessions.get(user_id, session_id)[0]
+    files = sessions.get_data_files(current_user.id, session_id)
+
+    return render_template(
+        'sessions/files.html',
+        session=session,
+        files=files
+    )

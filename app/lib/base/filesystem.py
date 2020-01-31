@@ -1,5 +1,6 @@
 import os
 import glob
+import datetime
 
 
 class FileSystemManager:
@@ -17,7 +18,9 @@ class FileSystemManager:
                 'name': name,
                 'path': file,
                 'size': os.stat(file).st_size,
-                'size_human': self.human_filesize(os.stat(file).st_size)
+                'size_human': self.human_filesize(os.stat(file).st_size),
+                'created_at': datetime.datetime.fromtimestamp(int(os.path.getctime(file))),
+                'modified_at': datetime.datetime.fromtimestamp(int(os.path.getmtime(file)))
             }
 
         return data

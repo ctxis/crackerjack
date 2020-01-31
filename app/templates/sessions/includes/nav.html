@@ -13,4 +13,7 @@
     <li class="nav-item">
         <a class="nav-link {{ 'active' if active_nav == 'settings' }}" href="{{ url_for('sessions.settings', session_id=session.id) }}"><i class="fas fa-cog mr-1"></i>Settings</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link {{ 'active' if active_nav == 'files' }}" href="{{ url_for('sessions.files', session_id=session.id) }}"><i class="fas fa-folder-open mr-1"></i>Files</a>
+    </li>
 </ul>
