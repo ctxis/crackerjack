@@ -325,6 +325,9 @@ class HashcatManager:
         # If it is STILL not running, take the last few output lines, and mark this as an 'error'.
         if status == 0 and len(tail_screen) > 0:
             status = 98
+        elif status == 3 and self.is_process_running(screen_name):
+            # Sometimes when it goes through multiple wordlists or incremenental brute force rules, it's marked as 'finished'.
+            status = 1
 
         return status
 
