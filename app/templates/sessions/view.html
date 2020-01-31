@@ -104,6 +104,7 @@
                     <th>Mask</th>
                     <th class="text-right">Increments</th>
                     <th class="text-right">Run At</th>
+                    <th class="text-center">Opt. Kernel</th>
                     <th class="text-center">Action</th>
                 </tr>
                 </thead>
@@ -121,6 +122,7 @@
                         {% endif %}
                     </td>
                     <td class="text-right">{{ history.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td class="text-center">{{ 'Yes' if history.optimised_kernel == 1 else 'No' }}</td>
                     <td class="text-center">
                         <form action="{{ url_for('sessions.history_apply', session_id=history.session_id, history_id=history.id) }}" method="post" id="form-apply-history-{{ history.id }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

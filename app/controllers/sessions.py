@@ -140,6 +140,7 @@ def setup_hashcat_save(session_id):
         return redirect(url_for('home.index'))
 
     hash_type = request.form['hash-type'].strip()
+    optimised_kernel = int(request.form.get('optimised_kernel', 0))
     wordlist = request.form['wordlist'].strip()
     rule = request.form['rule'].strip()
     mode = int(request.form['mode'].strip())
@@ -207,6 +208,7 @@ def setup_hashcat_save(session_id):
     sessions.set_hashcat_setting(session_id, 'mask', mask)
     sessions.set_hashcat_setting(session_id, 'increment_min', increment_min)
     sessions.set_hashcat_setting(session_id, 'increment_max', increment_max)
+    sessions.set_hashcat_setting(session_id, 'optimised_kernel', optimised_kernel)
 
     return redirect(url_for('sessions.settings', session_id=session_id))
 

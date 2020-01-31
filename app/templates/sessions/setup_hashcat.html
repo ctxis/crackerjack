@@ -44,6 +44,14 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="optimised_kernel">Use --optimized-kernel-enable (-O)</label>
+                        <div class="custom-control custom-switch float-right">
+                            <input name="optimised_kernel" type="checkbox" class="custom-control-input" id="optimised_kernel" value="1" {{ "checked='checked'" if session.hashcat.optimised_kernel == 1 else '' }}>
+                            <label class="custom-control-label" for="optimised_kernel"></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label>Attack Mode</label>
                         <div class="custom-control custom-radio">
                             <input type="radio" id="mode-wordlist" name="mode" class="mode-option custom-control-input" value="0" {{ 'checked' if session.hashcat.mode == 0 else '' }}>

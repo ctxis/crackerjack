@@ -77,7 +77,8 @@ class HashcatManager:
 
         return valid
 
-    def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile, increment_min, increment_max):
+    def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile,
+                           increment_min, increment_max, optimised_kernel):
         command = {
             self.hashcat_binary: '',
             '--session': session_name,
@@ -115,6 +116,9 @@ class HashcatManager:
         else:
             # Invalid or not implemented yet.
             return {}
+
+        if optimised_kernel == 1:
+            command['--optimized-kernel-enable'] = ''
 
         if self.force:
             command['--force'] = ''

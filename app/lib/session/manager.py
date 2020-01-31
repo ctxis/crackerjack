@@ -143,6 +143,7 @@ class SessionManager:
                     'mask': '' if not hashcat else hashcat.mask,
                     'increment_min': 0 if not hashcat else hashcat.increment_min,
                     'increment_max': 0 if not hashcat else hashcat.increment_max,
+                    'optimised_kernel': 0 if not hashcat else hashcat.optimised_kernel,
                     'data_raw': hashcat_data_raw,
                     'data': self.hashcat.process_hashcat_raw_data(hashcat_data_raw, session.screen_name, tail_screen),
                     'hashfile': self.session_filesystem.get_hashfile_path(session.user_id, session.id),
@@ -183,6 +184,7 @@ class SessionManager:
         current.mask = history.mask
         current.increment_min = history.increment_min
         current.increment_max = history.increment_max
+        current.optimised_kernel = history.optimised_kernel
 
         db.session.commit()
         return True
@@ -206,6 +208,8 @@ class SessionManager:
             record.increment_min = value
         elif name == 'increment_max':
             record.increment_max = value
+        elif name == 'optimised_kernel':
+            record.optimised_kernel = value
 
         db.session.commit()
 
@@ -246,7 +250,8 @@ class SessionManager:
                 self.session_filesystem.get_crackedfile_path(session['user_id'], session_id),
                 self.session_filesystem.get_potfile_path(session['user_id'], session_id),
                 int(session['hashcat']['increment_min']),
-                int(session['hashcat']['increment_max'])
+                int(session['hashcat']['increment_max']),
+                int(session['hashcat']['optimised_kernel'])
             )
 
             # Before we start a new session, rename the previous "screen.log" file
@@ -334,6 +339,7 @@ class SessionManager:
             mask=record.mask,
             increment_min=record.increment_min,
             increment_max=record.increment_max,
+            optimised_kernel=record.optimised_kernel,
             created_at=datetime.datetime.now(),
         )
 
