@@ -1,0 +1,12 @@
+- name: "Install packages"
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - vim
+      - git
+      - screen
+      - python3.6-venv
+      - python3-openssl
+      - python-pip
+      - sqlite3
