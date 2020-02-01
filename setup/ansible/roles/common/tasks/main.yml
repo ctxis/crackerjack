@@ -1,3 +1,6 @@
+- name: "Check python requirements"
+  import_tasks: version.yml
+
 - name: Install Ubuntu pre-requisites
   import_tasks: distro/ubuntu_18.yml
   when: ansible_distribution|lower == 'ubuntu' and ansible_distribution_major_version == '18'

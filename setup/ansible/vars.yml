@@ -1,4 +1,6 @@
 ---
+requirements:
+  minimum_python_version: '3.6'
 user:
   # Change this to your destination's local user (user should have sudo privileges).
   name: cj
@@ -9,8 +11,8 @@ webserver:
   user: www-data
   group: www-data
   # Leave empty to auto-generate certificates, or specify a location on the machine you're running ansible from.
-  ssl_cert_file: '/tmp/key.crt'
-  ssl_cert_keyfile: '/tmp/key.pem'
+  ssl_cert_file: ''
+  ssl_cert_keyfile: ''
 crackerjack:
   repo: 'https://github.com/ctxis/crackerjack.git'
   destination: /opt/web/crackerjack
