@@ -1,0 +1,34 @@
+---
+- name: "Install common packages"
+  hosts: all
+  become: yes
+  vars_files:
+    - vars.yml
+  roles:
+    - common
+
+- name: "Install CrackerJack"
+  hosts: all
+  become: yes
+  vars_files:
+    - vars.yml
+  roles:
+    - crackerjack
+  tasks:
+    - include: roles/crackerjack/tasks/install.yml
+
+- name: "Install CrackerJack Service"
+  hosts: all
+  become: yes
+  vars_files:
+    - vars.yml
+  roles:
+    - service
+
+- name: "Configure web server"
+  hosts: all
+  become: yes
+  vars_files:
+    - vars.yml
+  roles:
+    - webserver

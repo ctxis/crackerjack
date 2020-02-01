@@ -1,0 +1,32 @@
+- name: "Install nginx"
+  when: webserver.type == 'nginx'
+  apt:
+    name: "nginx"
+
+- name: "Check for nginx config file"
+  stat:
+    path: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+  register: http_config
+
+- name: "Check for enabled vhost"
+  stat:
+    path: /etc/nginx/sites-enabled/crackerjack
+  register: enabled_host
+
+- name: "Creating config"
+  when: http_config.stat.exists == False
+  template:
+    src: nginx/vhost.conf.j2
+    dest: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+
+- name: "Enabling vhost"
+  when: enabled_host.stat.exists == False
+  file:
+    src: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+    dest: "/etc/nginx/sites-enabled/crackerjack"
+    state: link
+
+- name: "Restarting nginx"
+  service:
+    name: nginx
+    state: restarted

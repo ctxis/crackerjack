@@ -1,0 +1,10 @@
+- name: Generate certificates
+  import_tasks: certificates.yml
+
+- name: Configure Apache
+  import_tasks: server/apache.yml
+  when: webserver.type == 'apache'
+
+- name: Configure nginx
+  import_tasks: server/nginx.yml
+  when: webserver.type == 'nginx'

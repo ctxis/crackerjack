@@ -1,0 +1,21 @@
+---
+user:
+  # Change this to your destination's local user (user should have sudo privileges).
+  name: cj
+  group: cj
+webserver:
+  # Choose between apache/nginx, or empty to skip entirely.
+  type: nginx
+  user: www-data
+  group: www-data
+  # Leave empty to auto-generate certificates, or specify a location on the machine you're running ansible from.
+  ssl_cert_file: '/tmp/key.crt'
+  ssl_cert_keyfile: '/tmp/key.pem'
+crackerjack:
+  repo: 'https://github.com/ctxis/crackerjack.git'
+  destination: /opt/web/crackerjack
+  # Set your server name.
+  domain: 'www.crackerjack.lan'
+service:
+  bind_address: 127.0.0.1
+  bind_port: 8888
