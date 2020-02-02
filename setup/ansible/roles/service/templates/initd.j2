@@ -1,0 +1,64 @@
+#! /bin/bash
+### BEGIN INIT INFO
+# Provides:          crackerjack
+# Required-Start:
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: CrackerJack Service
+#
+### END INIT INFO
+
+APPNAME=crackerjack
+USER=www-data
+GROUP=www-data
+ACTIVATE={{ crackerjack.destination }}/venv/bin/activate
+APPMODULE=wsgi:app
+DAEMON={{ crackerjack.destination }}/venv/bin/gunicorn
+BIND={{ service.bind_address }}:{{ service.bind_port }}
+PIDFILE=/var/run/crackerjack.pid
+LOGFILE=/var/log/crackerjack.log
+WORKERS=3
+
+. /lib/lsb/init-functions
+
+# First we include environment variables
+. /etc/environment
+
+# Now any app-specific variables.
+if [ -e "/etc/default/$APPNAME" ]
+then
+    . /etc/default/$APPNAME
+fi
+
+# Preprend VENV.
+PATH={{ crackerjack.destination }}/venv/bin:$PATH
+
+
+case "$1" in
+  start)
+        log_daemon_msg "Starting deferred execution scheduler" "$APPNAME"
+        cd {{ crackerjack.destination }}
+        source $ACTIVATE
+        $DAEMON --daemon --bind=$BIND --pid $PIDFILE --workers $WORKERS --user $USER --group $GROUP --log-file $LOGFILE -m 007 $APPMODULE
+        log_end_msg $?
+    ;;
+  stop)
+        log_daemon_msg "Stopping deferred execution scheduler" "$APPNAME"
+        killproc -p $PIDFILE $DAEMON
+        log_end_msg $?
+    ;;
+  force-reload|restart)
+    $0 stop
+    $0 start
+    ;;
+  status)
+    status_of_proc -p $PIDFILE $DAEMON && exit 0 || exit $?
+    ;;
+  *)
+    echo "Usage: /etc/init.d/$APPNAME {start|stop|restart|force-reload|status}"
+    exit 1
+    ;;
+esac
+
+exit 0

@@ -5,3 +5,7 @@
 - name: Install Ubuntu service
   import_tasks: distro/ubuntu_16.yml
   when: ansible_distribution|lower == 'ubuntu' and ansible_distribution_major_version == '16'
+
+- name: Install Ubuntu service
+  import_tasks: distro/ubuntu_14.yml
+  when: ansible_distribution|lower == 'ubuntu' and ansible_distribution_major_version == '14'

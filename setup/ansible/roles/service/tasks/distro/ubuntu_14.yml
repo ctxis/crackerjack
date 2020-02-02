@@ -1,0 +1,17 @@
+- name: "Create systemd service"
+  import_tasks: initd.yml
+
+# In Ubuntu 14 we have to copy the file, otherwise we get the following error:
+#     > Unable to enable service crackerjack: Failed to execute operation: Too many levels of symbolic links
+- name: "Creating link to service"
+  when: existing_service.stat.exists == False
+  file:
+    src: "{{ crackerjack.destination }}/data/config/service/crackerjack.service"
+    dest: "/etc/init.d/crackerjack"
+    state: link
+
+- name: "Enabling and starting service"
+  service:
+    name: crackerjack
+    enabled: true
+    state: started
