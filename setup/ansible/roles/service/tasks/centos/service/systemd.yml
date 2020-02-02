@@ -1,0 +1,29 @@
+- name: "Checking destination config directory"
+  stat:
+    path: "{{ crackerjack.destination }}/data/config/service"
+  register: config_service_path
+
+- name: "Checking for existing service file"
+  stat:
+    path: "{{ crackerjack.destination }}/data/config/service/crackerjack.service"
+  register: config_service_file
+
+- name: "Checking for installed service"
+  stat:
+    path: "/etc/systemd/system/crackerjack.service"
+  register: existing_service
+
+- name: "Creating directory"
+  when: existing_service.stat.exists == False and config_service_path.stat.exists == False
+  file:
+    path: "{{ crackerjack.destination }}/data/config/service"
+    state: directory
+    recurse: yes
+    owner: "{{ user.name }}"
+    group: "{{ user.group }}"
+
+- name: "Creating service file"
+  when: existing_service.stat.exists == False and config_service_file.stat.exists == False
+  template:
+    src: centos/systemd.j2
+    dest: "{{ crackerjack.destination }}/data/config/service/crackerjack.service"

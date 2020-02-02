@@ -1,5 +1,5 @@
 - name: "Create systemd service"
-  import_tasks: systemd.yml
+  import_tasks: service/systemd.yml
 
 # In Ubuntu 16 we have to copy the file, otherwise we get the following error:
 #     > Unable to enable service crackerjack: Failed to execute operation: Too many levels of symbolic links

@@ -1,10 +1,10 @@
 - name: Generate certificates
-  import_tasks: certificates.yml
+  import_tasks: ssl/certificates.yml
 
-- name: Configure Apache
-  import_tasks: server/apache.yml
-  when: webserver.type == 'apache'
+- name: Configure web server for Ubuntu
+  import_tasks: ubuntu/server.yml
+  when: ansible_distribution|lower == 'ubuntu'
 
-- name: Configure nginx
-  import_tasks: server/nginx.yml
-  when: webserver.type == 'nginx'
+- name: Configure web server for CentOS
+  import_tasks: centos/server.yml
+  when: ansible_distribution|lower == 'centos'

@@ -1,0 +1,88 @@
+- name: "Enabling Apache proxy module"
+  apache2_module:
+    name: proxy
+    state: present
+
+- name: "Enabling Apache proxy_http module"
+  apache2_module:
+    name: proxy_http
+    state: present
+
+- name: "Enabling Apache rewrite module"
+  apache2_module:
+    name: rewrite
+    state: present
+
+- name: "Installing Apache SSL"
+  yum:
+    name: mod_ssl
+
+- name: "Check for Apache config file"
+  stat:
+    path: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+  register: http_config
+
+- name: "Check for sites-available directory"
+  stat:
+    path: /etc/httpd/sites-available
+  register: sites_available
+
+- name: "Check for sites-enabled directory"
+  stat:
+    path: /etc/httpd/sites-enabled
+  register: sites_enabled
+
+- name: "Create sites-available directory"
+  when: sites_available.stat.exists == False
+  file:
+    path: "/etc/httpd/sites-available"
+    state: directory
+    recurse: yes
+
+- name: "Create sites-enabled directory"
+  when: sites_enabled.stat.exists == False
+  file:
+    path: "/etc/httpd/sites-enabled"
+    state: directory
+    recurse: yes
+
+- name: "Make sure vhosts are loaded"
+  lineinfile:
+    name: "/etc/httpd/conf/httpd.conf"
+    line: "IncludeOptional sites-enabled/*.conf"
+    state: present
+
+- name: "Check for available vhost"
+  stat:
+    path: /etc/httpd/sites-available/crackerjack.conf
+  register: available_host
+
+- name: "Check for enabled vhost"
+  stat:
+    path: /etc/httpd/sites-enabled/crackerjack.conf
+  register: enabled_host
+
+- name: "Creating config"
+  when: http_config.stat.exists == False
+  template:
+    src: centos/apache/vhost.conf.j2
+    dest: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+
+- name: "Creating available vhost"
+  when: available_host.stat.exists == False
+  file:
+    src: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+    dest: "/etc/httpd/sites-available/crackerjack.conf"
+    state: link
+
+- name: "Enabling vhost"
+  when: enabled_host.stat.exists == False
+  file:
+    src: "/etc/httpd/sites-available/crackerjack.conf"
+    dest: "/etc/httpd/sites-enabled/crackerjack.conf"
+    state: link
+
+- name: "Reloading apache"
+  service:
+    name: httpd
+    state: reloaded

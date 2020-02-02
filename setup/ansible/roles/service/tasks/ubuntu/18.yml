@@ -1,5 +1,5 @@
 - name: "Create systemd service"
-  import_tasks: systemd.yml
+  import_tasks: service/systemd.yml
 
 # In Ubuntu 18 it's enough to create a symlink to that folder before enabling.
 - name: "Creating link to service"

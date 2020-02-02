@@ -25,5 +25,5 @@
 - name: "Creating service file"
   when: existing_service.stat.exists == False and config_service_file.stat.exists == False
   template:
-    src: systemd.j2
+    src: ubuntu/systemd.j2
     dest: "{{ crackerjack.destination }}/data/config/service/crackerjack.service"

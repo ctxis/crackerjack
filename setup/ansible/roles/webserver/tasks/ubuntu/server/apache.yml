@@ -41,7 +41,7 @@
 - name: "Creating config"
   when: http_config.stat.exists == False
   template:
-    src: apache/vhost.conf.j2
+    src: ubuntu/apache/vhost.conf.j2
     dest: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
 
 - name: "Creating available vhost"

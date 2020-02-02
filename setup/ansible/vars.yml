@@ -10,9 +10,9 @@ user:
   group: cj
 webserver:
   # Choose between apache/nginx, or empty to skip entirely.
-  type: apache
-  user: www-data
-  group: www-data
+  type: nginx
+  user: nginx
+  group: nginx
   # Leave empty to auto-generate certificates, or specify a location on the machine you're running ansible from.
   ssl_cert_file: ''
   ssl_cert_keyfile: ''
