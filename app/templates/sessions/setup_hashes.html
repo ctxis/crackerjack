@@ -24,14 +24,6 @@
                 <form method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_hashes_save', session_id=session.id) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                    {% if session.hashcat.hashfile_exists %}
-                    <div class="form-group">
-                        <div class="alert alert-primary">
-                            <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}">Hashes have already been uploaded. Click here to download them.</a>
-                        </div>
-                    </div>
-                    {% endif %}
-
                     <div class="form-group">
                         <label for="hashfile">Upload file with hashes</label>
                         <div class="custom-file">

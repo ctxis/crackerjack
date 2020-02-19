@@ -53,7 +53,12 @@
                     <tbody>
                     <tr>
                         <th scope="row">Hashes Uploaded</th>
-                        <td class="text-right">{{ session.hashes_in_file }}</td>
+                        <td class="text-right">
+                            <span>{{ session.hashes_in_file }}</span>
+                            {% if session.hashes_in_file > 0 %}
+                            <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}" class="text-warning ml-1" title="download"><i class="fas fa-file-download fa-lg"></i></a>
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <th scope="row">Cracked</th>
