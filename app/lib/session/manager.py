@@ -479,8 +479,11 @@ class SessionManager:
             return []
 
         # Get the first hash from the file
-        with open(hashfile, 'r') as f:
-            hash = f.readline().strip()
+        try:
+            with open(hashfile, 'r') as f:
+                hash = f.readline().strip()
+        except UnicodeDecodeError:
+            hash = ''
 
         return self.hashid.guess(hash)
 

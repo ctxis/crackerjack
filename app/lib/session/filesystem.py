@@ -45,11 +45,14 @@ class SessionFileSystem:
         if not os.path.isfile(file):
             return 0
 
-        count = 0
-        with open(file, 'r') as f:
-            for line in f:
-                if line.strip():
-                    count += 1
+        try:
+            count = 0
+            with open(file, 'r') as f:
+                for line in f:
+                    if line.strip():
+                        count += 1
+        except UnicodeDecodeError:
+            count = 0
 
         return count
 
