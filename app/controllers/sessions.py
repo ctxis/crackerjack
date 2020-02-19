@@ -114,7 +114,7 @@ def setup_hashcat(session_id):
         'sessions/setup_hashcat.html',
         session=session,
         hashes_json=json.dumps(supported_hashes),
-        wordlists_json=json.dumps(password_wordlists),
+        wordlists_json=json.dumps(password_wordlists, indent=4, sort_keys=True, default=str),
         rules=hashcat_rules
     )
 
