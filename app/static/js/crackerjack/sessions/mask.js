@@ -466,3 +466,21 @@ var CJ_HashcatMasks = {
         return data;
     }
 };
+
+var CJ_SessionsMask = {
+    init: function() {
+        this.bindForm();
+        this.bindIncrements();
+    },
+
+    bindIncrements: function() {
+        $('#enable_increments').on('change', function() {
+            $('#increment-min').prop('disabled', !$(this).is(':checked'));
+            $('#increment-max').prop('disabled', !$(this).is(':checked'));
+        });
+    },
+
+    bindForm: function() {
+        $('#setup-hashcat').validate();
+    }
+};

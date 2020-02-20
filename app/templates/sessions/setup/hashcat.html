@@ -1,0 +1,84 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+{% if session.hashcat.data.process_state == 1 %}
+<div class="row mt-5">
+    <div class="col">
+        <div class="alert alert-warning">This session is currently running. Any changes you make on this page will not have any effect on it unless it is restarted.</div>
+    </div>
+</div>
+{% endif %}
+
+{% set active_nav = 'hashcat' %}
+{% include 'sessions/includes/header.html' %}
+
+<div class="row mt-5">
+    <div class="col-2">
+        {% include 'sessions/includes/nav.html' %}
+    </div>
+    <div class="col">
+        <form id="setup-hashcat" method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_hashcat_save', session_id=session.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="card">
+                <h4 class="card-header">Hashcat Setup</h4>
+                <div class="card-body">
+                    {% if session.guess_hashtype|length > 0 %}
+                    <div class="form-group">
+                        <div class="alert alert-primary">
+                            Possible Hash Type:
+                            <ul>
+                                {% for hashtype in session.guess_hashtype %}
+                                <li>{{ hashtype }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="hash-type">Hash Type</label>
+                        <select name="hash-type" id="hash-type" class="form-control" required>
+                            <option value=""></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="optimised_kernel">Use --optimized-kernel-enable (-O)</label>
+                        <div class="custom-control custom-switch float-right">
+                            <input name="optimised_kernel" type="checkbox" class="custom-control-input" id="optimised_kernel" value="1" {{ "checked='checked'" if session.hashcat.optimised_kernel == 1 else '' }}>
+                            <label class="custom-control-label" for="optimised_kernel"></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Attack Mode</label>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-wordlist" name="mode" class="mode-option custom-control-input" value="0" {{ 'checked' if session.hashcat.mode == 0 or session.hashcat.mode == '' else '' }}>
+                            <label class="custom-control-label" for="mode-wordlist">Wordlist</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-bruteforce" name="mode" class="mode-option custom-control-input" value="3" {{ 'checked' if session.hashcat.mode == 3 else '' }}>
+                            <label class="custom-control-label" for="mode-bruteforce">Brute Force</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary btn-block">save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/sessions/hashcat.js') }}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var supported_hashes = {{ hashes_json|safe }};
+        CJ_SessionsHashcat.init(supported_hashes, '{{ session.hashcat.hashtype }}');
+    });
+</script>
+
+{% endblock %}

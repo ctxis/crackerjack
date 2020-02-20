@@ -49,7 +49,7 @@ def setup_hashes(session_id):
     uploaded_hashfiles = uploaded_hashes.get_uploaded_hashes()
 
     return render_template(
-        'sessions/setup_hashes.html',
+        'sessions/setup/hashes.html',
         session=session,
         uploaded_hashfiles_json=json.dumps(uploaded_hashfiles, indent=4, sort_keys=True, default=str),
     )
@@ -114,8 +114,6 @@ def setup_hashcat(session_id):
     provider = Provider()
     sessions = provider.sessions()
     hashcat = provider.hashcat()
-    wordlists = provider.wordlists()
-    rules = provider.rules()
     system = provider.system()
 
     if not sessions.can_access(current_user, session_id):
@@ -133,15 +131,10 @@ def setup_hashcat(session_id):
         flash('Could not get the supported hashes from hashcat', 'error')
         flash('If you have compiled hashcat from source, make sure %s/.hashcat directory exists and is writable' % home_directory, 'error')
 
-    password_wordlists = wordlists.get_wordlists()
-    hashcat_rules = rules.get_rules()
-
     return render_template(
-        'sessions/setup_hashcat.html',
+        'sessions/setup/hashcat.html',
         session=session,
-        hashes_json=json.dumps(supported_hashes, indent=4, sort_keys=True, default=str),
-        wordlists_json=json.dumps(password_wordlists, indent=4, sort_keys=True, default=str),
-        rules=hashcat_rules
+        hashes_json=json.dumps(supported_hashes, indent=4, sort_keys=True, default=str)
     )
 
 
@@ -151,8 +144,6 @@ def setup_hashcat_save(session_id):
     provider = Provider()
     sessions = provider.sessions()
     hashcat = provider.hashcat()
-    wordlists = provider.wordlists()
-    rules = provider.rules()
 
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
@@ -160,17 +151,7 @@ def setup_hashcat_save(session_id):
 
     hash_type = request.form['hash-type'].strip()
     optimised_kernel = int(request.form.get('optimised_kernel', 0))
-    wordlist = request.form['wordlist'].strip()
-    rule = request.form['rule'].strip()
     mode = int(request.form['mode'].strip())
-    mask = request.form['compiled-mask'].strip()
-    enable_increments = int(request.form.get('enable_increments', 0))
-    if enable_increments == 1:
-        increment_min = int(request.form['increment-min'].strip())
-        increment_max = int(request.form['increment-max'].strip())
-    else:
-        increment_min = 0
-        increment_max = 0
 
     if mode != 0 and mode != 3:
         # As all the conditions below depend on the mode, if it's wrong return to the previous page immediately.
@@ -182,52 +163,145 @@ def setup_hashcat_save(session_id):
         has_errors = True
         flash('Invalid hash type selected', 'error')
 
-    if mode == 0:
-        # Wordlist.
-        if not wordlists.is_valid_wordlist(wordlist):
-            has_errors = True
-            flash('Invalid wordlist selected', 'error')
-
-        if len(rule) > 0 and not rules.is_valid_rule(rule):
-            has_errors = True
-            flash('Invalid rule selected', 'error')
-    elif mode == 3:
-        # Mask.
-        if len(mask) == 0:
-            flash('No mask set', 'error')
-            has_errors = True
-
-        if enable_increments == 1:
-            if increment_min <= 0:
-                has_errors = True
-                flash('Min Increment is invalid', 'error')
-
-            if increment_max <= 0:
-                has_errors = True
-                flash('Max Increment is invalid', 'error')
-
-            if increment_min > increment_max:
-                has_errors = True
-                flash('Min Increment cannot be bigger than Max Increment', 'error')
-
-        else:
-            increment_min = 0
-            increment_max = 0
-
     if has_errors:
         return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
+
+    sessions.set_hashcat_setting(session_id, 'mode', mode)
+    sessions.set_hashcat_setting(session_id, 'hashtype', hash_type)
+    sessions.set_hashcat_setting(session_id, 'optimised_kernel', optimised_kernel)
+
+    redirect_to = 'wordlist' if mode == 0 else 'mask'
+
+    return redirect(url_for('sessions.setup_' + redirect_to, session_id=session_id))
+
+
+@bp.route('/<int:session_id>/setup/mask', methods=['GET'])
+@login_required
+def setup_mask(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    user_id = 0 if current_user.admin else current_user.id
+    session = sessions.get(user_id, session_id)[0]
+
+    return render_template(
+        'sessions/setup/mask.html',
+        session=session
+    )
+
+
+@bp.route('/<int:session_id>/setup/mask/save', methods=['POST'])
+@login_required
+def setup_mask_save(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    mask = request.form['compiled-mask'].strip()
+    enable_increments = int(request.form.get('enable_increments', 0))
+    if enable_increments == 1:
+        increment_min = int(request.form['increment-min'].strip())
+        increment_max = int(request.form['increment-max'].strip())
+    else:
+        increment_min = 0
+        increment_max = 0
+
+    has_errors = False
+    if len(mask) == 0:
+        flash('No mask set', 'error')
+        has_errors = True
+
+    if enable_increments == 1:
+        if increment_min <= 0:
+            has_errors = True
+            flash('Min Increment is invalid', 'error')
+
+        if increment_max <= 0:
+            has_errors = True
+            flash('Max Increment is invalid', 'error')
+
+        if increment_min > increment_max:
+            has_errors = True
+            flash('Min Increment cannot be bigger than Max Increment', 'error')
+    else:
+        increment_min = 0
+        increment_max = 0
+
+    if has_errors:
+        return redirect(url_for('sessions.setup_mask', session_id=session_id))
+
+    sessions.set_hashcat_setting(session_id, 'mask', mask)
+    sessions.set_hashcat_setting(session_id, 'increment_min', increment_min)
+    sessions.set_hashcat_setting(session_id, 'increment_max', increment_max)
+
+    return redirect(url_for('sessions.settings', session_id=session_id))
+
+
+@bp.route('/<int:session_id>/setup/wordlist', methods=['GET'])
+@login_required
+def setup_wordlist(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+    wordlists = provider.wordlists()
+    rules = provider.rules()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    user_id = 0 if current_user.admin else current_user.id
+    session = sessions.get(user_id, session_id)[0]
+
+    password_wordlists = wordlists.get_wordlists()
+    hashcat_rules = rules.get_rules()
+
+    return render_template(
+        'sessions/setup/wordlist.html',
+        session=session,
+        wordlists_json=json.dumps(password_wordlists, indent=4, sort_keys=True, default=str),
+        rules=hashcat_rules
+    )
+
+
+@bp.route('/<int:session_id>/setup/wordlist/save', methods=['POST'])
+@login_required
+def setup_wordlist_save(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+    wordlists = provider.wordlists()
+    rules = provider.rules()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    wordlist = request.form['wordlist'].strip()
+    rule = request.form['rule'].strip()
+
+    has_errors = False
+    if not wordlists.is_valid_wordlist(wordlist):
+        has_errors = True
+        flash('Invalid wordlist selected', 'error')
+
+    if len(rule) > 0 and not rules.is_valid_rule(rule):
+        has_errors = True
+        flash('Invalid rule selected', 'error')
+
+    if has_errors:
+        return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
 
     wordlist_location = wordlists.get_wordlist_path(wordlist)
     rule_location = rules.get_rule_path(rule)
 
-    sessions.set_hashcat_setting(session_id, 'mode', mode)
-    sessions.set_hashcat_setting(session_id, 'hashtype', hash_type)
     sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
     sessions.set_hashcat_setting(session_id, 'rule', rule_location)
-    sessions.set_hashcat_setting(session_id, 'mask', mask)
-    sessions.set_hashcat_setting(session_id, 'increment_min', increment_min)
-    sessions.set_hashcat_setting(session_id, 'increment_max', increment_max)
-    sessions.set_hashcat_setting(session_id, 'optimised_kernel', optimised_kernel)
 
     return redirect(url_for('sessions.settings', session_id=session_id))
 
@@ -345,7 +419,7 @@ def settings_save(session_id):
     sessions.set_notifications(session_id, notifications_enabled)
 
     flash('Settings saved', 'success')
-    return redirect(url_for('sessions.settings', session_id=session_id))
+    return redirect(url_for('sessions.view', session_id=session_id))
 
 
 @bp.route('/<int:session_id>/history/apply/<int:history_id>', methods=['POST'])

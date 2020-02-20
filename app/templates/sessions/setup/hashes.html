@@ -89,13 +89,11 @@
     </div>
 </div>
 
-<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.filesize.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.sessions.hashes.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/sessions/hashes.js') }}"></script>
 
 <script type="text/javascript">
-    CJ_FileSize.init('#hashfile', '.file-error-message', '.file-size-message', 100);
-
     var uploaded_hashfiles = {{ uploaded_hashfiles_json|safe }}
     CJ_SessionsHashes.init(uploaded_hashfiles);
+    CJ_FileSize.init('#hashfile', '.file-error-message', '.file-size-message', 100);
 </script>
 {% endblock %}

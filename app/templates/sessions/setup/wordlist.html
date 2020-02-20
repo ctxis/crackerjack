@@ -1,0 +1,62 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+{% if session.hashcat.data.process_state == 1 %}
+<div class="row mt-5">
+    <div class="col">
+        <div class="alert alert-warning">This session is currently running. Any changes you make on this page will not have any effect on it unless it is restarted.</div>
+    </div>
+</div>
+{% endif %}
+
+{% set active_nav = 'wordlist' %}
+{% include 'sessions/includes/header.html' %}
+
+<div class="row mt-5">
+    <div class="col-2">
+        {% include 'sessions/includes/nav.html' %}
+    </div>
+    <div class="col">
+        <form id="setup-hashcat" method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_wordlist_save', session_id=session.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="card">
+                <h5 class="card-header">Wordlist Options</h5>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="wordlist">Wordlist</label>
+                        <select name="wordlist" id="wordlist" class="form-control" required>
+                            <option value=""></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rule">Rules</label>
+                        <select name="rule" id="rule" class="form-control">
+                            <option value="">No Rules</option>
+                            {% for key, rule in rules.items() %}
+                            <option value="{{ key }}">{{ rule.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <button type="submit" class="btn btn-primary btn-block">save</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/sessions/wordlist.js') }}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        var wordlists = {{ wordlists_json|safe }};
+        CJ_SessionsWordlist.init(wordlists, '{{ session.hashcat.wordlist }}', '{{ session.hashcat.rule }}');
+    });
+</script>
+
+{% endblock %}

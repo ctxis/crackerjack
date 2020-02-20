@@ -9,6 +9,15 @@
     <li class="nav-item">
         <a class="nav-link {{ 'active' if active_nav == 'hashcat' }}" href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}"><i class="fas fa-cat mr-1"></i>Hashcat</a>
     </li>
+        {% if session.hashcat.mode == 0 %}
+    <li class="nav-item">
+        <a class="nav-link {{ 'active' if active_nav == 'wordlist' }}" href="{{ url_for('sessions.setup_wordlist', session_id=session.id) }}"><i class="fas fa-file-alt mr-1"></i>Wordlist</a>
+    </li>
+        {% elif session.hashcat.mode == 3 %}
+    <li class="nav-item">
+        <a class="nav-link {{ 'active' if active_nav == 'mask' }}" href="{{ url_for('sessions.setup_mask', session_id=session.id) }}"><i class="fas fa-sliders-h mr-1"></i>Mask</a>
+    </li>
+        {% endif %}
     {% endif %}
     <li class="nav-item">
         <a class="nav-link {{ 'active' if active_nav == 'settings' }}" href="{{ url_for('sessions.settings', session_id=session.id) }}"><i class="fas fa-cog mr-1"></i>Settings</a>

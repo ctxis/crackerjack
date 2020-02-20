@@ -1,4 +1,4 @@
-var CJ_Select2_HashFiles = {
+var CJ_Select2_Wordlists = {
     escapeMarkup: function (markup) {
         return markup;
     },
@@ -29,7 +29,7 @@ var CJ_Select2_HashFiles = {
         searchIn = data.text.toString().toLowerCase();
         searchInId = data.id.toString();
 
-        var found = CJ_Select2_HashFiles.select2Search(searchFor, searchIn, searchInId);
+        var found = CJ_Select2_Wordlists.select2Search(searchFor, searchIn, searchInId);
 
         if (found) {
             return modifiedData = $.extend({}, data, true);
@@ -57,63 +57,37 @@ var CJ_Select2_HashFiles = {
     }
 };
 
-var CJ_SessionsHashes = {
-    init: function(uploaded_hashfiles) {
-        this.bindHashFiles(uploaded_hashfiles);
-        this.bindModes();
+var CJ_SessionsWordlist = {
+    init: function(wordlists, selected_wordlist, selected_rule) {
+        this.bindWordlists(wordlists, selected_wordlist);
+        this.bindRules(selected_rule);
     },
 
-    bindModes: function() {
-        this.setModes();
-        $('.mode-option').click(function() {
-            CJ_SessionsHashes.setModes();
-            return true;
-        });
+    bindRules: function(selected_rule) {
+        $('#rule').select2({}).val(selected_rule).trigger('change');
     },
 
-    setModes: function() {
-        mode = $("input[name='mode']:checked").val();
-        if (typeof mode == 'undefined') {
-            $('#mode-upload').prop('checked', true);
-            mode = 0;
-        }
-
-        if (mode == 0) {
-            $('.box-mode-upload').removeClass('d-none');
-            $('.box-mode-paste').addClass('d-none');
-            $('.box-mode-remote').addClass('d-none');
-        } else if (mode == 1) {
-            $('.box-mode-upload').addClass('d-none');
-            $('.box-mode-paste').removeClass('d-none');
-            $('.box-mode-remote').addClass('d-none');
-        } else if (mode == 2) {
-            $('.box-mode-upload').addClass('d-none');
-            $('.box-mode-paste').addClass('d-none');
-            $('.box-mode-remote').removeClass('d-none');
-        }
+    bindWordlists: function(wordlists, selected_wordlist) {
+        wordlists = this.processWordlists(wordlists);
+        $('#wordlist').select2({
+            placeholder: 'Select wordlist',
+            data: wordlists,
+            escapeMarkup: CJ_Select2_Wordlists.escapeMarkup,
+            templateResult: CJ_Select2_Wordlists.templateResult,
+            templateSelection: CJ_Select2_Wordlists.templateSelection,
+            matcher: CJ_Select2_Wordlists.matcher
+        }).val(selected_wordlist).trigger('change');
     },
 
-    bindHashFiles: function(uploaded_hashfiles) {
-        hashfiles = this.processHashFiles(uploaded_hashfiles);
-        $('#remotefile').select2({
-            placeholder: 'Select uploaded hashes',
-            data: hashfiles,
-            escapeMarkup: CJ_Select2_HashFiles.escapeMarkup,
-            templateResult: CJ_Select2_HashFiles.templateResult,
-            templateSelection: CJ_Select2_HashFiles.templateSelection,
-            matcher: CJ_Select2_HashFiles.matcher
-        }).trigger('change');
-    },
-
-    processHashFiles: function(hashfiles) {
+    processWordlists: function(wordlists) {
         // Convert keys to properties.
         data = [];
-        for (var name in hashfiles) {
-            if (hashfiles.hasOwnProperty(name)) {
+        for (var name in wordlists) {
+            if (wordlists.hasOwnProperty(name)) {
                 data.push({
                     id: name,
                     text: name,
-                    size: hashfiles[name].size_human
+                    size: wordlists[name].size_human
                 });
             }
         }
