@@ -58,7 +58,7 @@
                                 {% if session.hashes_in_file == -1 %}
                                     File too large
                                 {% else %}
-                                    {{ session.hashes_in_file }}
+                                    {{ '{0:,}'.format(session.hashes_in_file) }}
                                 {% endif %}
                             </span>
                             {% if session.hashes_in_file > 0 or session.hashes_in_file == -1 %}
@@ -69,7 +69,7 @@
                     <tr>
                         <th scope="row">Cracked</th>
                         <td class="text-right">
-                            <span>{{ session.hashcat.data.cracked_passwords }}/{{ session.hashcat.data.all_passwords }}</span>
+                            <span>{{ '{0:,}'.format(session.hashcat.data.cracked_passwords) }}/{{ '{0:,}'.format(session.hashcat.data.all_passwords) }}</span>
                             {% if session.hashcat.data.cracked_passwords > 0 %}
                             <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
                             {% endif %}
