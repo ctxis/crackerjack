@@ -45,6 +45,12 @@ class SessionFileSystem:
         if not os.path.isfile(file):
             return 0
 
+        size = os.path.getsize(file)
+        max_size = 100 * 1024 * 1024 # 100 MB.
+        if size > max_size:
+            # File is too large, don't count it.
+            return -1
+
         try:
             count = 0
             with open(file, 'r') as f:

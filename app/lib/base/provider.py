@@ -16,6 +16,7 @@ from app.lib.base.api import ApiManager
 from app.lib.base.cron import CronManager
 from app.lib.base.hashid import HashIdentifier
 from app.lib.base.webpush import WebPushManager
+from app.lib.base.hashes import HashesManager
 from flask_login import current_user
 
 
@@ -117,3 +118,7 @@ class Provider:
         vapid_private = self.settings().get('vapid_private', '')
 
         return WebPushManager(vapid_private, email, '/static/images/favicon.png')
+
+    def hashes(self):
+        settings = self.settings()
+        return HashesManager(self.filesystem(), settings.get('uploaded_hashes_path', ''))

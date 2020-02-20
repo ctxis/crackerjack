@@ -319,6 +319,7 @@ def settings_general_save():
         return redirect(url_for('home.index'))
 
     wordlists_path = request.form['wordlists_path'].strip()
+    uploaded_hashes_path = request.form['uploaded_hashes_path'].strip()
     theme = request.form['theme'].strip()
     webpush_enabled = int(request.form.get('webpush_enabled', 0))
     vapid_private = request.form['vapid_private'].strip()
@@ -332,6 +333,13 @@ def settings_general_save():
         has_errors = True
         flash('Wordlist directory is not readable', 'error')
 
+    if len(uploaded_hashes_path) > 0 and not os.path.isdir(uploaded_hashes_path):
+        has_errors = True
+        flash('Uploaded Hashes directory does not exist', 'error')
+    elif len(uploaded_hashes_path) > 0 and not os.access(uploaded_hashes_path, os.R_OK):
+        has_errors = True
+        flash('Uploaded Hashes directory is not readable', 'error')
+
     themes = filesystem.get_files(os.path.join(current_app.root_path, 'static', 'css', 'themes'))
 
     if not (theme + '.css') in themes:
@@ -342,6 +350,7 @@ def settings_general_save():
         return redirect(url_for('admin.settings_general'))
 
     settings.save('wordlists_path', wordlists_path)
+    settings.save('uploaded_hashes_path', uploaded_hashes_path)
     settings.save('theme', theme)
     # Only update if it's not '********' because we don't show it in the UI.
     if vapid_private != '********':

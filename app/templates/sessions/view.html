@@ -54,8 +54,14 @@
                     <tr>
                         <th scope="row">Hashes Uploaded</th>
                         <td class="text-right">
-                            <span>{{ session.hashes_in_file }}</span>
-                            {% if session.hashes_in_file > 0 %}
+                            <span>
+                                {% if session.hashes_in_file == -1 %}
+                                    File too large
+                                {% else %}
+                                    {{ session.hashes_in_file }}
+                                {% endif %}
+                            </span>
+                            {% if session.hashes_in_file > 0 or session.hashes_in_file == -1 %}
                             <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}" class="text-warning ml-1" title="download"><i class="fas fa-file-download fa-lg"></i></a>
                             {% endif %}
                         </td>

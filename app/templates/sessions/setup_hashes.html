@@ -25,16 +25,59 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="form-group">
-                        <label for="hashfile">Upload file with hashes</label>
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="hashfile" name="hashfile">
-                            <label class="custom-file-label" for="hashfile">Choose hashes file</label>
+                        <label>Select method</label>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-upload" name="mode" class="mode-option custom-control-input" value="0" checked="checked">
+                            <label class="custom-control-label" for="mode-upload">Upload from local machine</label>
+                        </div>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-paste" name="mode" class="mode-option custom-control-input" value="1">
+                            <label class="custom-control-label" for="mode-paste">Enter hashes manually</label>
+                        </div>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-remote" name="mode" class="mode-option custom-control-input" value="2">
+                            <label class="custom-control-label" for="mode-remote">Select file from server <i>(if you uploaded via SSH)</i></label>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="hashes">Or paste them here</label>
-                        <textarea name="hashes" id="hashes" class="form-control text-monospace" rows="10" placeholder="Hashes"></textarea>
+                    <div class="box-mode-upload">
+                        <div class="form-group">
+                            <label for="hashfile">Upload file with hashes</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="hashfile" name="hashfile">
+                                <label class="custom-file-label" for="hashfile">Choose hashes file</label>
+                            </div>
+                            <div class="small text-warning file-error-message"></div>
+                            <div class="small text-warning file-size-message d-none">
+                                <div>The file you selected is <span class="file-size"></span> MB which exceeds the limit of <span class="file-limit"></span> MB.</div>
+                                <div>You can still upload this file but it will take a lot of time. It's recommended to upload this file via SSH and select it using the 'filesystem' option.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box-mode-paste">
+                        <div class="form-group">
+                            <label for="hashes">Enter your hashes here (one per line)</label>
+                            <textarea name="hashes" id="hashes" class="form-control text-monospace" rows="10" placeholder="Hashes"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="box-mode-remote">
+                        <div class="form-group">
+                            <label for="remotefile">Select your alreaedy uploaded hash file</label>
+                            <select name="remotefile" id="remotefile" class="form-control">
+                                <option value="">No File Selected</option>
+                            </select>
+                            <div class="text-warning small mt-2">
+                                Note: This file will be <b>copied</b> by CrackerJack, which make take a bit of time and will definitely double the space used.
+                                Following the successful import of this file, it is recommended to remove the file from the currently uploaded hashes directory.
+                                <br>
+                                To use this option, upload your file via SSH to: <b>{{ setting_get('uploaded_hashes_path', 'Setting not enabled by your administrator') }}</b>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -45,4 +88,14 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.filesize.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/cj.sessions.hashes.js') }}"></script>
+
+<script type="text/javascript">
+    CJ_FileSize.init('#hashfile', '.file-error-message', '.file-size-message', 100);
+
+    var uploaded_hashfiles = {{ uploaded_hashfiles_json|safe }}
+    CJ_SessionsHashes.init(uploaded_hashfiles);
+</script>
 {% endblock %}

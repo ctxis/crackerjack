@@ -37,6 +37,7 @@ def create():
 def setup_hashes(session_id):
     provider = Provider()
     sessions = provider.sessions()
+    uploaded_hashes = provider.hashes()
 
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
@@ -45,9 +46,12 @@ def setup_hashes(session_id):
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id, session_id)[0]
 
+    uploaded_hashfiles = uploaded_hashes.get_uploaded_hashes()
+
     return render_template(
         'sessions/setup_hashes.html',
-        session=session
+        session=session,
+        uploaded_hashfiles_json=json.dumps(uploaded_hashfiles, indent=4, sort_keys=True, default=str),
     )
 
 
@@ -56,18 +60,17 @@ def setup_hashes(session_id):
 def setup_hashes_save(session_id):
     provider = Provider()
     sessions = provider.sessions()
+    uploaded_hashes = provider.hashes()
 
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
-    hashes = request.form['hashes'].strip()
-
+    mode = int(request.form['mode'].strip())
     save_as = sessions.session_filesystem.get_hashfile_path(current_user.id, session_id)
 
-    if len(hashes) > 0:
-        sessions.session_filesystem.save_hashes(current_user.id, session_id, hashes)
-    else:
+    if mode == 0:
+        # Upload file.
         if len(request.files) != 1:
             flash('Uploaded file could not be found', 'error')
             return redirect(url_for('sessions.setup_hashes', session_id=session_id))
@@ -78,6 +81,29 @@ def setup_hashes_save(session_id):
             return redirect(url_for('sessions.setup_hashes', session_id=session_id))
 
         file.save(save_as)
+    elif mode == 1:
+        # Enter hashes manually.
+        hashes = request.form['hashes'].strip()
+        if len(hashes) > 0:
+            sessions.session_filesystem.save_hashes(current_user.id, session_id, hashes)
+        else:
+            flash('No hashes entered', 'error')
+            return redirect(url_for('sessions.setup_hashes', session_id=session_id))
+    elif mode == 2:
+        # Select already uploaded file.
+        remotefile = request.form['remotefile'].strip()
+        if not uploaded_hashes.is_valid_uploaded_hashfile(remotefile):
+            flash('Invalid uploaded file selected', 'error')
+            return redirect(url_for('sessions.setup_hashes', session_id=session_id))
+
+        remotefile_location = uploaded_hashes.get_uploaded_hashes_path(remotefile)
+
+        if not uploaded_hashes.copy_file(remotefile_location, save_as):
+            flash('Could not copy file', 'error')
+            return redirect(url_for('sessions.setup_hashes', session_id=session_id))
+    else:
+        flash('Invalid mode selected', 'error')
+        return redirect(url_for('sessions.setup_hashes', session_id=session_id))
 
     return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
 
@@ -113,7 +139,7 @@ def setup_hashcat(session_id):
     return render_template(
         'sessions/setup_hashcat.html',
         session=session,
-        hashes_json=json.dumps(supported_hashes),
+        hashes_json=json.dumps(supported_hashes, indent=4, sort_keys=True, default=str),
         wordlists_json=json.dumps(password_wordlists, indent=4, sort_keys=True, default=str),
         rules=hashcat_rules
     )
