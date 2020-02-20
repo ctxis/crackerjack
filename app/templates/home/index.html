@@ -77,7 +77,7 @@
                         <td class="table-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</td>
                         <td class="text-right">{{ session.hashcat.data.progress }}%</td>
                         <td class="text-right">
-                            <span>{{ session.hashcat.data.cracked_passwords }}/{{ session.hashcat.data.all_passwords }}</span>
+                            <span>{{ '{0:,}'.format(session.hashcat.data.cracked_passwords) }}/{{ '{0:,}'.format(session.hashcat.data.all_passwords) }}</span>
                             {% if session.hashcat.data.cracked_passwords > 0 %}
                             <span>
                                 <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
