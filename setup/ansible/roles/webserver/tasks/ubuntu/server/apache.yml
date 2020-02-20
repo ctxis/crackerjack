@@ -1,0 +1,61 @@
+- name: "Install apache"
+  when: webserver.type == 'apache'
+  apt:
+    name: "apache2"
+
+- name: "Enabling Apache proxy module"
+  apache2_module:
+    name: proxy
+    state: present
+
+- name: "Enabling Apache proxy_http module"
+  apache2_module:
+    name: proxy_http
+    state: present
+
+- name: "Enabling Apache rewrite module"
+  apache2_module:
+    name: rewrite
+    state: present
+
+- name: "Enabling Apache ssl module"
+  apache2_module:
+    name: ssl
+    state: present
+
+- name: "Check for Apache config file"
+  stat:
+    path: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+  register: http_config
+
+- name: "Check for available vhost"
+  stat:
+    path: /etc/apache2/sites-available/crackerjack.conf
+  register: available_host
+
+- name: "Check for enabled vhost"
+  stat:
+    path: /etc/apache2/sites-enabled/crackerjack.conf
+  register: enabled_host
+
+- name: "Creating config"
+  when: http_config.stat.exists == False
+  template:
+    src: ubuntu/apache/vhost.conf.j2
+    dest: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+
+- name: "Creating available vhost"
+  when: available_host.stat.exists == False
+  file:
+    src: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+    dest: "/etc/apache2/sites-available/crackerjack.conf"
+    state: link
+
+- name: "Enabling vhost"
+  when: enabled_host.stat.exists == False
+  command: a2ensite "crackerjack.conf"
+
+- name: "Reloading apache"
+  service:
+    name: apache2
+    state: reloaded

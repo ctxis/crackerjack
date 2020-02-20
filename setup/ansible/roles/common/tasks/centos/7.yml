@@ -1,0 +1,36 @@
+- name: "Install epel-release"
+  yum:
+    name: epel-release
+
+- name: "Install packages"
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - vim
+      - git
+      - screen
+      - sqlite
+      - python-setuptools
+      - python-pip
+      - policycoreutils-python
+
+- name: "Install latest version of pip"
+  pip:
+    name: pip
+    extra_args: --upgrade
+
+- name: "Install pip cryptography"
+  pip:
+    name: cryptography
+
+# Web server needs to be installed here, otherwise there's no apache user in passwd.
+- name: "Install Apache"
+  yum:
+    name: httpd
+  when: webserver.type == 'apache'
+
+- name: "Install nginx"
+  yum:
+    name: nginx
+  when: webserver.type == 'nginx'

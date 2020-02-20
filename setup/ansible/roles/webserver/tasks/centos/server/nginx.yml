@@ -1,0 +1,69 @@
+- name: "Check for nginx config file"
+  stat:
+    path: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+  register: http_config
+
+- name: "Check for sites-available directory"
+  stat:
+    path: /etc/nginx/sites-available
+  register: sites_available
+
+- name: "Check for sites-enabled directory"
+  stat:
+    path: /etc/nginx/sites-enabled
+  register: sites_enabled
+
+- name: "Check for proxy_params"
+  stat:
+    path: /etc/nginx/proxy_params
+  register: proxy_params
+
+- name: "Create sites-available directory"
+  when: sites_available.stat.exists == False
+  file:
+    path: "/etc/nginx/sites-available"
+    state: directory
+    recurse: yes
+
+- name: "Create sites-enabled directory"
+  when: sites_enabled.stat.exists == False
+  file:
+    path: "/etc/nginx/sites-enabled"
+    state: directory
+    recurse: yes
+
+- name: "Make sure vhosts are loaded"
+  lineinfile:
+    name: "/etc/nginx/nginx.conf"
+    line: "include /etc/nginx/sites-enabled/*.conf;"
+    insertafter: "http {"
+    state: present
+
+- name: "Check for enabled vhost"
+  stat:
+    path: /etc/nginx/sites-enabled/crackerjack.conf
+  register: enabled_host
+
+- name: "Creating proxy_params"
+  when: proxy_params.stat.exists == False
+  template:
+    src: centos/nginx/proxy_params.j2
+    dest: /etc/nginx/proxy_params
+
+- name: "Creating config"
+  when: http_config.stat.exists == False
+  template:
+    src: centos/nginx/vhost.conf.j2
+    dest: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+
+- name: "Enabling vhost"
+  when: enabled_host.stat.exists == False
+  file:
+    src: "{{ crackerjack.destination }}/data/config/http/vhost.conf"
+    dest: "/etc/nginx/sites-enabled/crackerjack.conf"
+    state: link
+
+- name: "Restarting nginx"
+  service:
+    name: nginx
+    state: restarted

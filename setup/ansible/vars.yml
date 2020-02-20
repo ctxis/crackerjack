@@ -1,0 +1,26 @@
+---
+system:
+  minimum_python_version: '3.6'
+  # If you are running an old distro where the path to python >= 3.6 isn't named as 'python3', set the absolute path
+  # here. Otherwise (ie Ubuntu 18), leave as is.
+  python: 'python3.6'
+user:
+  # Change this to your destination's local user (user should have sudo privileges).
+  name: cj
+  group: cj
+webserver:
+  # Choose between apache/nginx, or empty to skip entirely.
+  type: nginx
+  user: nginx
+  group: nginx
+  # Leave empty to auto-generate certificates, or specify a location on the machine you're running ansible from.
+  ssl_cert_file: ''
+  ssl_cert_keyfile: ''
+crackerjack:
+  repo: 'https://github.com/ctxis/crackerjack.git'
+  destination: /opt/web/crackerjack
+  # Set your server name.
+  domain: 'www.crackerjack.lan'
+service:
+  bind_address: 127.0.0.1
+  bind_port: 8888

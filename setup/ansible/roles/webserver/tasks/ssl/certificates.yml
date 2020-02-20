@@ -1,0 +1,55 @@
+- name: "Check for private key"
+  stat:
+    path: "{{ crackerjack.destination }}/data/config/http/ssl.pem"
+  register: ssl_pem
+
+- name: "Check for csr key"
+  stat:
+    path: "{{ crackerjack.destination }}/data/config/http/ssl.csr"
+  register: ssl_csr
+
+- name: "Check for crt key"
+  stat:
+    path: "{{ crackerjack.destination }}/data/config/http/ssl.crt"
+  register: ssl_crt
+
+- name: "Creating http config directory"
+  file:
+    path: "{{ crackerjack.destination }}/data/config/http"
+    state: directory
+    recurse: yes
+
+- name: "Check if custom SSL certificate exists"
+  when: webserver.ssl_cert_file != ''
+  copy:
+    src: "{{ webserver.ssl_cert_file }}"
+    dest: "{{ crackerjack.destination }}/data/config/http/ssl.crt"
+    mode: "0644"
+
+- name: "Check if custom SSL private key exists"
+  when: webserver.ssl_cert_keyfile != ''
+  copy:
+    src: "{{ webserver.ssl_cert_keyfile }}"
+    dest: "{{ crackerjack.destination }}/data/config/http/ssl.pem"
+    mode: "0600"
+
+- name: "Generating private key"
+  when: ssl_pem.stat.exists == False and webserver.ssl_cert_file == ''
+  openssl_privatekey:
+    path: "{{ crackerjack.destination }}/data/config/http/ssl.pem"
+    size: 2048
+
+- name: "Generating csr key"
+  when: ssl_csr.stat.exists == False and webserver.ssl_cert_file == ''
+  openssl_csr:
+    path: "{{ crackerjack.destination }}/data/config/http/ssl.csr"
+    privatekey_path: "{{ crackerjack.destination }}/data/config/http/ssl.pem"
+    common_name: "{{ crackerjack.domain }}"
+
+- name: "Generating crt key"
+  when: ssl_crt.stat.exists == False and webserver.ssl_cert_file == ''
+  openssl_certificate:
+    path: "{{ crackerjack.destination }}/data/config/http/ssl.crt"
+    privatekey_path: "{{ crackerjack.destination }}/data/config/http/ssl.pem"
+    csr_path: "{{ crackerjack.destination }}/data/config/http/ssl.csr"
+    provider: selfsigned

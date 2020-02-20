@@ -1,0 +1,83 @@
+- name: "Check for installation directory"
+  stat:
+    path: "{{ crackerjack.destination }}"
+  register: parent_path
+
+- name: "Creating directory"
+  when: parent_path.stat.exists == False
+  file:
+    path: "{{ crackerjack.destination }}"
+    state: directory
+    recurse: yes
+    owner: "{{ user.name }}"
+    group: "{{ user.group }}"
+
+- name: "Check if repo is already cloned"
+  git:
+    repo: "{{ crackerjack.repo }}"
+    dest: "{{ crackerjack.destination }}"
+    clone: no
+    update: no
+  register: git_info
+
+# I'm using this technique because git won't allow you to clone into an existing directory.
+# And if our user doesn't have permission to create the destination folder, ansible will throw a clone error.
+- name: "Clone repo"
+  when: git_info.before == None
+  become: yes
+  become_user: "{{ user.name }}"
+  shell:
+    chdir: "{{ crackerjack.destination }}"
+    cmd: "git init &&
+          git remote add origin {{ crackerjack.repo }} &&
+          git fetch -p &&
+          git checkout master"
+
+- name: "Checking for virtual environment"
+  stat:
+    path: "{{ crackerjack.destination }}/venv"
+  register: venv
+
+- name: "Setting up virtual environment"
+  when: venv.stat.exists == False
+  become: yes
+  become_user: "{{ user.name }}"
+  shell:
+    chdir: "{{ crackerjack.destination }}"
+    cmd: |
+      {{ system.python }} -m venv venv
+      . venv/bin/activate
+      pip install -r requirements.txt
+      flask db init
+      flask db migrate
+      flask db upgrade
+      flask crontab add
+      deactivate
+  args:
+    chdir: "{{ crackerjack.destination }}"
+
+- name: "Check web user's home directory"
+  shell: "eval echo ~{{ webserver.user }}"
+  register: www_home
+
+- name: "Check for hashcat directory in web user's home folder"
+  stat:
+    path: "{{ www_home.stdout }}/.hashcat"
+  register: www_hashcat
+
+- name: "Create hashcat directory for web user"
+  when: www_hashcat.stat.exists == False
+  file:
+    path: "{{ www_home.stdout }}/.hashcat"
+    state: directory
+    recurse: yes
+    owner: "{{ webserver.user }}"
+    group: "{{ webserver.group }}"
+
+- name: "Set {{ webserver.user }} as the owner for {{ crackerjack.destination }}"
+  file:
+    path: "{{ crackerjack.destination }}"
+    state: directory
+    recurse: yes
+    owner: "{{ webserver.user }}"
+    group: "{{ webserver.group }}"

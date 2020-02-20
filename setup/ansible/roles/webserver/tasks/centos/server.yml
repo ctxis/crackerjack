@@ -1,0 +1,29 @@
+- name: Configure HttpD
+  import_tasks: server/apache.yml
+  when: webserver.type == 'apache'
+
+- name: Configure nginx
+  import_tasks: server/nginx.yml
+  when: webserver.type == 'nginx'
+
+- name: "Opening http port"
+  firewalld:
+    service: http
+    permanent: yes
+    state: enabled
+
+- name: "Opening https port"
+  firewalld:
+    service: https
+    permanent: yes
+    state: enabled
+
+- name: "Set httpd_can_network_connect flag on and keep it persistent across reboots"
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+
+- name: "Reload firewall"
+  shell:
+    cmd: firewall-cmd --reload

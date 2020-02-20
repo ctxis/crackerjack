@@ -1,0 +1,16 @@
+- name: "Create systemd service"
+  import_tasks: service/systemd.yml
+
+# In Ubuntu 18 it's enough to create a symlink to that folder before enabling.
+- name: "Creating link to service"
+  when: existing_service.stat.exists == False
+  file:
+    src: "{{ crackerjack.destination }}/data/config/service/crackerjack.service"
+    dest: "/etc/systemd/system/crackerjack.service"
+    state: link
+
+- name: "Enabling and starting service"
+  service:
+    name: crackerjack
+    enabled: true
+    state: started

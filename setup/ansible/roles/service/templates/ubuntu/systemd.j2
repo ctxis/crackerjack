@@ -1,0 +1,14 @@
+[Unit]
+Description=CrackerJack Gunicorn
+After=network.target
+
+[Service]
+User={{ webserver.user }}
+Group={{ webserver.group }}
+WorkingDirectory={{ crackerjack.destination }}
+EnvironmentFile=/etc/environment
+Environment="PATH={{ crackerjack.destination }}/venv/bin:$PATH"
+ExecStart={{ crackerjack.destination }}/venv/bin/gunicorn --workers 3 --bind {{ service.bind_address }}:{{ service.bind_port }} -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target

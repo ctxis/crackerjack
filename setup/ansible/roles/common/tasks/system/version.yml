@@ -1,0 +1,9 @@
+- name: "Getting python version"
+  shell:
+    cmd: "{{ system.python }} --version 2>&1 | grep -Po '(?<=Python )(.+)'"
+  register: python_version
+
+- name: "Checking minimum python version"
+  when: python_version.stdout is version("{{ system.minimum_python_version }}", '<')
+  fail:
+    msg: "Minimum python version is {{ system.minimum_python_version }} and the currently installed version is {{ python_version.stdout }}"

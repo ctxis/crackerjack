@@ -1,0 +1,28 @@
+<VirtualHost *:80>
+    ServerName {{ crackerjack.domain }}
+    DocumentRoot /var/www/html
+
+    ErrorLog /var/log/httpd/crackerjack.error.log
+    CustomLog /var/log/httpd/crackerjack.access.log combined
+
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName {{ crackerjack.domain }}
+    DocumentRoot /var/www/html
+
+    ErrorLog /var/log/httpd/crackerjack.error.log
+    CustomLog /var/log/httpd/crackerjack.access.log combined
+
+    ProxyPreserveHost On
+    ProxyPass	/	http://{{ service.bind_address }}:{{ service.bind_port }}/
+    ProxyPassReverse	/	http://{{ service.bind_address }}:{{ service.bind_port }}/
+
+    SSLEngine on
+
+    SSLCertificateFile	{{ crackerjack.destination }}/data/config/http/ssl.crt
+    SSLCertificateKeyFile {{ crackerjack.destination }}/data/config/http/ssl.pem
+</VirtualHost>

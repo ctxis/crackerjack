@@ -1,0 +1,20 @@
+- name: "Install packages"
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+      - vim
+      - git
+      - screen
+      - sqlite3
+      - python3.6-venv
+      - python-pip
+
+- name: "Install latest version of pip"
+  pip:
+    name: pip
+    extra_args: --upgrade
+
+- name: "Install pip cryptography"
+  pip:
+    name: cryptography
