@@ -305,33 +305,31 @@ class HashcatManager:
         #   98  ERROR
         #   99  UNKNOWN
         status = 0
-        if 'Status' in raw:
-            if raw['Status'] == 'Running':
-                status = 1
-                # However, if there's no process then it's probably an error.
-                if not self.is_process_running(screen_name):
-                    # Set to error.
-                    status = 98
-            elif raw['Status'] == 'Quit':
-                status = 2
-            if raw['Status'] == 'Exhausted':
-                status = 3
-            elif raw['Status'] == 'Paused':
-                status = 4
-            elif raw['Status'] == 'Cracked':
-                status = 5
-        else:
-            # There's a chance that there's no 'status' output displayed yet. In this case, check if the process is running.
-            if self.is_process_running(screen_name):
-                # Set to running.
-                status = 1
+        if self.is_process_running(screen_name):
+            status = 1
+            # If it's still running, there's a chance it's just paused. Check for that.
+            if 'Status' in raw:
+                if raw['Status'] == 'Paused':
+                    status = 4
 
-        # If it is STILL not running, take the last few output lines, and mark this as an 'error'.
+        # If it's not running, try to get the current status.
+        if status == 0:
+            if 'Status' in raw:
+                if raw['Status'] == 'Running' or raw['Status'] == 'Paused':
+                    # If we got to this point it means that the process isn't currently running but there is a 'Status'
+                    # feed. In this case, mark it as an error.
+                    status = 98
+                elif raw['Status'] == 'Quit':
+                    status = 2
+                elif raw['Status'] == 'Exhausted':
+                    status = 3
+                elif raw['Status'] == 'Cracked':
+                    status = 5
+
+        # In the event that the status is still 0 BUT the screen.log file is not empty, it means there has been some
+        # activity, so it's probably an error.
         if status == 0 and len(tail_screen) > 0:
             status = 98
-        elif status == 3 and self.is_process_running(screen_name):
-            # Sometimes when it goes through multiple wordlists or incremenental brute force rules, it's marked as 'finished'.
-            status = 1
 
         return status
 
