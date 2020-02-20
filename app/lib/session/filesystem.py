@@ -13,8 +13,11 @@ class SessionFileSystem:
         path = Path(current_app.root_path)
         return os.path.join(str(path.parent), 'data')
 
+    def get_data_sessions_path(self):
+        return os.path.join(self.get_data_path(), 'sessions')
+
     def get_user_data_path(self, user_id, session_id):
-        path = os.path.join(self.get_data_path(), str(user_id))
+        path = os.path.join(self.get_data_sessions_path(), str(user_id))
         if session_id > 0:
             path = os.path.join(path, str(session_id))
 
