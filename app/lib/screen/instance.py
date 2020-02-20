@@ -1,5 +1,4 @@
 import time
-import shlex
 
 
 class ScreenInstance:
@@ -49,15 +48,7 @@ class ScreenInstance:
 
         # Cannot pass the "command" variable as a list to shell.execute() because screen expects it to be passed as
         # a string instead. Therefore, although the command argument is a dict, we manually escape all of it.
-        sanitised = []
-        for key, value in command.items():
-            item = shlex.quote(key)
-            if isinstance(value, str) and len(value) > 0:
-                item = item + ' ' + shlex.quote(value)
-            else:
-                item = item + ' ' + str(value)
-
-            sanitised.append(item)
+        sanitised = self.shell.build_command_from_dict(command)
 
         # Paste command into the input buffer.
         cmd = [

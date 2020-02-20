@@ -77,6 +77,21 @@ class HashcatManager:
 
         return valid
 
+    def build_export_password_command_line(self, hashfile, potfile, save_as):
+        command = [
+            self.hashcat_binary,
+            '--potfile-path',
+            potfile,
+            '--outfile',
+            save_as,
+            '--outfile-format',
+            '2',
+            '--show',
+            hashfile
+        ]
+
+        return command
+
     def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile,
                            increment_min, increment_max, optimised_kernel):
         command = {

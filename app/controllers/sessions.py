@@ -282,25 +282,46 @@ def setup_wordlist_save(session_id):
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
-    wordlist = request.form['wordlist'].strip()
-    rule = request.form['rule'].strip()
+    wordlist_type = int(request.form['wordlist_type'].strip())
 
-    has_errors = False
-    if not wordlists.is_valid_wordlist(wordlist):
-        has_errors = True
-        flash('Invalid wordlist selected', 'error')
+    if wordlist_type == 0:
+        # Global wordlist.
+        wordlist = request.form['wordlist'].strip()
+        if not wordlists.is_valid_wordlist(wordlist):
+            flash('Invalid wordlist selected', 'error')
+            return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
 
-    if len(rule) > 0 and not rules.is_valid_rule(rule):
-        has_errors = True
-        flash('Invalid rule selected', 'error')
+        wordlist_location = wordlists.get_wordlist_path(wordlist)
+        sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
+    elif wordlist_type == 1:
+        # Custom wordlist.
+        save_as = sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id)
+        if len(request.files) != 1:
+            flash('Uploaded file could not be found', 'error')
+            return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
 
-    if has_errors:
+        file = request.files['custom_wordlist']
+        if file.filename == '':
+            flash('No hashes uploaded', 'error')
+            return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
+
+        file.save(save_as)
+    elif wordlist_type == 2:
+        # Create wordlist from cracked passwords.
+        save_as = sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id)
+        sessions.export_cracked_passwords(session_id, save_as)
+    else:
+        flash('Invalid wordlist option', 'error')
         return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
 
-    wordlist_location = wordlists.get_wordlist_path(wordlist)
-    rule_location = rules.get_rule_path(rule)
+    sessions.set_hashcat_setting(session_id, 'wordlist_type', wordlist_type)
 
-    sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
+    rule = request.form['rule'].strip()
+    if len(rule) > 0 and not rules.is_valid_rule(rule):
+        flash('Invalid rule selected', 'error')
+        return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
+
+    rule_location = rules.get_rule_path(rule)
     sessions.set_hashcat_setting(session_id, 'rule', rule_location)
 
     return redirect(url_for('sessions.settings', session_id=session_id))

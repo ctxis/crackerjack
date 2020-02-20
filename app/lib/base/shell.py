@@ -1,5 +1,6 @@
 import subprocess
 import datetime
+import shlex
 
 from sqlalchemy import and_, desc
 
@@ -21,6 +22,19 @@ class ShellManager:
         log = self.__log_finish(log, output)
 
         return output
+
+    def build_command_from_dict(self, command):
+        sanitised = []
+        for key, value in command.items():
+            item = shlex.quote(key)
+            if isinstance(value, str) and len(value) > 0:
+                item = item + ' ' + shlex.quote(value)
+            else:
+                item = item + ' ' + str(value)
+
+            sanitised.append(item.strip())
+
+        return sanitised
 
     def __log_start(self, command, user_id):
         record = ShellLogModel(user_id=user_id, command=command, executed_at=datetime.datetime.now())

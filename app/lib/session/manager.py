@@ -15,13 +15,14 @@ from flask import send_file, url_for
 
 
 class SessionManager:
-    def __init__(self, hashcat, screens, wordlists, hashid, filesystem, webpush):
+    def __init__(self, hashcat, screens, wordlists, hashid, filesystem, webpush, shell):
         self.hashcat = hashcat
         self.screens = screens
         self.wordlists = wordlists
         self.hashid = hashid
         self.filesystem = filesystem
         self.webpush = webpush
+        self.shell = shell
         self.session_filesystem = SessionFileSystem(filesystem)
         self.session_validation = SessionValidation()
         self.cmd_sleep = 2
@@ -148,6 +149,7 @@ class SessionManager:
                     'configured': True if hashcat else False,
                     'mode': '' if not hashcat else hashcat.mode,
                     'hashtype': '' if not hashcat else hashcat.hashtype,
+                    'wordlist_type': 0 if not hashcat else hashcat.wordlist_type,
                     'wordlist': '' if not hashcat else self.wordlists.get_name_from_path(hashcat.wordlist),
                     'wordlist_path': '' if not hashcat else hashcat.wordlist,
                     'rule': '' if not hashcat else os.path.basename(hashcat.rule),
@@ -191,6 +193,7 @@ class SessionManager:
 
         current.mode = history.mode
         current.hashtype = history.hashtype
+        current.wordlist_type = history.wordlist_type
         current.wordlist = history.wordlist
         current.rule = history.rule
         current.mask = history.mask
@@ -222,6 +225,8 @@ class SessionManager:
             record.increment_max = value
         elif name == 'optimised_kernel':
             record.optimised_kernel = value
+        elif name == 'wordlist_type':
+            record.wordlist_type = value
 
         db.session.commit()
 
@@ -239,6 +244,19 @@ class SessionManager:
         db.session.refresh(record)
 
         return record
+
+    def export_cracked_passwords(self, session_id, save_as):
+        # First get the session.
+        session = self.get(session_id=session_id)[0]
+
+        command = self.hashcat.build_export_password_command_line(
+            self.session_filesystem.get_hashfile_path(session['user_id'], session_id),
+            self.session_filesystem.get_potfile_path(session['user_id'], session_id),
+            save_as
+        )
+        self.shell.execute(command)
+
+        return True
 
     def hashcat_action(self, session_id, action):
         # First get the session.
@@ -347,6 +365,7 @@ class SessionManager:
             mode=record.mode,
             hashtype=record.hashtype,
             wordlist=record.wordlist,
+            wordlist_type=record.wordlist_type,
             rule=record.rule,
             mask=record.mask,
             increment_min=record.increment_min,

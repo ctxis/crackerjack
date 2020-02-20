@@ -25,10 +25,33 @@
                 <h5 class="card-header">Wordlist Options</h5>
                 <div class="card-body">
                     <div class="form-group">
-                        <label for="wordlist">Wordlist</label>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="wordlist-global" name="wordlist_type" class="mode-option custom-control-input" value="0" {{ 'checked' if session.hashcat.wordlist_type == 0 or session.hashcat.wordlist_type == '' else '' }}>
+                            <label class="custom-control-label" for="wordlist-global">Global Wordlist</label>
+                        </div>
+
                         <select name="wordlist" id="wordlist" class="form-control" required>
                             <option value=""></option>
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="wordlist-session" name="wordlist_type" class="mode-option custom-control-input" value="1" {{ 'checked' if session.hashcat.wordlist_type == 1 else '' }}>
+                            <label class="custom-control-label" for="wordlist-session">Custom Session Wordlist</label>
+                        </div>
+
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="custom_wordlist" name="custom_wordlist">
+                            <label class="custom-file-label" for="custom_wordlist">Choose your wordlist</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="wordlist-passwords" name="wordlist_type" class="mode-option custom-control-input" value="2" {{ 'checked' if session.hashcat.wordlist_type == 2 else '' }}>
+                            <label class="custom-control-label" for="wordlist-passwords">Create wordlist from already cracked passwords</label>
+                        </div>
                     </div>
 
                     <div class="form-group">

@@ -32,7 +32,8 @@ class Provider:
             self.wordlists(),
             self.hashid(),
             self.filesystem(),
-            self.webpush()
+            self.webpush(),
+            self.shell()
         )
         return session
 

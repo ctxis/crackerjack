@@ -29,6 +29,9 @@ class SessionFileSystem:
     def get_hashfile_path(self, user_id, session_id):
         return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.txt')
 
+    def get_custom_wordlist_path(self, user_id, session_id):
+        return os.path.join(self.get_user_data_path(user_id, session_id), 'custom_wordlist.dict')
+
     def hashfile_exists(self, user_id, session_id):
         path = self.get_hashfile_path(user_id, session_id)
         return os.path.isfile(path)
