@@ -69,8 +69,8 @@
                     <tr>
                         <th scope="row">Cracked</th>
                         <td class="text-right">
-                            <span>{{ '{0:,}'.format(session.hashcat.data.cracked_passwords) }}/{{ '{0:,}'.format(session.hashcat.data.all_passwords) }}</span>
-                            {% if session.hashcat.data.cracked_passwords > 0 %}
+                            <span>{{ '{0:,}'.format(session.hashcat.cracked_passwords) }}/{{ '{0:,}'.format(session.hashcat.all_passwords) }}</span>
+                            {% if session.hashcat.cracked_passwords > 0 %}
                             <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
                             {% endif %}
                         </td>
@@ -91,7 +91,7 @@
     <div class="col">
         <div>
             <a href="#" class="raw-progress btn btn-warning">
-                {% if session.hashcat.data.process_state == 98 %}
+                {% if session.hashcat.state == 98 %}
                 <span class="mr-2 text-danger"><i class="fas fa-exclamation"></i></span>
                 {% endif %}
                 View Raw/Debug Information
@@ -155,7 +155,7 @@
                     <td class="text-right">{{ value }}</td>
                 </tr>
                 {% endfor %}
-                {% if session.hashcat.data.process_state == 98 %}
+                {% if session.hashcat.state == 98 %}
                 <tr>
                     <td colspan="2">
                         <div class="session-error-tail">
@@ -173,7 +173,7 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        CJ_SessionsView.init("{{ url_for('sessions.status', session_id=session.id) }}", {{ session.hashcat.data.process_state }});
+        CJ_SessionsView.init("{{ url_for('sessions.status', session_id=session.id) }}", {{ session.hashcat.state }});
     });
 </script>
 {% endblock %}

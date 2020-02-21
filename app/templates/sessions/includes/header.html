@@ -5,7 +5,7 @@
             <div class="col-6">
                 <div>
                     <h1 class="d-inline-block" title="Internal Session Name: {{ session.name }}">{{ session.description if (session.description and session.description|length > 0) else session.name }}</h1>
-                    <span class="badge badge-pill badge-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}" style="vertical-align: top">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</span>
+                    <span class="badge badge-pill badge-{{ template().get_hashcat_running_class(session.hashcat.state) }}" style="vertical-align: top">{{ template().get_hashcat_running_text(session.hashcat.state) }}</span>
                 </div>
             </div>
             <div class="col text-right">
@@ -17,46 +17,46 @@
                     <input type="hidden" name="action" id="action" value="">
 
                     {%
-                        if session.hashcat.data.process_state == 0 or
-                            session.hashcat.data.process_state == 2 or
-                            session.hashcat.data.process_state == 3 or
-                            session.hashcat.data.process_state == 98
+                        if session.hashcat.state == 0 or
+                            session.hashcat.state == 2 or
+                            session.hashcat.state == 3 or
+                            session.hashcat.state == 98
                     %}
-                    {% if session.hashcat.data.process_state == 2 %}
+                    {% if session.hashcat.state == 2 %}
                     <a href="#" data-action="restore" title="Restore" class="form-action ml-2 btn btn-info"><i class="fas fa-redo"></i> Restore</a>
                     {% endif %}
                     <a href="#" data-action="start" title="Start" class="form-action ml-2 btn btn-success"><i class="fas fa-play-circle"></i> Start</a>
                     <a href="#" data-action="reset" title="Reset - If the session won't start click this link" class="form-action ml-2 btn btn-danger"><i class="fas fa-sync"></i> Rebuild</a>
                     {% endif %}
 
-                    {% if session.hashcat.data.process_state == 4 %}
+                    {% if session.hashcat.state == 4 %}
                     <a href="#" data-action="resume" title="Resume" class="form-action ml-2 btn btn-success"><i class="fas fa-play-circle"></i> Continue</a>
                     {% endif %}
 
-                    {% if session.hashcat.data.process_state == 1 %}
+                    {% if session.hashcat.state == 1 %}
                     <a href="#" data-action="pause" title="Pause" class="form-action ml-2 btn btn-warning"><i class="fas fa-pause-circle"></i> Pause</a>
                     {% endif %}
 
-                    {% if session.hashcat.data.process_state == 1 or session.hashcat.data.process_state == 4 %}
+                    {% if session.hashcat.state == 1 or session.hashcat.state == 4 %}
                     <a href="#" data-action="stop" title="Stop" class="form-action ml-2 btn btn-danger"><i class="fas fa-stop-circle"></i> Stop</a>
                     {% endif %}
                 </form>
                 {% endif %}
             </div>
         </div>
-        {% if session.hashcat.data.progress|int > 0 and session.hashcat.data.progress|int < 100 and session.hashcat.data.process_state == 1 %}
+        {% if session.hashcat.progress|int > 0 and session.hashcat.progress|int < 100 and session.hashcat.state == 1 %}
         <div class="row">
             <div class="col">
                 <div class="progress" style="height: 30px; font-size: 1.2em">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success text-dark" role="progressbar" aria-valuenow="{{ session.hashcat.data.progress|int }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ session.hashcat.data.progress|int }}%" title="{{ session.hashcat.data.progress }}%">{{ session.hashcat.data.progress }}%</div>
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success text-dark" role="progressbar" aria-valuenow="{{ session.hashcat.progress|int }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ session.hashcat.progress|int }}%" title="{{ session.hashcat.progress }}%">{{ session.hashcat.progress }}%</div>
                 </div>
             </div>
         </div>
         {% endif %}
-        {% if session.hashcat.data.process_state == 1 %}
+        {% if session.hashcat.state == 1 %}
         <div class="row">
             <div class="col">
-                <div>Estimated Time: <abbr title="{{ session.hashcat.data.estimated_completion_time }}">{{ session.hashcat.data.time_remaining }}</abbr></div>
+                <div>Estimated Time: <abbr title="{{ session.hashcat.estimated_completion_time }}">{{ session.hashcat.time_remaining }}</abbr></div>
                 <div>Termination Time: <abbr title="You can set this from the session's settings menu on the left">{{ session.terminate_at }}</abbr></div>
             </div>
             <div class="col">

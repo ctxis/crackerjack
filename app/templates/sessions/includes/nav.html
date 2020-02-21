@@ -2,7 +2,7 @@
     <li class="nav-item">
         <a class="nav-link {{ 'active' if active_nav == 'session' }}" href="{{ url_for('sessions.view', session_id=session.id) }}"><i class="fas fa-spinner mr-1"></i>Session</a>
     </li>
-    {% if session.hashcat.data.process_state != 1 %}
+    {% if session.hashcat.state != 1 %}
     <li class="nav-item">
         <a class="nav-link {{ 'active' if active_nav == 'hashes' }}" href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}"><i class="fas fa-hashtag mr-1"></i>Hashes</a>
     </li>

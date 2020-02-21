@@ -72,13 +72,13 @@
                     {% for session in sessions %}
                     <tr>
                         <td>{{ session.id }}</td>
-                        <td>{{ session.user.record.username }}</td>
-                        <td><a href="{{ url_for('sessions.view', session_id=session.id) }}">{{ session.description if (session.description and session.description|length > 0) else session.name }}</a></td>
-                        <td class="table-{{ template().get_hashcat_running_class(session.hashcat.data.process_state) }}">{{ template().get_hashcat_running_text(session.hashcat.data.process_state) }}</td>
-                        <td class="text-right">{{ session.hashcat.data.progress }}%</td>
+                        <td>{{ session.username }}</td>
+                        <td><a href="{{ url_for('sessions.view', session_id=session.id) }}">{{ session.friendly_name }}</a></td>
+                        <td class="table-{{ template().get_hashcat_running_class(session.hashcat.state) }}">{{ template().get_hashcat_running_text(session.hashcat.state) }}</td>
+                        <td class="text-right">{{ session.hashcat.progress }}%</td>
                         <td class="text-right">
-                            <span>{{ '{0:,}'.format(session.hashcat.data.cracked_passwords) }}/{{ '{0:,}'.format(session.hashcat.data.all_passwords) }}</span>
-                            {% if session.hashcat.data.cracked_passwords > 0 %}
+                            <span>{{ '{0:,}'.format(session.hashcat.cracked_passwords) }}/{{ '{0:,}'.format(session.hashcat.all_passwords) }}</span>
+                            {% if session.hashcat.cracked_passwords > 0 %}
                             <span>
                                 <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
                             </span>

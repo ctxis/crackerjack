@@ -365,7 +365,7 @@ def action(session_id):
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id, session_id)[0]
 
-    if len(session['validation']) > 0:
+    if len(session.validation) > 0:
         flash('Please configure all required settings and try again.', 'error')
         return redirect(url_for('sessions.view', session_id=session_id))
 
@@ -480,7 +480,7 @@ def status(session_id):
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id, session_id)[0]
 
-    return json.dumps({'result': True, 'status': session['hashcat']['data']['process_state']})
+    return json.dumps({'result': True, 'status': session.hashcat.state})
 
 
 @bp.route('/<int:session_id>/files', methods=['GET'])

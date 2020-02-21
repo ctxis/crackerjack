@@ -241,7 +241,8 @@ class HashcatManager:
 
     def __stream_get_last_progress(self, stream):
         # Split all stream by \n.
-        stream = stream.split("\\n")
+        # stream = stream.split("\\n")
+        stream = stream.split("\n")
 
         progress_starts_from = self.__stream_find_last_progress_line(stream)
         if progress_starts_from is False:
