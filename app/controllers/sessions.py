@@ -295,7 +295,7 @@ def setup_wordlist_save(session_id):
         sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
     elif wordlist_type == 1:
         # Custom wordlist.
-        save_as = sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id)
+        save_as = sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id, prefix='custom_wordlist_', random=True)
         if len(request.files) != 1:
             flash('Uploaded file could not be found', 'error')
             return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
@@ -306,10 +306,12 @@ def setup_wordlist_save(session_id):
             return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
 
         file.save(save_as)
+        sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
     elif wordlist_type == 2:
         # Create wordlist from cracked passwords.
-        save_as = sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id)
+        save_as = sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id, prefix='pwd_wordlist')
         sessions.export_cracked_passwords(session_id, save_as)
+        sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
     else:
         flash('Invalid wordlist option', 'error')
         return redirect(url_for('sessions.setup_wordlist', session_id=session_id))

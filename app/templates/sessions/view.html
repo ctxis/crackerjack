@@ -25,7 +25,17 @@
                     {% if session.hashcat.mode == 0 %}
                     <tr>
                         <th scope="row">Wordlist</th>
-                        <td><abbr title="{{ session.hashcat.wordlist_path }}">{{ session.hashcat.wordlist if session.hashcat.mode == 0 else '' }}</abbr></td>
+                        <td>
+                            <abbr title="{{ session.hashcat.wordlist_path }}">
+                                {% if session.hashcat.wordlist_type == 0 or session.hashcat.wordlist_type == '' %}
+                                    {{ session.hashcat.wordlist if session.hashcat.mode == 0 else '' }}
+                                {% elif session.hashcat.wordlist_type == 1 %}
+                                    Custom Session Wordlist
+                                {% elif session.hashcat.wordlist_type == 2 %}
+                                    Generated from Passwords
+                                {% endif %}
+                            </abbr>
+                        </td>
                     </tr>
                     <tr>
                         <th scope="row">Rule</th>
