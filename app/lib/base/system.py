@@ -1,5 +1,6 @@
 import os
 import getpass
+import datetime
 
 
 class SystemManager:
@@ -39,6 +40,18 @@ class SystemManager:
         except ValueError:
             count = 0
         self.settings.save('git_commit_count', count)
+
+        # Save last commit date.
+        try:
+            last_commit_timestamp = int(self.shell.execute(['git', 'log', '-1', '--format=%at'], user_id=0))
+        except ValueError:
+            last_commit_timestamp = 0
+
+        last_commit_date = ''
+        if last_commit_timestamp > 0:
+            last_commit_date = datetime.datetime.fromtimestamp(last_commit_timestamp).strftime('%Y-%m-%d %H:%M')
+        self.settings.save('last_commit_date', last_commit_date)
+
         return True
 
     def get_system_user(self):
