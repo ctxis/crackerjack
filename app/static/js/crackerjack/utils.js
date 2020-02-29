@@ -14,5 +14,12 @@ var CJ_Utils = {
             }
         }
         return data;
+    },
+
+    submitOnClick: function() {
+        $('.submit-on-click').click(function() {
+            $(this).closest('form').submit();
+            return false;
+        });
     }
 };

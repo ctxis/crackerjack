@@ -110,8 +110,8 @@
     </div>
 </footer>
 
-{% if current_user.is_authenticated and setting_get('webpush_enabled', '0')|int == 1 %}
 <script type="text/javascript">
+{% if current_user.is_authenticated and setting_get('webpush_enabled', '0')|int == 1 %}
     $(document).ready(function() {
         WebPush.init(
             '{{ csrf_token() }}',
@@ -120,8 +120,12 @@
             '{{ url_for('webpush.register') }}'
         );
     });
-</script>
 {% endif %}
+
+    $(document).ready(function() {
+        CJ_Utils.submitOnClick();
+    });
+</script>
 
 </body>
 </html>

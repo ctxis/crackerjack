@@ -16,3 +16,8 @@
 .select2-container {
     color: black;
 }
+
+/* Force a form to be inline */
+.force-inline {
+    display: inline;
+}

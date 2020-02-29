@@ -72,7 +72,10 @@
                                 {% endif %}
                             </span>
                             {% if session.hashes_in_file > 0 or session.hashes_in_file == -1 %}
-                            <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}" class="text-warning ml-1" title="download"><i class="fas fa-file-download fa-lg"></i></a>
+                            <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}" method="post" class="force-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <a href="#" class="text-warning ml-1 submit-on-click" title="download"><i class="fas fa-file-download fa-lg"></i></a>
+                            </form>
                             {% endif %}
                         </td>
                     </tr>
@@ -81,7 +84,16 @@
                         <td class="text-right">
                             <span>{{ '{0:,}'.format(session.hashcat.cracked_passwords) }}/{{ '{0:,}'.format(session.hashcat.all_passwords) }}</span>
                             {% if session.hashcat.cracked_passwords > 0 %}
-                            <a href="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" class="text-warning ml-1" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
+                            <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" method="post" class="force-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <a href="#" class="text-warning ml-1 submit-on-click" title="Download cracked hashes+plain"><i class="fas fa-file-download fa-lg"></i></a>
+                            </form>
+                                {% if session.hashcat.state != 1 %}
+                                <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file='plain') }}" method="post" class="force-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <a href="#" class="text-success ml-1 submit-on-click" title="Download cracked plain passwords"><i class="fas fa-file-download fa-lg"></i></a>
+                                </form>
+                                {% endif %}
                             {% endif %}
                         </td>
                     </tr>

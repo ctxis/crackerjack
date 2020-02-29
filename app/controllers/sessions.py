@@ -380,7 +380,7 @@ def action(session_id):
     return redirect(url_for('sessions.view', session_id=session_id))
 
 
-@bp.route('/<int:session_id>/download/<string:which_file>', methods=['GET'])
+@bp.route('/<int:session_id>/download/<string:which_file>', methods=['POST'])
 @login_required
 def download_file(session_id, which_file):
     provider = Provider()
