@@ -21,3 +21,5 @@ data/*
 
 os/config/*
 !os/config/.gitkeep
+
+setup/ansible/vars.yml
