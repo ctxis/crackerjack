@@ -44,12 +44,14 @@
                 {% endif %}
             </div>
         </div>
-        {% if session.hashcat.progress|int > 0 and session.hashcat.progress|int < 100 and session.hashcat.state == 1 %}
+        {% if session.hashcat.state == 1 %}
         <div class="row">
             <div class="col">
-                <div class="progress" style="height: 30px; font-size: 1.2em">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success text-dark" role="progressbar" aria-valuenow="{{ session.hashcat.progress|int }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ session.hashcat.progress|int }}%" title="{{ session.hashcat.progress }}%">{{ session.hashcat.progress }}%</div>
-                </div>
+                {% if session.hashcat.progress|int > 0 and session.hashcat.progress|int < 100 %}
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success text-dark" role="progressbar" aria-valuenow="{{ session.hashcat.progress|int }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ session.hashcat.progress|int }}%" title="{{ session.hashcat.progress }}%">{{ session.hashcat.progress }}%</div>
+                {% else %}
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-info text-dark" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%" title="Please Wait...">Please Wait...</div>
+                {% endif %}
             </div>
         </div>
         {% endif %}
@@ -78,5 +80,8 @@
 <script type="text/javascript">
     $(document).ready(function() {
         CJ_SessionsHeader.init('{{ session.terminate_at }}');
+        {% if session.hashcat.state == 1 %}
+        document.title = document.title + " ({{ '{0:,}'.format(session.hashcat.cracked_passwords) }}/{{ '{0:,}'.format(session.hashcat.all_passwords) }})";
+        {% endif %}
     });
 </script>
