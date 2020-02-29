@@ -341,9 +341,13 @@ class SessionManager:
         if which_file == 'cracked':
             file = self.session_filesystem.get_crackedfile_path(session.user_id, session_id)
             save_as = save_as + '.cracked'
-        elif which_file == 'hashes':
+        elif which_file == 'hashes' or which_file == 'all':
             file = self.session_filesystem.get_hashfile_path(session.user_id, session_id)
             save_as = save_as + '.hashes'
+        elif which_file == 'plain':
+            file = self.session_filesystem.get_custom_wordlist_path(session.user_id, session_id, prefix='pwd_wordlist')
+            self.export_cracked_passwords(session_id, file)
+            save_as = save_as + '.plain'
         else:
             # It means it's a raw/screen log file.
             files = self.get_data_files(session.user_id, session_id)

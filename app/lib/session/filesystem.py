@@ -115,8 +115,11 @@ class SessionFileSystem:
 
     def save_hashes(self, user_id, session_id, hashes):
         save_as = self.get_hashfile_path(user_id, session_id)
-        with open(save_as, 'w') as f:
-            f.write(hashes)
+        return self.write_to_file(save_as, hashes)
+
+    def write_to_file(self, file, data):
+        with open(file, 'w') as f:
+            f.write(data)
 
         return True
 

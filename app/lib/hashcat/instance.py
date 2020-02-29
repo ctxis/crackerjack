@@ -28,6 +28,10 @@ class HashcatInstance:
         return self._state
 
     @property
+    def state_description(self):
+        return self.__get_state_description(self.state)
+
+    @property
     def cracked_passwords(self):
         if self._cracked_passwords is None:
             self._cracked_passwords = self.data['cracked_passwords']
@@ -94,6 +98,10 @@ class HashcatInstance:
         return self.settings.increment_max if self.settings else 0
 
     @property
+    def increment_enabled(self):
+        return self.increment_min > 0 and self.increment_max > 0
+
+    @property
     def mode(self):
         return self.settings.mode if self.settings else ''
 
@@ -147,3 +155,25 @@ class HashcatInstance:
                 data = self.__load_tail_screen(next_size, kb_max, step)
 
         return data
+
+    def __get_state_description(self, state):
+        description = 'Unknown'
+
+        if state == 0:
+            description = 'Not Started'
+        elif state == 1:
+            description = 'Running'
+        elif state == 2:
+            description = 'Stopped'
+        elif state == 3:
+            description = 'Finished'
+        elif state == 4:
+            description = 'Paused'
+        elif state == 5:
+            description = 'Cracked'
+        elif state == 98:
+            description = 'Error'
+        elif state == 99:
+            description = 'Unknown'
+
+        return description

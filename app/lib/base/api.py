@@ -1,11 +1,8 @@
 import random
 import string
-import json
 from sqlalchemy import and_
 from app.lib.models.api import ApiKeys
-from app.lib.models.user import UserModel
 from app import db
-from flask import request, abort
 
 
 class ApiManager:
@@ -53,62 +50,3 @@ class ApiManager:
         db.session.commit()
 
         return True
-
-    def __auth(self, apikey):
-        if len(apikey) == 0:
-            return False
-
-        key = ApiKeys.query.filter(and_(ApiKeys.apikey == apikey, ApiKeys.enabled == True)).first()
-        if not key:
-            return False
-
-        return UserModel.query.filter(UserModel.id == key.user_id).first()
-
-    def create_session(self, user_id, name):
-        return self.sessions.create(user_id, name)
-
-    def prep_session_response(self, session):
-        # Remove sensitive or non-required parameters.
-        del session['user']
-        del session['screen_name']
-        del session['hashcat']['wordlist_path']
-        del session['hashcat']['rule_path']
-        del session['hashcat']['hashfile']
-
-        return session
-
-    def prep_wordlist_response(self, wordlists):
-        for key, data in wordlists.items():
-            del data['path']
-            del data['size_human']
-
-        return wordlists
-
-    def prep_rule_response(self, rules):
-        for key, data in rules.items():
-            del data['path']
-            del data['size_human']
-
-        return rules
-
-    def response(self, result, message='', data=None):
-        resp = {
-            'success': result,
-            'message': message,
-            'data': '' if data is None else data
-        }
-        return json.dumps(resp, default=str)
-
-    def auth_api(self):
-        apikey = request.headers['X-CrackerJack-Auth'] if 'X-CrackerJack-Auth' in request.headers else ''
-        user = self.__auth(apikey)
-        if not user:
-            abort(403)
-
-        return user
-
-    def get_json(self):
-        if not request.is_json:
-            abort(400)
-
-        return request.get_json()

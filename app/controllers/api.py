@@ -1,215 +1,364 @@
-from flask import Blueprint, request, abort
-from app.lib.base.provider import Provider
+from flask import Blueprint
+from app.lib.api.sessions import ApiSession
+from app.lib.api.hashes import ApiHashes
+from app.lib.api.hashcat import ApiHashcat
+from app.lib.api.wordlists import ApiWordlists
+from app.lib.api.rules import ApiRules
+from app.lib.api.mask import ApiMask
+from app.lib.api.auth import ApiAuth
+from app.lib.api.base import ApiBase
+from flask_login import current_user
 
 
 bp = Blueprint('api', __name__)
 
 
-@bp.route('/session/create', methods=['POST'])
+@bp.route('/sessions', methods=['POST'])
 def session_create():
-    provider = Provider()
-    api = provider.api()
-    sessions = provider.sessions()
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
 
-    user = api.auth_api()
-    data = api.get_json()
+    if not auth.auth(True):
+        return base.send_access_denied_response()
 
-    if 'name' not in data:
-        return api.response(False, 'Name not found in request')
-
-    session = api.create_session(user.id, data['name'])
-    if not session:
-        return api.response(False, 'Could not create session')
-
-    session = sessions.get(user.id, session.id)
-    session = api.prep_session_response(session[0])
-
-    return api.response(True, '', session)
+    return sessions.create(current_user.id, current_user.username)
 
 
-@bp.route('/session/<int:session_id>', methods=['GET'])
+@bp.route('/sessions', methods=['GET'])
+def session_get_all():
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+
+    return sessions.get_all(current_user.id)
+
+
+@bp.route('/sessions/<int:session_id>', methods=['GET'])
 def session_get(session_id):
-    provider = Provider()
-    api = provider.api()
-    sessions = provider.sessions()
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
 
-    user = api.auth_api()
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
 
-    if not sessions.can_access(user, session_id):
-        abort(403)
-
-    session = sessions.get(user.id, session_id)
-    session = api.prep_session_response(session[0])
-
-    return api.response(True, '', session)
+    return sessions.get(current_user.id, session_id)
 
 
-@bp.route('/session/<int:session_id>/hashes', methods=['POST'])
-def session_hashes(session_id):
-    provider = Provider()
-    api = provider.api()
-    sessions = provider.sessions()
+@bp.route('/sessions/<int:session_id>/validate', methods=['GET'])
+def session_validate(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
 
-    user = api.auth_api()
-    data = api.get_json()
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
 
-    if not sessions.can_access(user, session_id):
-        abort(403)
-
-    if 'hashes' not in data:
-        return api.response(False, 'Hashes not found in request')
-
-    sessions.session_filesystem.save_hashes(user.id, session_id, data['hashes'])
-
-    return api.response(True)
+    return sessions.validate(current_user.id, session_id)
 
 
-@bp.route('/session/<int:session_id>/hashcat', methods=['POST'])
-def session_hashcat(session_id):
-    provider = Provider()
-    api = provider.api()
-    hashcat = provider.hashcat()
-    sessions = provider.sessions()
-    wordlists = provider.wordlists()
-    rules = provider.rules()
+@bp.route('/sessions/<int:session_id>/state', methods=['GET'])
+def session_state(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
 
-    user = api.auth_api()
-    data = api.get_json()
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
 
-    if not sessions.can_access(user, session_id):
-        abort(403)
+    return sessions.state(current_user.id, session_id)
 
-    checks = {
-        'hash_type': 'Hash Type not found',
-        'mode': 'Mode not found',
-        'mask': 'Mask not found',
-        'increment_min': 'Increment Min not found',
-        'increment_max': 'Increment Max not found',
-        'wordlist': 'Wordlist not found',
-        'rule': 'Rule not found',
-        'enable_increments': 'Enable Increments not found',
-    }
 
-    for field, error in checks.items():
-        if field not in data:
-            return api.response(False, error)
+@bp.route('/sessions/<int:session_id>/termination', methods=['POST'])
+def session_termination(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
 
-    hash_type = data['hash_type']
-    mode = int(data['mode'])
-    mask = data['mode']
-    increment_min = int(data['increment_min'])
-    increment_max = int(data['increment_max'])
-    wordlist = data['wordlist']
-    rule = data['rule']
-    enable_increments = int(data['enable_increments'])
-    wordlist_location = ''
-    rule_location = ''
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
 
-    if not hashcat.is_valid_hash_type(hash_type):
-        return api.response(False, 'Invalid Hash Type')
-    elif mode != 0 and mode != 3:
-        return api.response(False, 'Invalid Mode')
-    elif mode == 0:
-        if not wordlists.is_valid_wordlist(wordlist):
-            return api.response(False, 'Invalid Wordlist')
-        elif len(rule) > 0 and not rules.is_valid_rule(rule):
-            return api.response(False, 'Invalid Rule')
+    return sessions.termination(current_user.id, session_id)
 
-        wordlist_location = wordlists.get_wordlist_path(wordlist)
-        rule_location = rules.get_rule_path(rule)
-    elif mode == 3:
-        if enable_increments > 0:
-            if increment_min <= 0:
-                return api.response(False, 'Invalid Increment Minimum')
-            elif increment_max <= 0:
-                return api.response(False, 'Invalid Increment Maximum')
-            elif increment_min > increment_max:
-                return api.response(False, 'Increment Minimum cannot be bigger than Increment Maximum')
 
-    sessions.set_hashcat_setting(session_id, 'mode', mode)
-    sessions.set_hashcat_setting(session_id, 'hashtype', hash_type)
-    sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
-    sessions.set_hashcat_setting(session_id, 'rule', rule_location)
-    sessions.set_hashcat_setting(session_id, 'mask', mask)
-    sessions.set_hashcat_setting(session_id, 'increment_min', increment_min)
-    sessions.set_hashcat_setting(session_id, 'increment_max', increment_max)
+@bp.route('/sessions/<int:session_id>/notifications', methods=['POST'])
+def session_notifications(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
 
-    session = sessions.get(user.id, session_id)
-    session = api.prep_session_response(session[0])
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
 
-    return api.response(True, '', session)
+    return sessions.notifications(current_user.id, session_id)
+
+
+@bp.route('/sessions/<int:session_id>/execute', methods=['POST'])
+def session_action(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return sessions.action(current_user.id, session_id)
+
+
+@bp.route('/hashes/<int:session_id>/upload', methods=['POST'])
+def hashes_upload(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    hashes = ApiHashes()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return hashes.upload(current_user.id, session_id)
+
+
+@bp.route('/hashes/remote', methods=['GET'])
+def hashes_remote():
+    auth = ApiAuth()
+    base = ApiBase()
+    hashes = ApiHashes()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+
+    return hashes.get_remote()
+
+
+@bp.route('/hashes/<int:session_id>/remote', methods=['POST'])
+def hashes_remote_set(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    hashes = ApiHashes()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return hashes.set_remote(current_user.id, session_id)
+
+
+@bp.route('/hashes/<int:session_id>/download', methods=['POST'])
+def hashes_download(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    hashes = ApiHashes()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return hashes.download(current_user.id, session_id)
+
+
+@bp.route('/hashcat/types', methods=['GET'])
+def hashcat_types():
+    auth = ApiAuth()
+    base = ApiBase()
+    hashcat = ApiHashcat()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+
+    return hashcat.get_types()
+
+
+@bp.route('/hashcat/<int:session_id>/type', methods=['POST'])
+def hashcat_type_set(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    hashcat = ApiHashcat()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return hashcat.set_type(current_user.id, session_id)
+
+
+@bp.route('/hashcat/<int:session_id>/optimise', methods=['POST'])
+def hashcat_set_optimisation(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    hashcat = ApiHashcat()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return hashcat.set_optimisation(current_user.id, session_id)
+
+
+@bp.route('/hashcat/<int:session_id>/mode', methods=['POST'])
+def hashcat_set_mode(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    hashcat = ApiHashcat()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return hashcat.set_mode(current_user.id, session_id)
+
+
+@bp.route('/mask/<int:session_id>', methods=['POST'])
+def mask_set(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    mask = ApiMask()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return mask.set_mask(current_user.id, session_id)
+
+
+@bp.route('/mask/<int:session_id>/increment', methods=['POST'])
+def mask_increment_set(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    mask = ApiMask()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return mask.set_increment(current_user.id, session_id)
 
 
 @bp.route('/wordlists', methods=['GET'])
-def wordlists_get():
-    provider = Provider()
-    api = provider.api()
-    wordlists = provider.wordlists()
+def wordlists():
+    auth = ApiAuth()
+    base = ApiBase()
+    wordlists = ApiWordlists()
 
-    user = api.auth_api()
+    if not auth.auth(True):
+        return base.send_access_denied_response()
 
-    all_wordlists = api.prep_wordlist_response(wordlists.get_wordlists())
+    return wordlists.get()
 
-    return api.response(True, '', all_wordlists)
+
+@bp.route('/wordlists/<int:session_id>/type', methods=['POST'])
+def wordlist_set_type(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    wordlists = ApiWordlists()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return wordlists.set_type(current_user.id, session_id)
+
+
+@bp.route('/wordlists/<int:session_id>/global', methods=['POST'])
+def wordlist_set_global(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    wordlists = ApiWordlists()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return wordlists.set_global(current_user.id, session_id)
+
+
+@bp.route('/wordlists/<int:session_id>/custom', methods=['POST'])
+def wordlist_set_custom(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    wordlists = ApiWordlists()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return wordlists.set_custom(current_user.id, session_id)
+
+
+@bp.route('/wordlists/<int:session_id>/cracked', methods=['POST'])
+def wordlist_set_cracked(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    wordlists = ApiWordlists()
+
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
+
+    return wordlists.set_cracked(current_user.id, session_id)
 
 
 @bp.route('/rules', methods=['GET'])
-def rules_get():
-    provider = Provider()
-    api = provider.api()
-    rules = provider.rules()
+def rules():
+    auth = ApiAuth()
+    base = ApiBase()
+    rules = ApiRules()
 
-    user = api.auth_api()
+    if not auth.auth(True):
+        return base.send_access_denied_response()
 
-    all_rules = api.prep_rule_response(rules.get_rules())
-
-    return api.response(True, '', all_rules)
-
-
-@bp.route('/hashtypes', methods=['GET'])
-def hashtypes_get():
-    provider = Provider()
-    api = provider.api()
-    hashcat = provider.hashcat()
-
-    user = api.auth_api()
-
-    types = hashcat.compact_hashes(hashcat.get_supported_hashes())
-
-    return api.response(True, '', types)
+    return rules.get()
 
 
-@bp.route('/session/<int:session_id>/action', methods=['POST'])
-def session_action(session_id):
-    provider = Provider()
-    api = provider.api()
-    sessions = provider.sessions()
+@bp.route('/rules/<int:session_id>', methods=['POST'])
+def rule_set(session_id):
+    auth = ApiAuth()
+    base = ApiBase()
+    sessions = ApiSession()
+    rules = ApiRules()
 
-    user = api.auth_api()
-    data = api.get_json()
+    if not auth.auth(True):
+        return base.send_access_denied_response()
+    elif not sessions.can_access(current_user, session_id):
+        return base.send_access_denied_response()
 
-    if not sessions.can_access(user, session_id):
-        abort(403)
-
-    if 'action' not in data:
-        return api.response(False, 'Action not found in request')
-
-    action = data['action']
-    if not sessions.hashcat_action(session_id, action):
-        return api.response(False, 'Could not execute action')
-
-    return api.response(True)
-
-
-@bp.route('/session/<int:session_id>/download/<string:which_file>', methods=['POST'])
-def session_download(session_id, which_file):
-    provider = Provider()
-    api = provider.api()
-    sessions = provider.sessions()
-
-    user = api.auth_api()
-
-    if not sessions.can_access(user, session_id):
-        abort(403)
-
-    return sessions.download_file(session_id, which_file)
+    return rules.set(current_user.id, session_id)

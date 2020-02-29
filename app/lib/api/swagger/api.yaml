@@ -1,0 +1,817 @@
+swagger: '2.0'
+info:
+  title: CrackerJack API
+  version: "1.0.0"
+schemes:
+  - https
+  - http
+securityDefinitions:
+  APIKeyHeader:
+    type: apiKey
+    in: header
+    name: X-CrackerJack-Auth
+basePath: /api/v1
+produces:
+  - application/json
+consumes:
+  - application/json
+security:
+  - APIKeyHeader: []
+paths:
+  /sessions:
+    post:
+      summary: Create session
+      parameters:
+        - name: sessionDescription
+          in: body
+          description: Session Description
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+      tags:
+        - session
+      responses:
+        200:
+          $ref: '#/definitions/NewSession'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+    get:
+      summary: Get all sessions
+      tags:
+        - session
+      responses:
+        200:
+          description: All sessions
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Session'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /sessions/{id}:
+    get:
+      summary: Get specific session
+      tags:
+        - session
+      parameters:
+        - name: id
+          description: session id to fetch
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          $ref: '#/definitions/Session'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /sessions/{id}/validate:
+    get:
+      summary: Validate session
+      tags:
+        - session
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Validation errors
+          schema:
+            type: array
+            items:
+              type: string
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /sessions/{id}/state:
+    get:
+      summary: Get session state
+      tags:
+        - session
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          $ref: '#/definitions/SessionState'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /sessions/{id}/termination:
+    post:
+      summary: Set session termination datetime
+      tags:
+        - session
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: termination
+          description: Date/time
+          in: body
+          schema:
+            $ref: '#/definitions/DateTime'
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /sessions/{id}/notifications:
+    post:
+      summary: Set notifications
+      tags:
+        - session
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: notifications
+          description: Enabled/Disabled
+          in: body
+          schema:
+            type: object
+            required:
+              - state
+            properties:
+              state:
+                type: boolean
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /sessions/{id}/execute:
+    post:
+      summary: Execute action
+      tags:
+        - session
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: action
+          description: Action to execute
+          in: body
+          schema:
+            type: object
+            required:
+              - action
+            properties:
+              action:
+                type: string
+                enum:
+                  - start
+                  - stop
+                  - pause
+                  - rebuild
+                  - restore
+      responses:
+        200:
+          $ref: '#/definitions/SessionState'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /hashes/{id}/upload:
+    post:
+      summary: Upload hashes
+      tags:
+        - hashes
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: hashes
+          in: body
+          description: Hashes
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: string
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /hashes/remote:
+    get:
+      summary: Get a list of already uploaded hash files (used for large files)
+      tags:
+        - hashes
+      responses:
+        200:
+          description: All Files
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/File'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /hashes/{id}/remote:
+    post:
+      summary: Set hashes to already uploaded files
+      tags:
+        - hashes
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: file
+          in: body
+          description: Filename
+          schema:
+            type: object
+            required:
+              - file
+            properties:
+              file:
+                type: string
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /hashes/{id}/download:
+    post:
+      summary: Download hashes/passwords
+      produces:
+        - text/plain
+      tags:
+        - hashes
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: type
+          description: Download type
+          in: body
+          schema:
+            type: object
+            required:
+              - type
+            properties:
+              type:
+                type: string
+                enum:
+                  - all
+                  - cracked
+                  - plain
+      responses:
+        200:
+          description: Passwords/Hashes
+          schema:
+            type: file
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /hashcat/types:
+    get:
+      summary: Get supported hash types
+      tags:
+        - hashcat
+      responses:
+        200:
+          description: All supported hash types
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/HashType'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /hashcat/{id}/type:
+    post:
+      summary: Set hash type for the session
+      tags:
+        - hashcat
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: type
+          in: body
+          description: Hash type
+          schema:
+            type: object
+            required:
+              - type
+            properties:
+              type:
+                type: string
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /hashcat/{id}/optimise:
+    post:
+      summary: Set optimisation setting
+      tags:
+        - hashcat
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: optimisation
+          in: body
+          description: Enabled/Disabled
+          schema:
+            type: object
+            required:
+              - optimise
+            properties:
+              optimise:
+                type: boolean
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /hashcat/{id}/mode:
+    post:
+      summary: Set hashcat mode (wordlist/mask)
+      tags:
+        - hashcat
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: mode
+          description: Mode (wordlist/mask)
+          in: body
+          schema:
+            type: object
+            required:
+              - mode
+            properties:
+              mode:
+                type: string
+                enum:
+                  - wordlist
+                  - mask
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /mask/{id}:
+    post:
+      summary: Set mask for session
+      tags:
+        - mask
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: mask
+          description: Mask
+          in: body
+          schema:
+            type: object
+            required:
+              - mask
+            properties:
+              mask:
+                type: string
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /mask/{id}/increment:
+    post:
+      summary: Set increment options for mask attack
+      tags:
+        - mask
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: increments
+          description: Increment options
+          in: body
+          schema:
+            $ref: '#/definitions/Increment'
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /wordlists:
+    get:
+      summary: Get global wordlists
+      tags:
+        - wordlist
+      responses:
+        200:
+          description: All Files
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/File'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /wordlists/{id}/type:
+    post:
+      summary: Set wordlist type
+      tags:
+        - wordlist
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: type
+          description: Wordlist type
+          in: body
+          schema:
+            type: object
+            required:
+              - type
+            properties:
+              type:
+                type: string
+                enum:
+                  - global
+                  - custom
+                  - cracked
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /wordlists/{id}/global:
+    post:
+      summary: Set session wordlist
+      tags:
+        - wordlist
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: wordlist
+          description: Wordlist name
+          in: body
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /wordlists/{id}/custom:
+    post:
+      summary: Upload custom wordlist
+      tags:
+        - wordlist
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: words
+          description: Wordlist data
+          in: body
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: string
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /wordlists/{id}/cracked:
+    post:
+      summary: Build wordlist from cracked passwords
+      tags:
+        - wordlist
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /rules:
+    get:
+      summary: Get global rules
+      tags:
+        - rules
+      responses:
+        200:
+          description: All Files
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/File'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+  /rules/{id}:
+    post:
+      summary: Set session rule
+      tags:
+        - rules
+      parameters:
+        - name: id
+          description: Session id
+          in: path
+          required: true
+          type: integer
+        - name: rule
+          description: Rule name
+          in: body
+          schema:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+      responses:
+        200:
+          $ref: '#/definitions/Response'
+        401:
+          $ref: '#/definitions/Response'
+        500:
+          $ref: '#/definitions/Response'
+definitions:
+  Response:
+    type: object
+    properties:
+      success:
+        type: boolean
+        description: Action result
+      code:
+        type: integer
+        description: Error code, if any.
+      message:
+        type: string
+        description: Short Message
+      details:
+        type: string
+        description: Additional details
+  NewSession:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Id of the newly created session
+  Session:
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Session Id
+      description:
+        type: string
+        description: Session description
+      name:
+        type: string
+        description: Name
+      username:
+        type: string
+        description: Session owner
+      terminateAt:
+        type: string
+        description: Session termination date
+      userId:
+        type: integer
+        description: Session owner user id
+      screenName:
+        type: string
+        description: Screen name running the hashcat session
+      active:
+        type: boolean
+        description: Whether the session is active or not
+      notificationsEnabled:
+        type: boolean
+        description: Whether the session has enabled web push notifications
+      createdAt:
+        type: string
+        description: Session creation date
+      friendlyName:
+        type: string
+        description: Session friendly name
+      hashesInFile:
+        type: integer
+        description: Uploaded hashes count
+      hashFileExists:
+        type: boolean
+        description: Whether the hash file has been successfully created
+      validation:
+        type: array
+        items:
+          type: string
+      history:
+        type: string
+        description: Session history
+      guessHashType:
+        type: string
+        description: Session hash type guess
+      hashcat:
+        $ref: '#/definitions/Hashcat'
+  Hashcat:
+    type: object
+    properties:
+      state:
+        type: integer
+        description: Running state
+      crackedPasswords:
+        type: integer
+        description: Hashes cracked so far
+      allPasswords:
+        type: integer
+        description: All uploaded hashes
+      progress:
+        type: number
+        description: Cracked progress %
+      timeRemaining:
+        type: string
+        description: Remaining time
+      estimatedCompletionTime:
+        type: string
+        description: ETA for completion
+      dataRaw:
+        type: string
+        description: Raw Hashcat data
+      data:
+        type: string
+        description: Raw parsed data
+      incrementMin:
+        type: integer
+        description: Min increment value
+      incrementMax:
+        type: integer
+        description: Max increment value
+      incrementEnabled:
+        type: boolean
+        description: Whether increment are enabled/disabled
+      mode:
+        type: integer
+        description: Hashcat cracking mode
+      hashType:
+        type: string
+        description: Hash type
+      wordlistType:
+        type: integer
+        description: Wordlist type (global, uploaded, generated)
+      wordlist:
+        type: string
+        description: Current wordlist
+      rule:
+        type: string
+        description: Current rule
+      mask:
+        type: string
+        description: Current mask
+      optimisedKernel:
+        type: boolean
+        description: Whether optimised kernel is enabled/disabled
+  SessionState:
+    type: object
+    properties:
+      state:
+        type: integer
+        description: State Code
+      description:
+        type: string
+        description: State Description
+      progress:
+        type: number
+        description: Cracking Progress
+  File:
+    type: object
+    properties:
+      name:
+        type: string
+        description: File name
+      size:
+        type: number
+        description: File size
+  HashType:
+    type: object
+    properties:
+      type:
+        type: string
+        description: Hash type
+      name:
+        type: string
+        description: Hash name
+  Increment:
+    type: object
+    properties:
+      state:
+        type: boolean
+        description: Enabled/Disabled
+      min:
+        type: integer
+        description: Min Increment
+      max:
+        type: integer
+        description: Max Increment
+  DateTime:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date
+        description: Date
+        example: YYYY-MM-DD
+      time:
+        type: string
+        format: time
+        description: Time
+        example: HH:MM

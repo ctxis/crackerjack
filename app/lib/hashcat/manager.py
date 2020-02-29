@@ -175,7 +175,7 @@ class HashcatManager:
                 -3
                 ?d?s
                 -4
-                a-b??d
+                ab??d
         """
         charset = False
         all_charsets = []

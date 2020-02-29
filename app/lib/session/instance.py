@@ -1,12 +1,8 @@
 import os
 from app.lib.models.user import UserModel
-from app.lib.models.hashcat import HashcatModel, HashcatHistoryModel
-from sqlalchemy import and_, desc
+from app.lib.models.hashcat import HashcatHistoryModel
+from sqlalchemy import desc
 
-
-# 'guess_hashtype': self.guess_hashtype(session.user_id, session.id),
-# 'hashcat_history': self.__get_hashcat_history(session_id),
-# validation
 
 class SessionInstance:
     def __init__(self, session, hashcat, filesystem, hashid):
