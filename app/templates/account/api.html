@@ -7,6 +7,7 @@
         <div class="card">
             <h3 class="card-header">API Keys</h3>
             <div class="card-body">
+                <p><a href="{{ url_for('api.swagger') }}">For the Swagger 2.0 definition click here</a></p>
                 <form method="post" action="{{ url_for('account.api_add', user_id=current_user.id) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
