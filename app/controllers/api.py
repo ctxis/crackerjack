@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, Response
 from app.lib.api.sessions import ApiSession
 from app.lib.api.hashes import ApiHashes
 from app.lib.api.hashcat import ApiHashcat
@@ -11,6 +11,17 @@ from flask_login import current_user
 
 
 bp = Blueprint('api', __name__)
+
+
+@bp.route('/swagger.yaml', methods=['GET'])
+def swagger():
+    base = ApiBase()
+    data = base.get_swagger_file('v1')
+
+    response = Response()
+    response.headers.add('Content-Type', 'text/plain')
+    response.data = data
+    return response
 
 
 @bp.route('/sessions', methods=['POST'])

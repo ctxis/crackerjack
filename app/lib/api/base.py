@@ -1,10 +1,24 @@
 import json
+import os
 from flask import request
 from app.lib.api.definitions.response import Response
 from app.lib.api.definitions.file import File
 
 
 class ApiBase:
+    def get_swagger_file(self, version):
+        if not version in ['v1']:
+            return 'Invalid API Version'
+
+        definition = os.path.join(os.path.dirname(__file__), 'swagger', version + '.yaml')
+        if not os.path.isfile(definition):
+            return 'API definition does not exist'
+
+        with open(definition, 'r') as f:
+            contents = f.read()
+
+        return contents
+
     def send_valid_response(self, object):
         return self.toJSON(object), 200
 
