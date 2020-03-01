@@ -3,7 +3,6 @@
     name: "{{ packages }}"
   vars:
     packages:
-      - vim
       - git
       - screen
       - sqlite3

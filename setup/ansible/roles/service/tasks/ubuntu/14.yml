@@ -5,10 +5,10 @@
 #     > Unable to enable service crackerjack: Failed to execute operation: Too many levels of symbolic links
 - name: "Creating link to service"
   when: existing_service.stat.exists == False
-  file:
+  copy:
     src: "{{ crackerjack.destination }}/data/config/service/crackerjack.service"
     dest: "/etc/init.d/crackerjack"
-    state: link
+    remote_src: yes
 
 - name: "Enabling and starting service"
   service:
