@@ -53,7 +53,8 @@ class UserManager:
         if ldap == 0:
             # There is no point in updating these if it's an LDAP user.
             user.username = username
-            user.password = password
+            if len(password) > 0:
+                user.password = password
             user.full_name = full_name
             user.email = email
 
