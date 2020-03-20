@@ -29,7 +29,7 @@
                         <td class="text-right">{{ file.created_at }}</td>
                         <td class="text-right">{{ file.size_human }}</td>
                         <td class="text-right">
-                            <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file=filename) }}" method="post" class="force-inline">
+                            <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file=filename) }}" method="post" class="force-inline" autocomplete="off">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <a href="#" class="text-warning submit-on-click" title="Download"><i class="fas fa-file-download"></i></a>
                             </form>

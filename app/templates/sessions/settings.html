@@ -13,7 +13,7 @@
         <div class="card">
             <h4 class="card-header">Settings</h4>
             <div class="card-body">
-                <form method="post" action="{{ url_for('sessions.settings_save', session_id=session.id) }}">
+                <form method="post" action="{{ url_for('sessions.settings_save', session_id=session.id) }}" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <label>Session will terminate on</label>

@@ -7,7 +7,7 @@
         <div class="card">
             <h3 class="card-header">Theme Settings</h3>
             <div class="card-body">
-                <form method="post" action="{{ url_for('account.theme_save', user_id=user.id) }}">
+                <form method="post" action="{{ url_for('account.theme_save', user_id=user.id) }}" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="form-group clearfix">

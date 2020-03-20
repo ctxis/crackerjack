@@ -6,7 +6,7 @@
     <div class="col">
         <h3 class="card-header">Settings</h3>
         <div class="card-body">
-            <form method="post" action="{{ url_for('admin.settings_general_save') }}">
+            <form method="post" action="{{ url_for('admin.settings_general_save') }}" autocomplete="off">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <h2>General</h2>

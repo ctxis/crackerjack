@@ -7,7 +7,7 @@
         <div class="card">
             <h3 class="card-header">Auth Settings</h3>
             <div class="card-body">
-                <form method="post" action="{{ url_for('admin.settings_auth_save') }}">
+                <form method="post" action="{{ url_for('admin.settings_auth_save') }}" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <ul class="nav nav-tabs">

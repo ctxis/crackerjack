@@ -18,7 +18,7 @@
         {% include 'sessions/includes/nav.html' %}
     </div>
     <div class="col">
-        <form id="setup-hashcat" method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_wordlist_save', session_id=session.id) }}">
+        <form id="setup-hashcat" method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_wordlist_save', session_id=session.id) }}" autocomplete="off">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <div class="card">

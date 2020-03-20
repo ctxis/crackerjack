@@ -8,7 +8,7 @@
             <h3 class="card-header">API Keys</h3>
             <div class="card-body">
                 <p><a href="{{ url_for('api.swagger') }}">For the Swagger 2.0 definition click here</a></p>
-                <form method="post" action="{{ url_for('account.api_add', user_id=current_user.id) }}">
+                <form method="post" action="{{ url_for('account.api_add', user_id=current_user.id) }}" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="row">
@@ -39,7 +39,7 @@
                         <td>{{ apikey.name }}</td>
                         <td class="text-monospace">{{ apikey.apikey }}</td>
                         <td class="text-center">
-                            <form id="api-set-status" method="post" action="{{ url_for('account.api_set_status', user_id=current_user.id, key_id=apikey.id) }}">
+                            <form id="api-set-status" method="post" action="{{ url_for('account.api_set_status', user_id=current_user.id, key_id=apikey.id) }}" autocomplete="off">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 {% if apikey.enabled %}
                                 <input type="hidden" name="action" value="disable">

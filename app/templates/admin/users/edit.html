@@ -8,7 +8,7 @@
             <h3 class="card-header">{{ 'New User' if user == None else 'Edit User' }}</h3>
             <div class="card-body">
                 {% set user_id = 0 if user == None else user.id %}
-                <form method="post" action="{{ url_for('admin.user_save', user_id=user_id) }}">
+                <form method="post" action="{{ url_for('admin.user_save', user_id=user_id) }}" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="form-group">

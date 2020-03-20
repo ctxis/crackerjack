@@ -21,7 +21,7 @@
         <div class="card">
             <h4 class="card-header">Hashes</h4>
             <div class="card-body">
-                <form method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_hashes_save', session_id=session.id) }}">
+                <form method="post" enctype="multipart/form-data" action="{{ url_for('sessions.setup_hashes_save', session_id=session.id) }}" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="form-group">

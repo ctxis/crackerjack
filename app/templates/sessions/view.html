@@ -72,7 +72,7 @@
                                 {% endif %}
                             </span>
                             {% if session.hashes_in_file > 0 or session.hashes_in_file == -1 %}
-                            <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}" method="post" class="force-inline">
+                            <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file='hashes') }}" method="post" class="force-inline" autocomplete="off">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <a href="#" class="text-warning ml-1 submit-on-click" title="download"><i class="fas fa-file-download fa-lg"></i></a>
                             </form>
@@ -84,12 +84,12 @@
                         <td class="text-right">
                             <span>{{ '{0:,}'.format(session.hashcat.cracked_passwords) }}/{{ '{0:,}'.format(session.hashcat.all_passwords) }}</span>
                             {% if session.hashcat.cracked_passwords > 0 %}
-                            <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" method="post" class="force-inline">
+                            <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" method="post" class="force-inline" autocomplete="off">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <a href="#" class="text-warning ml-1 submit-on-click" title="Download cracked hashes+plain"><i class="fas fa-file-download fa-lg"></i></a>
                             </form>
                                 {% if session.hashcat.state != 1 %}
-                                <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file='plain') }}" method="post" class="force-inline">
+                                <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file='plain') }}" method="post" class="force-inline" autocomplete="off">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <a href="#" class="text-success ml-1 submit-on-click" title="Download cracked plain passwords"><i class="fas fa-file-download fa-lg"></i></a>
                                 </form>
@@ -157,7 +157,7 @@
                     <td class="text-right">{{ history.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                     <td class="text-center">{{ 'Yes' if history.optimised_kernel == 1 else 'No' }}</td>
                     <td class="text-center">
-                        <form action="{{ url_for('sessions.history_apply', session_id=history.session_id, history_id=history.id) }}" method="post" id="form-apply-history-{{ history.id }}">
+                        <form action="{{ url_for('sessions.history_apply', session_id=history.session_id, history_id=history.id) }}" method="post" id="form-apply-history-{{ history.id }}" autocomplete="off">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <a href="{{ url_for('sessions.history_apply', session_id=history.session_id, history_id=history.id) }}" data-id="{{ history.id }}" title="Apply these settings to the current session" class="apply-history-settings"><i class="fas fa-redo"></i></a>
                         </form>

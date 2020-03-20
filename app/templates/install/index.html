@@ -7,7 +7,7 @@
         <div class="card">
             <h3 class="card-header">CrackerJack Setup</h3>
             <div class="card-body">
-                <form method="post" action="{{ url_for('install.save') }}">
+                <form method="post" action="{{ url_for('install.save') }}" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="form-group">

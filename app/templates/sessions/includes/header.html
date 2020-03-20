@@ -12,7 +12,7 @@
                 {% if session.validation|length > 0 %}
                 <button type="button" class="btn btn-warning" title="" data-container="body" data-toggle="popover" data-placement="left" data-content="* {{ session.validation|join('<br>* ') }}<br><br>Once you have fixed all the above issues, you will be able to start your session." data-original-title="Missing Configuration">Click here to identify missing configuration</button>
                 {% else %}
-                <form method="post" action="{{ url_for('sessions.action', session_id=session.id) }}" id="form-action">
+                <form method="post" action="{{ url_for('sessions.action', session_id=session.id) }}" id="form-action" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="action" id="action" value="">
 
