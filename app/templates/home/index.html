@@ -61,7 +61,9 @@
                     <thead>
                     <tr>
                         <th>ID</th>
+                        {% if current_user.admin %}
                         <th>User</th>
+                        {% endif %}
                         <th>Name</th>
                         <th>State</th>
                         <th class="text-right">Progress</th>
@@ -72,7 +74,9 @@
                     {% for session in sessions %}
                     <tr>
                         <td>{{ session.id }}</td>
+                        {% if current_user.admin %}
                         <td>{{ session.username }}</td>
+                        {% endif %}
                         <td><a href="{{ url_for('sessions.view', session_id=session.id) }}">{{ session.friendly_name }}</a></td>
                         <td class="table-{{ template().get_hashcat_running_class(session.hashcat.state) }}">{{ template().get_hashcat_running_text(session.hashcat.state) }}</td>
                         <td class="text-right">{{ session.hashcat.progress }}%</td>
