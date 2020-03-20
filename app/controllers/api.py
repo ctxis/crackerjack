@@ -59,7 +59,7 @@ def session_get(session_id):
     elif not sessions.can_access(current_user, session_id):
         return base.send_access_denied_response()
 
-    return sessions.get(current_user.id, session_id)
+    return sessions.get(user_id=current_user.id, session_id=session_id)
 
 
 @bp.route('/sessions/<int:session_id>/validate', methods=['GET'])

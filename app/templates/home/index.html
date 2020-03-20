@@ -57,6 +57,16 @@
         <div class="card">
             <h3 class="card-header">Sessions</h3>
             <div class="card-body">
+                <div class="clearfix mb-2">
+                    <div class="float-right">
+                        {% if show_all %}
+                        <a href="{{ url_for('home.index') }}">hide inactive sessions</a>
+                        {% else %}
+                        <a href="{{ url_for('home.index', all=1) }}">show inactive sessions</a>
+                        {% endif %}
+                    </div>
+                </div>
+
                 <table class="table table-sm table-striped">
                     <thead>
                     <tr>
@@ -68,6 +78,7 @@
                         <th>State</th>
                         <th class="text-right">Progress</th>
                         <th class="text-right">Cracked</th>
+                        <th class="text-center">State</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -89,6 +100,19 @@
                                     <a href="#" class="text-warning ml-1 submit-on-click" title="Download"><i class="fas fa-file-download fa-lg"></i></a>
                                 </form>
                             </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if session.active %}
+                            <form action="{{ url_for('sessions.active_action', session_id=session.id, action='hide') }}" method="post" class="force-inline" autocomplete="off">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <a href="#" class="submit-on-click" title="Click here to hide"><i class="fas fa-eye-slash"></i></a>
+                            </form>
+                            {% else %}
+                            <form action="{{ url_for('sessions.active_action', session_id=session.id, action='show') }}" method="post" class="force-inline" autocomplete="off">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <a href="#" class="submit-on-click" title="Click here to show"><i class="fas fa-eye"></i></a>
+                            </form>
                             {% endif %}
                         </td>
                     </tr>

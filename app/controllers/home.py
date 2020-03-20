@@ -28,17 +28,21 @@ def index():
         for error in errors:
             flash(error, 'error')
 
+    show_all = 'all' in request.args
+    active = None if show_all else True
+
     sessions = provider.sessions()
 
     if current_user.admin:
-        all_sessions = sessions.get()
+        all_sessions = sessions.get(active=active)
     else:
-        all_sessions = sessions.get(current_user.id)
+        all_sessions = sessions.get(user_id=current_user.id, active=active)
         
     processes = sessions.get_running_processes()
 
     return render_template(
         'home/index.html',
         sessions=all_sessions,
-        processes=processes
+        processes=processes,
+        show_all=show_all
     )

@@ -44,7 +44,7 @@ def setup_hashes(session_id):
         return redirect(url_for('home.index'))
 
     user_id = 0 if current_user.admin else current_user.id
-    session = sessions.get(user_id, session_id)[0]
+    session = sessions.get(user_id=user_id, session_id=session_id)[0]
 
     uploaded_hashfiles = uploaded_hashes.get_uploaded_hashes()
 
@@ -121,7 +121,7 @@ def setup_hashcat(session_id):
         return redirect(url_for('home.index'))
 
     user_id = 0 if current_user.admin else current_user.id
-    session = sessions.get(user_id, session_id)[0]
+    session = sessions.get(user_id=user_id, session_id=session_id)[0]
 
     supported_hashes = hashcat.get_supported_hashes()
     # We need to process the array in a way to make it easy for JSON usage.
@@ -186,7 +186,7 @@ def setup_mask(session_id):
         return redirect(url_for('home.index'))
 
     user_id = 0 if current_user.admin else current_user.id
-    session = sessions.get(user_id, session_id)[0]
+    session = sessions.get(user_id=user_id, session_id=session_id)[0]
 
     return render_template(
         'sessions/setup/mask.html',
@@ -257,7 +257,7 @@ def setup_wordlist(session_id):
         return redirect(url_for('home.index'))
 
     user_id = 0 if current_user.admin else current_user.id
-    session = sessions.get(user_id, session_id)[0]
+    session = sessions.get(user_id=user_id, session_id=session_id)[0]
 
     password_wordlists = wordlists.get_wordlists()
     hashcat_rules = rules.get_rules()
@@ -341,7 +341,7 @@ def view(session_id):
         return redirect(url_for('home.index'))
 
     user_id = 0 if current_user.admin else current_user.id
-    session = sessions.get(user_id, session_id)[0]
+    session = sessions.get(user_id=user_id, session_id=session_id)[0]
 
     supported_hashes = hashcat.get_supported_hashes()
     # We need to process the array in a way to make it easy for JSON usage.
@@ -365,7 +365,7 @@ def action(session_id):
         return redirect(url_for('home.index'))
 
     user_id = 0 if current_user.admin else current_user.id
-    session = sessions.get(user_id, session_id)[0]
+    session = sessions.get(user_id=user_id, session_id=session_id)[0]
 
     if len(session.validation) > 0:
         flash('Please configure all required settings and try again.', 'error')
@@ -404,7 +404,7 @@ def settings(session_id):
         return redirect(url_for('home.index'))
 
     user_id = 0 if current_user.admin else current_user.id
-    session = sessions.get(user_id, session_id)[0]
+    session = sessions.get(user_id=user_id, session_id=session_id)[0]
 
     return render_template(
         'sessions/settings.html',
@@ -479,7 +479,7 @@ def status(session_id):
         return json.dumps(response)
 
     user_id = 0 if current_user.admin else current_user.id
-    session = sessions.get(user_id, session_id)[0]
+    session = sessions.get(user_id=user_id, session_id=session_id)[0]
 
     return json.dumps({'result': True, 'status': session.hashcat.state})
 
@@ -495,7 +495,7 @@ def files(session_id):
         return redirect(url_for('home.index'))
 
     user_id = 0 if current_user.admin else current_user.id
-    session = sessions.get(user_id, session_id)[0]
+    session = sessions.get(user_id=user_id, session_id=session_id)[0]
     files = sessions.get_data_files(current_user.id, session_id)
 
     return render_template(
@@ -503,3 +503,24 @@ def files(session_id):
         session=session,
         files=files
     )
+
+
+@bp.route('/<int:session_id>/active/<string:action>', methods=['POST'])
+@login_required
+def active_action(session_id, action):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    if action not in ['show', 'hide']:
+        flash('Invalid Action', 'error')
+        return redirect(url_for('home.index'))
+
+    active = True if action == 'show' else False
+    sessions.set_active(session_id, active)
+
+    flash('Session updated', 'success')
+    return redirect(url_for('home.index'))

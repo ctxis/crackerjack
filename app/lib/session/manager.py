@@ -108,16 +108,18 @@ class SessionManager:
 
         return True if history else False
 
-    def get(self, user_id=0, session_id=0):
-        conditions = and_(1 == 1)
-        if user_id > 0 and session_id > 0:
-            conditions = and_(SessionModel.user_id == user_id, SessionModel.id == session_id)
-        elif user_id > 0:
-            conditions = and_(SessionModel.user_id == user_id)
-        elif session_id > 0:
-            conditions = and_(SessionModel.id == session_id)
+    def get(self, user_id=0, session_id=0, active=None):
+        query = SessionModel.query
+        if user_id > 0:
+            query = query.filter(SessionModel.user_id == user_id)
 
-        sessions = SessionModel.query.filter(conditions).order_by(desc(SessionModel.id)).all()
+        if session_id > 0:
+            query = query.filter(SessionModel.id == session_id)
+
+        if active is not None:
+            query = query.filter(SessionModel.active == active)
+
+        sessions = query.all()
 
         data = []
         for session in sessions:
@@ -524,4 +526,12 @@ class SessionManager:
                 print("Could not send notification")
 
         print("Finished sending notifications")
+        return True
+
+    def set_active(self, session_id, active):
+        session = self.__get_by_id(session_id)
+        session.active = active
+
+        db.session.commit()
+        db.session.refresh(session)
         return True
