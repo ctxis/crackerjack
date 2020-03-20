@@ -110,6 +110,15 @@ def create_app(config_class=None):
             app.permanent_session_lifetime = datetime.timedelta(minutes=20)
             session.modified = True
 
+    @app.after_request
+    def after_request(response):
+        response.headers['Server'] = 'Windows 98'
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['Referrer-Policy'] = 'no-referrer'
+        return response
+
     @app.errorhandler(500)
     def internal_error(error):
         return render_template('errors/500.html', error=error), 500
