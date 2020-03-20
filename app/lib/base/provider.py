@@ -17,6 +17,7 @@ from app.lib.base.cron import CronManager
 from app.lib.base.hashid import HashIdentifier
 from app.lib.base.webpush import WebPushManager
 from app.lib.base.hashes import HashesManager
+from app.lib.base.password_complexity import PasswordComplexityManager
 from flask_login import current_user
 
 
@@ -92,7 +93,17 @@ class Provider:
         return manager
 
     def users(self):
-        return UserManager()
+        return UserManager(self.password_complexity())
+
+    def password_complexity(self):
+        settings = self.settings()
+        return PasswordComplexityManager(
+            settings.get('pwd_min_length', 12),
+            settings.get('pwd_min_lower', 2),
+            settings.get('pwd_min_upper', 2),
+            settings.get('pwd_min_digits', 2),
+            settings.get('pwd_min_special', 2)
+        )
 
     def user_settings(self):
         return UserSettingsManager()

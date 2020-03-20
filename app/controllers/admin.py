@@ -91,6 +91,32 @@ def settings_auth():
     )
 
 
+@bp.route('/settings/auth/save/complexity', methods=['POST'])
+@login_required
+def settings_auth_save_complexity():
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    pwd_min_length = int(request.form['pwd_min_length'].strip())
+    pwd_min_lower = int(request.form['pwd_min_lower'].strip())
+    pwd_min_upper = int(request.form['pwd_min_upper'].strip())
+    pwd_min_digits = int(request.form['pwd_min_digits'].strip())
+    pwd_min_special = int(request.form['pwd_min_special'].strip())
+
+    provider = Provider()
+    settings = provider.settings()
+
+    settings.save('pwd_min_length', pwd_min_length)
+    settings.save('pwd_min_lower', pwd_min_lower)
+    settings.save('pwd_min_upper', pwd_min_upper)
+    settings.save('pwd_min_digits', pwd_min_digits)
+    settings.save('pwd_min_special', pwd_min_special)
+
+    flash('Settings saved', 'success')
+    return redirect(url_for('admin.settings_auth'))
+
+
 @bp.route('/settings/auth/save/general', methods=['POST'])
 @login_required
 def settings_auth_save_general():

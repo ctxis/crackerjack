@@ -8,8 +8,9 @@ import string
 
 
 class UserManager:
-    def __init__(self):
+    def __init__(self, password_complexity):
         self.last_error = ''
+        self.password_complexity = password_complexity
 
     def __error(self, message):
         self.last_error = message
@@ -46,6 +47,10 @@ class UserManager:
 
         if ldap == 0:
             if password != '':
+                if not self.password_complexity.meets_requirements(password):
+                    self.__error('Password does not meet the complexity requirements: ' + self.password_complexity.get_requirement_description())
+                    return False
+
                 # If the password is empty, it means it wasn't changed.
                 password = bcrypt.generate_password_hash(password)
         else:

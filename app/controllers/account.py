@@ -80,19 +80,22 @@ def settings_save(user_id):
 
         if len(existing_password) == 0:
             flash('Please enter your existing password', 'error')
-            return redirect(url_for('account.password', user_id=user_id))
+            return redirect(url_for('account.settings', user_id=user_id))
         elif len(new_password) == 0:
             flash('Please enter your new password', 'error')
-            return redirect(url_for('account.password', user_id=user_id))
+            return redirect(url_for('account.settings', user_id=user_id))
         elif len(confirm_password) == 0:
             flash('Please confirm your new password', 'error')
-            return redirect(url_for('account.password', user_id=user_id))
+            return redirect(url_for('account.settings', user_id=user_id))
         elif new_password != confirm_password:
             flash('Passwords do not match', 'error')
-            return redirect(url_for('account.password', user_id=user_id))
+            return redirect(url_for('account.settings', user_id=user_id))
         elif not users.validate_user_password(user_id, existing_password):
             flash('Existing password is invalid', 'error')
-            return redirect(url_for('account.password', user_id=user_id))
+            return redirect(url_for('account.settings', user_id=user_id))
+        elif not users.password_complexity.meets_requirements(new_password):
+            flash('Password does not meet complexity requirements: ' + users.password_complexity.get_requirement_description(), 'error')
+            return redirect(url_for('account.settings', user_id=user_id))
 
         users.update_password(user_id, new_password)
 
