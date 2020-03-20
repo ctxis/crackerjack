@@ -7,126 +7,139 @@
         <div class="card">
             <h3 class="card-header">Auth Settings</h3>
             <div class="card-body">
-                <form method="post" action="{{ url_for('admin.settings_auth_save') }}" autocomplete="off">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                    <ul class="nav nav-tabs">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-toggle="tab" href="#general">General</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#ldap">LDAP</a>
-                        </li>
-                    </ul>
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="ldap-tab" data-toggle="tab" href="#ldap" role="tab" aria-controls="ldap" aria-selected="true">LDAP</a>
+                    </li>
+                </ul>
 
-                    <div id="auth-tabs" class="tab-content p-3">
-                        <div class="tab-pane fade active show" id="general">
-                            <div class="form-group">
-                                <label for="allow_logins">Allow SSO Logins<br><small>only local users will be able to login</small></label>
-                                <div class="custom-control custom-switch float-right">
-                                    <input name="allow_logins" type="checkbox" class="custom-control-input" id="allow_logins" value="1" {{ "checked='checked'" if setting_get('allow_logins', '0') == '1' else '' }}>
-                                    <label class="custom-control-label" for="allow_logins"></label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="ldap">
-                            <h4>Settings</h4>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+                        <form method="post" action="{{ url_for('admin.settings_auth_save_general') }}" autocomplete="off">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                            <div class="form-group pt-2">
-                                <label for="ldap_enabled">Enabled</label>
-                                <div class="custom-control custom-switch float-right">
-                                    <input name="ldap_enabled" type="checkbox" class="custom-control-input" id="ldap_enabled" value="1" {{ "checked='checked'" if setting_get('ldap_enabled', '0') == '1' else '' }}>
-                                    <label class="custom-control-label" for="ldap_enabled"></label>
-                                </div>
-                            </div>
-
-                            <div class="form-group pt-2">
-                                <label for="ldap_ssl">SSL</label>
-                                <div class="custom-control custom-switch float-right">
-                                    <input name="ldap_ssl" type="checkbox" class="custom-control-input" id="ldap_ssl" value="1" {{ "checked='checked'" if setting_get('ldap_ssl', '0') == '1' else '' }}>
-                                    <label class="custom-control-label" for="ldap_ssl"></label>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-4"><label for="ldap_host">Host</label></div>
-                                    <div class="col">
-                                        <input name="ldap_host" type="text" id="ldap_host" class="form-control" value="{{ setting_get('ldap_host', '') }}" placeholder="">
+                            <div class="p-3">
+                                <div class="form-group">
+                                    <label for="allow_logins">Allow SSO Logins<br><small>only local users will be able to login</small></label>
+                                    <div class="custom-control custom-switch float-right">
+                                        <input name="allow_logins" type="checkbox" class="custom-control-input" id="allow_logins" value="1" {{ "checked='checked'" if setting_get('allow_logins', '0') == '1' else '' }}>
+                                        <label class="custom-control-label" for="allow_logins"></label>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <div class="row">
-                                    <div class="col-4"><label for="ldap_base_dn">Base DN</label></div>
-                                    <div class="col">
-                                        <input name="ldap_base_dn" type="text" id="ldap_base_dn" class="form-control" value="{{ setting_get('ldap_base_dn', '') }}" placeholder="dc=example,dc=com">
-                                    </div>
-                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">save general settings</button>
                             </div>
-
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-4"><label for="ldap_domain">Domain</label></div>
-                                    <div class="col">
-                                        <input name="ldap_domain" type="text" id="ldap_domain" class="form-control" value="{{ setting_get('ldap_domain', '') }}" placeholder="EXAMPLE">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-4"><label for="ldap_bind_user">Bind Username</label></div>
-                                    <div class="col">
-                                        <input name="ldap_bind_user" type="text" id="ldap_bind_user" class="form-control" value="{{ setting_get('ldap_bind_user', '') }}" placeholder="readonlyuser">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-4"><label for="ldap_bind_pass">Bind Password</label></div>
-                                    <div class="col">
-                                        <input name="ldap_bind_pass" type="password" id="ldap_bind_pass" class="form-control" value="{{ '********' if setting_get('ldap_bind_pass', '')|length > 0 else '' }}" placeholder="readonlypass">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <h4>Mappings</h4>
-
-                            <div class="form-group pt-2">
-                                <div class="row">
-                                    <div class="col-4"><label for="ldap_mapping_username">Username</label></div>
-                                    <div class="col">
-                                        <input name="ldap_mapping_username" type="text" id="ldap_mapping_username" class="form-control" value="{{ setting_get('ldap_mapping_username', '') }}" placeholder="sAMAccountName">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group pt-2">
-                                <div class="row">
-                                    <div class="col-4"><label for="ldap_mapping_fullname">Full Name</label></div>
-                                    <div class="col">
-                                        <input name="ldap_mapping_fullname" type="text" id="ldap_mapping_fullname" class="form-control" value="{{ setting_get('ldap_mapping_fullname', '') }}" placeholder="givenName">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group pt-2">
-                                <div class="row">
-                                    <div class="col-4"><label for="ldap_mapping_email">E-mail</label></div>
-                                    <div class="col">
-                                        <input name="ldap_mapping_email" type="text" id="ldap_mapping_email" class="form-control" value="{{ setting_get('ldap_mapping_email', '') }}" placeholder="mail">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        </form>
                     </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary btn-block">save</button>
+
+                    <div class="tab-pane fade" id="ldap" role="tabpanel" aria-labelledby="ldap-tab">
+                        <form method="post" action="{{ url_for('admin.settings_auth_save_ldap') }}" autocomplete="off">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                            <div class="p-3">
+                                <div class="form-group pt-2">
+                                    <label for="ldap_enabled">Enabled</label>
+                                    <div class="custom-control custom-switch float-right">
+                                        <input name="ldap_enabled" type="checkbox" class="custom-control-input" id="ldap_enabled" value="1" {{ "checked='checked'" if setting_get('ldap_enabled', '0') == '1' else '' }}>
+                                        <label class="custom-control-label" for="ldap_enabled"></label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group pt-2">
+                                    <label for="ldap_ssl">SSL</label>
+                                    <div class="custom-control custom-switch float-right">
+                                        <input name="ldap_ssl" type="checkbox" class="custom-control-input" id="ldap_ssl" value="1" {{ "checked='checked'" if setting_get('ldap_ssl', '0') == '1' else '' }}>
+                                        <label class="custom-control-label" for="ldap_ssl"></label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-4"><label for="ldap_host">Host</label></div>
+                                        <div class="col">
+                                            <input name="ldap_host" type="text" id="ldap_host" class="form-control" value="{{ setting_get('ldap_host', '') }}" placeholder="">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-4"><label for="ldap_base_dn">Base DN</label></div>
+                                        <div class="col">
+                                            <input name="ldap_base_dn" type="text" id="ldap_base_dn" class="form-control" value="{{ setting_get('ldap_base_dn', '') }}" placeholder="dc=example,dc=com">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-4"><label for="ldap_domain">Domain</label></div>
+                                        <div class="col">
+                                            <input name="ldap_domain" type="text" id="ldap_domain" class="form-control" value="{{ setting_get('ldap_domain', '') }}" placeholder="EXAMPLE">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-4"><label for="ldap_bind_user">Bind Username</label></div>
+                                        <div class="col">
+                                            <input name="ldap_bind_user" type="text" id="ldap_bind_user" class="form-control" value="{{ setting_get('ldap_bind_user', '') }}" placeholder="readonlyuser">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-4"><label for="ldap_bind_pass">Bind Password</label></div>
+                                        <div class="col">
+                                            <input name="ldap_bind_pass" type="password" id="ldap_bind_pass" class="form-control" value="{{ '********' if setting_get('ldap_bind_pass', '')|length > 0 else '' }}" placeholder="readonlypass">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h4>Mappings</h4>
+
+                                <div class="form-group pt-2">
+                                    <div class="row">
+                                        <div class="col-4"><label for="ldap_mapping_username">Username</label></div>
+                                        <div class="col">
+                                            <input name="ldap_mapping_username" type="text" id="ldap_mapping_username" class="form-control" value="{{ setting_get('ldap_mapping_username', '') }}" placeholder="sAMAccountName">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group pt-2">
+                                    <div class="row">
+                                        <div class="col-4"><label for="ldap_mapping_fullname">Full Name</label></div>
+                                        <div class="col">
+                                            <input name="ldap_mapping_fullname" type="text" id="ldap_mapping_fullname" class="form-control" value="{{ setting_get('ldap_mapping_fullname', '') }}" placeholder="givenName">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group pt-2">
+                                    <div class="row">
+                                        <div class="col-4"><label for="ldap_mapping_email">E-mail</label></div>
+                                        <div class="col">
+                                            <input name="ldap_mapping_email" type="text" id="ldap_mapping_email" class="form-control" value="{{ setting_get('ldap_mapping_email', '') }}" placeholder="mail">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary btn-block">save ldap settings</button>
+                            </div>
+                        </form>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>

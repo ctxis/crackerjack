@@ -91,9 +91,9 @@ def settings_auth():
     )
 
 
-@bp.route('/settings/auth/save', methods=['POST'])
+@bp.route('/settings/auth/save/general', methods=['POST'])
 @login_required
-def settings_auth_save():
+def settings_auth_save_general():
     if not current_user.admin:
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
@@ -102,6 +102,25 @@ def settings_auth_save():
     settings = provider.settings()
 
     allow_logins = request.form.get('allow_logins', 0)
+    settings.save('allow_logins', allow_logins)
+
+    # When settings are saved, run system updates.
+    system = provider.system()
+    system.run_updates()
+
+    flash('Settings saved', 'success')
+    return redirect(url_for('admin.settings_auth'))
+
+
+@bp.route('/settings/auth/save/ldap', methods=['POST'])
+@login_required
+def settings_auth_save_ldap():
+    if not current_user.admin:
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    provider = Provider()
+    settings = provider.settings()
 
     ldap_enabled = int(request.form.get('ldap_enabled', 0))
     ldap_ssl = int(request.form.get('ldap_ssl', 0))
@@ -133,7 +152,6 @@ def settings_auth_save():
         return redirect(url_for('admin.settings_auth'))
 
     settings.save('ldap_mapping_email', request.form['ldap_mapping_email'].strip())
-    settings.save('allow_logins', allow_logins)
     settings.save('ldap_enabled', ldap_enabled)
     settings.save('ldap_ssl', ldap_ssl)
     for key, data in ldap_settings.items():
