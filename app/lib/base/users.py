@@ -3,6 +3,8 @@ from app.lib.models.user import UserModel, UserLogins
 from app import db
 import flask_bcrypt as bcrypt
 import datetime
+import random
+import string
 
 
 class UserManager:
@@ -129,3 +131,14 @@ class UserManager:
             conditions = and_(UserModel.admin == 1, UserModel.active == 1)
 
         return UserModel.query.filter(conditions).order_by(UserModel.id).all()
+
+    def login_session(self, user):
+        user.session_token = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=64))
+        return user
+
+    def logout_session(self, user_id):
+        user = self.get_by_id(user_id)
+        user.session_token = ''
+        db.session.commit()
+        db.session.refresh(user)
+        return True

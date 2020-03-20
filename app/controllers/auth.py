@@ -59,6 +59,7 @@ def login_process():
         flash('Your account has been disabled by the Administrator.', 'error')
         return redirect(url_for('auth.login', next=next))
 
+    user = users.login_session(user)
     login_user(user)
     users.record_login(user.id)
 
@@ -74,5 +75,9 @@ def login_process():
 
 @bp.route('/logout', methods=['GET'])
 def logout():
+    provider = Provider()
+    users = provider.users()
+
+    users.logout_session(current_user.id)
     logout_user()
     return redirect(url_for('auth.login'))
