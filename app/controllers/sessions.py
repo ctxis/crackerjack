@@ -496,7 +496,7 @@ def files(session_id):
 
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id=user_id, session_id=session_id)[0]
-    files = sessions.get_data_files(current_user.id, session_id)
+    files = sessions.get_data_files(session.user_id, session_id)
 
     return render_template(
         'sessions/files.html',
