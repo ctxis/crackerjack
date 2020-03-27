@@ -2,6 +2,10 @@
 
 Web Interface for Hashcat by [Context Information Security](https://www.contextis.com/en/)
 
+## Demo / Start Cracking in Under 5 Minutes
+
+[![CrackerJack Demo](https://img.youtube.com/vi/9Ol48qQtuk4/0.jpg)](https://www.youtube.com/watch?v=9Ol48qQtuk4)
+
 # Contents
 
 * [Introduction](#introduction)
