@@ -39,7 +39,7 @@ def save():
         return redirect(url_for('install.index'))
 
     if not users.save(0, username, password, full_name, email, 1, 0, 1):
-        flash('Could not create user - make sure the database file is writable', 'error')
+        flash('Could not create user: ' + users.get_last_error(), 'error')
         return redirect(url_for('install.index'))
 
     flash('Please login as the newly created administrator', 'success')
