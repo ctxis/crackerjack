@@ -80,6 +80,9 @@ class UserManager:
     def get_by_username(self, username):
         return UserModel.query.filter(UserModel.username == username).first()
 
+    def get_ldap_user(self, username):
+        return UserModel.query.filter(UserModel.username == username, UserModel.ldap == True).first()
+
     def get_by_id(self, user_id):
         return UserModel.query.filter(UserModel.id == user_id).first()
 
@@ -147,3 +150,26 @@ class UserManager:
         db.session.commit()
         db.session.refresh(user)
         return True
+
+    def create_ldap_user(self, username, full_name, email):
+        user = UserModel.query.filter(and_(UserModel.username == username, UserModel.ldap == 1)).first()
+        if not user:
+            user = UserModel(
+                username=username,
+                password='',
+                full_name=full_name,
+                email=email,
+                ldap=True,
+                admin=False
+            )
+
+            db.session.add(user)
+        else:
+            user.full_name = full_name
+            user.email = email
+
+        db.session.commit()
+        # In order to get the created object, we need to refresh it.
+        db.session.refresh(user)
+
+        return user
