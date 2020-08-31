@@ -10,13 +10,15 @@ bp = Blueprint('install', __name__)
 def index():
     provider = Provider()
     users = provider.users()
+    password_complexity = provider.password_complexity()
 
     if users.get_user_count() > 0:
         flash('Application has already been configured.', 'error')
         return redirect(url_for('home.index'))
 
     return render_template(
-        'install/index.html'
+        'install/index.html',
+        complexity=password_complexity.get_requirement_description()
     )
 
 
