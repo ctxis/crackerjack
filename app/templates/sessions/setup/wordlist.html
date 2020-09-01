@@ -32,6 +32,21 @@
 
                         <select name="wordlist" id="wordlist" class="form-control">
                             <option value=""></option>
+                            <optgroup label="Directories">
+                                {% for name, wordlist in wordlists.items() %}
+                                {% if wordlist['type'] == 'folder' %}
+                                <option value="{{ name }}">{{ name }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </optgroup>
+
+                            <optgroup label="Files">
+                                {% for name, wordlist in wordlists.items() %}
+                                {% if wordlist['type'] == 'file' %}
+                                <option value="{{ name }}">{{ name }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </optgroup>
                         </select>
                     </div>
 
@@ -77,8 +92,8 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        var wordlists = {{ wordlists_json|safe }};
-        CJ_SessionsWordlist.init(wordlists, '{{ session.hashcat.wordlist }}', '{{ session.hashcat.rule }}');
+        $('#rule').select2({}).val('{{ session.hashcat.rule }}').trigger('change');
+        $('#wordlist').select2({}).val('{{ session.hashcat.wordlist }}').trigger('change');
     });
 </script>
 

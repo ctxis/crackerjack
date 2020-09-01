@@ -264,14 +264,11 @@ def setup_wordlist(session_id):
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id=user_id, session_id=session_id)[0]
 
-    password_wordlists = wordlists.get_wordlists()
-    hashcat_rules = rules.get_rules()
-
     return render_template(
         'sessions/setup/wordlist.html',
         session=session,
-        wordlists_json=json.dumps(password_wordlists, indent=4, sort_keys=True, default=str),
-        rules=hashcat_rules
+        wordlists=wordlists.get_wordlists(),
+        rules=rules.get_rules()
     )
 
 

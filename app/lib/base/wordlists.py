@@ -7,7 +7,9 @@ class WordlistManager:
         self.wordlist_path = wordlist_path
 
     def get_wordlists(self):
-        return self.filesystem.get_files(self.wordlist_path, recursive=True)
+        files = self.filesystem.get_files(self.wordlist_path, recursive=True)
+        folders = self.filesystem.get_folders(self.wordlist_path, recursive=True)
+        return {**files, **folders}
 
     def is_valid_wordlist(self, wordlist):
         wordlists = self.get_wordlists()
