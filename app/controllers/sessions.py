@@ -151,11 +151,15 @@ def setup_hashcat_save(session_id):
 
     hash_type = request.form['hash-type'].strip()
     optimised_kernel = int(request.form.get('optimised_kernel', 0))
+    workload = int(request.form.get('workload', 2))
     mode = int(request.form['mode'].strip())
 
     if mode != 0 and mode != 3:
         # As all the conditions below depend on the mode, if it's wrong return to the previous page immediately.
         flash('Invalid attack mode selected', 'error')
+        return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
+    elif workload not in [1, 2, 3, 4]:
+        flash('Invalid workload selected', 'error')
         return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
 
     has_errors = False
@@ -169,6 +173,7 @@ def setup_hashcat_save(session_id):
     sessions.set_hashcat_setting(session_id, 'mode', mode)
     sessions.set_hashcat_setting(session_id, 'hashtype', hash_type)
     sessions.set_hashcat_setting(session_id, 'optimised_kernel', optimised_kernel)
+    sessions.set_hashcat_setting(session_id, 'workload', workload)
 
     redirect_to = 'wordlist' if mode == 0 else 'mask'
 

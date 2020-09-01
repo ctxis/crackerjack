@@ -93,7 +93,7 @@ class HashcatManager:
         return command
 
     def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile,
-                           increment_min, increment_max, optimised_kernel):
+                           increment_min, increment_max, optimised_kernel, workload):
         command = {
             self.hashcat_binary: '',
             '--session': session_name,
@@ -103,6 +103,7 @@ class HashcatManager:
             '--potfile-path': potfile,
             '--status': '',
             '--status-timer': self.status_interval,
+            '--workload-profile': workload,
             hashfile: '',
         }
 

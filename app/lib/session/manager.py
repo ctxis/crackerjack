@@ -145,6 +145,7 @@ class SessionManager:
         current.increment_min = history.increment_min
         current.increment_max = history.increment_max
         current.optimised_kernel = history.optimised_kernel
+        current.workload = history.workload
 
         db.session.commit()
         return True
@@ -172,6 +173,8 @@ class SessionManager:
             record.optimised_kernel = value
         elif name == 'wordlist_type':
             record.wordlist_type = value
+        elif name == 'workload':
+            record.workload = value
 
         db.session.commit()
 
@@ -226,7 +229,8 @@ class SessionManager:
                 self.session_filesystem.get_potfile_path(session.user_id, session_id),
                 int(session.hashcat.increment_min),
                 int(session.hashcat.increment_max),
-                int(session.hashcat.optimised_kernel)
+                int(session.hashcat.optimised_kernel),
+                int(session.hashcat.workload)
             )
 
             # Before we start a new session, rename the previous "screen.log" file
@@ -316,6 +320,7 @@ class SessionManager:
             increment_min=record.increment_min,
             increment_max=record.increment_max,
             optimised_kernel=record.optimised_kernel,
+            workload=record.workload,
             created_at=datetime.datetime.now(),
         )
 

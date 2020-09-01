@@ -1,6 +1,7 @@
 # CrackerJack Installation
 
 * [Requirements](#requirements)
+* [Updates](#update-to-latest-version)
 * [Installation](#installation)
   * [Ansible](#ansible)
   * [Manual](manual_installation.md)
@@ -17,6 +18,38 @@
     * This version of screen onwards has the -Logfile parameter where you can set the output path of the logfile.
 * hashcat
     * Any version will do, all supported hashes are dynamically extracted from the --help option.
+
+## Update to Latest Version
+
+If you already have a working installation of CrackerJack, follow the instructions below to get the latest and greatest version:
+
+```
+# Stop the web server.
+sudo systemctl stop crackerjack
+
+# Switch to the user that owns the files in the installation directory. This is usually the user running the web server.
+sudo -u www-data /bin/bash
+
+# Navigate to CrackerJack's install path. 
+cd /opt/crackerjack
+
+# Pull the latest code.
+git checkout master
+git pull
+
+# Activate the virtual environment
+. venv/bin/activate
+
+# Install any requirements.
+pip install -r requirements.txt
+
+# Run flask migrations. If you get errors here, it means you are probably logged in as the wrong user.
+flask db migrate
+flask db upgrade
+
+# Restart service. Make sure you exit the `www-data` shell before you run this.
+sudo systemctl start crackerjack
+```
 
 ## Installation
 

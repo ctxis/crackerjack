@@ -52,6 +52,18 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="workload">Workload profile (-w)<br><small><i>Please be considerate of other users using the rig</i></small></label>
+                        <div class="custom-control float-right">
+                            <select name="workload" id="workload" class="form-control custom-select">
+                                <option value="1" {{ 'selected' if session.hashcat.workload == 1 }}>Low</option>
+                                <option value="2" {{ 'selected' if session.hashcat.workload == 2 or session.hashcat.workload == None }}>Default</option>
+                                <option value="3" {{ 'selected' if session.hashcat.workload == 3 }}>High</option>
+                                <option value="4" {{ 'selected' if session.hashcat.workload == 4 }}>Insane</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label>Attack Mode</label>
                         <div class="custom-control custom-radio">
                             <input type="radio" id="mode-wordlist" name="mode" class="mode-option custom-control-input" value="0" {{ 'checked' if session.hashcat.mode == 0 or session.hashcat.mode == '' else '' }}>

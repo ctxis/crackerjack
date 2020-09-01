@@ -82,7 +82,8 @@ class HashcatInstance:
     @property
     def data(self):
         if self._data is None:
-            self._data = self.hashcat.process_hashcat_raw_data(self.hashcat_data_raw, self.session.screen_name, self.tail_screen)
+            self._data = self.hashcat.process_hashcat_raw_data(self.hashcat_data_raw, self.session.screen_name,
+                                                               self.tail_screen)
         return self._data
 
     @property
@@ -136,6 +137,10 @@ class HashcatInstance:
     @property
     def optimised_kernel(self):
         return self.settings.optimised_kernel if self.settings else 0
+
+    @property
+    def workload(self):
+        return 2 if self.settings.workload is None else int(self.settings.workload)
 
     @property
     def configured(self):
