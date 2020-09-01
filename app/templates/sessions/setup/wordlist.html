@@ -43,7 +43,7 @@
                             <optgroup label="Files">
                                 {% for name, wordlist in wordlists.items() %}
                                 {% if wordlist['type'] == 'file' %}
-                                <option value="{{ name }}">{{ name }}</option>
+                                <option value="{{ name }}">{{ name }} - {{ wordlist['size_human'] }}</option>
                                 {% endif %}
                                 {% endfor %}
                             </optgroup>
