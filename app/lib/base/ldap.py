@@ -141,6 +141,8 @@ class LDAPManager:
 
             # Reconnect using the BindUser and return the user's data.
             return {'result': self.AUTH_SUCCESS, 'user': self.__load_user(username)}
+        if connection is False:
+            return False
         return self.__process_result(self.last_result)
 
     def __load_user(self, username):
