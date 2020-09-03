@@ -1,4 +1,4 @@
-from sqlalchemy import desc, and_
+from sqlalchemy import desc, and_, func
 from app.lib.models.user import UserModel, UserLogins
 from app import db
 import flask_bcrypt as bcrypt
@@ -78,10 +78,10 @@ class UserManager:
         return True
 
     def get_by_username(self, username):
-        return UserModel.query.filter(UserModel.username == username).first()
+        return UserModel.query.filter(and_(func.lower(UserModel.username) == func.lower(username))).first()
 
     def get_ldap_user(self, username):
-        return UserModel.query.filter(UserModel.username == username, UserModel.ldap == True).first()
+        return UserModel.query.filter(and_(func.lower(UserModel.username) == func.lower(username), UserModel.ldap == 1)).first()
 
     def get_by_id(self, user_id):
         return UserModel.query.filter(UserModel.id == user_id).first()
