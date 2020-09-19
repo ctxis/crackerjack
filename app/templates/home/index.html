@@ -79,6 +79,7 @@
                         <th class="text-right">Progress</th>
                         <th class="text-right">Cracked</th>
                         <th class="text-center">State</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -114,6 +115,12 @@
                                 <a href="#" class="submit-on-click" title="Click here to show"><i class="fas fa-eye"></i></a>
                             </form>
                             {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <form action="{{ url_for('sessions.delete', session_id=session.id) }}" method="post" class="d-inline ml-1" id="delete-record-form-{{ session.id }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <a href="#" class="confirm-delete text-danger"><i class="fas fa-trash"></i></a>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}

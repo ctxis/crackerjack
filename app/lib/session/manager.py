@@ -540,3 +540,28 @@ class SessionManager:
         db.session.commit()
         db.session.refresh(session)
         return True
+
+    def delete(self, session_id):
+        session = self.get(session_id=session_id)
+        if not session or len(session) == 0:
+            # If we can't get the session, consider it deleted - MIND GAMES!
+            return True
+
+        session = session[0]
+        if session.hashcat.state in [1, 4]:
+            # Session is either running or paused.
+            return False
+
+        # Delete data first.
+        data_path = self.session_filesystem.get_user_data_path(session.user_id, session.id)
+        if os.path.isdir(data_path):
+            self.session_filesystem.delete_path(data_path)
+
+        # Now delete database records.
+        HashcatModel.query.filter_by(session_id=session.id).delete()
+        HashcatHistoryModel.query.filter_by(session_id=session.id).delete()
+        SessionNotificationModel.query.filter_by(session_id=session.id).delete()
+        SessionModel.query.filter_by(id=session.id).delete()
+
+        db.session.commit()
+        return True

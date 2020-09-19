@@ -3,6 +3,7 @@ import re
 import time
 from pathlib import Path
 from flask import current_app
+import shutil
 
 
 class SessionFileSystem:
@@ -147,3 +148,6 @@ class SessionFileSystem:
         screen_files.sort(reverse=True)
 
         return os.path.join(path, screen_files[0])
+
+    def delete_path(self, path):
+        return shutil.rmtree(path)

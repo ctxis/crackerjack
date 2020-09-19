@@ -526,3 +526,21 @@ def active_action(session_id, action):
 
     flash('Session updated', 'success')
     return redirect(url_for('home.index'))
+
+
+@bp.route('/<int:session_id>/delete', methods=['POST'])
+@login_required
+def delete(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    if not sessions.delete(session_id):
+        flash('Could not delete session', 'error')
+        return redirect(url_for('home.index'))
+
+    flash('Session deleted', 'success')
+    return redirect(url_for('home.index'))

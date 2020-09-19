@@ -183,7 +183,7 @@ class LDAPManager:
     def __process_result(self, result):
         # https://ldapwiki.com/wiki/Common%20Active%20Directory%20Bind%20Errors
         # Weird way to get the AD response as it only returns a string rather than the code in a property. It could
-        # be the ldap3 library or the way AD returns the code, but I can't can't fix either one soooo here it is!
+        # be the ldap3 library or the way AD returns the code, but I can't fix either one soooo here it is!
         ldap_responses = {
             'data 532': self.AUTH_CHANGE_PASSWORD,  # ERROR_PASSWORD_EXPIRED
             'data 773': self.AUTH_CHANGE_PASSWORD, # ERROR_PASSWORD_MUST_CHANGE
