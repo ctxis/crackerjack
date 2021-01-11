@@ -77,7 +77,7 @@ class HashcatManager:
 
         return valid
 
-    def build_export_password_command_line(self, hashfile, potfile, save_as):
+    def build_export_password_command_line(self, hashfile, potfile, save_as, contains_usernames):
         command = [
             self.hashcat_binary,
             '--potfile-path',
@@ -87,7 +87,8 @@ class HashcatManager:
             '--outfile-format',
             '2',
             '--show',
-            hashfile
+            hashfile,
+            '--username' if contains_usernames == 1 else ''
         ]
 
         return command

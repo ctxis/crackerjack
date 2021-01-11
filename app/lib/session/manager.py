@@ -203,7 +203,8 @@ class SessionManager:
         command = self.hashcat.build_export_password_command_line(
             self.session_filesystem.get_hashfile_path(session.user_id, session_id),
             self.session_filesystem.get_potfile_path(session.user_id, session_id),
-            save_as
+            save_as,
+            session.hashcat.contains_usernames
         )
         self.shell.execute(command)
 
