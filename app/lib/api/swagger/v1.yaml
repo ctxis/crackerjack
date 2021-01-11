@@ -217,9 +217,12 @@ paths:
             type: object
             required:
               - data
+              - contains_usernames
             properties:
               data:
                 type: string
+              contains_usernames:
+                type: boolean
       responses:
         200:
           $ref: '#/definitions/Response'

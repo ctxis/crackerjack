@@ -145,6 +145,7 @@ class SessionManager:
         current.increment_min = history.increment_min
         current.increment_max = history.increment_max
         current.optimised_kernel = history.optimised_kernel
+        current.contains_usernames = history.contains_usernames
         current.workload = history.workload
 
         db.session.commit()
@@ -175,6 +176,8 @@ class SessionManager:
             record.wordlist_type = value
         elif name == 'workload':
             record.workload = value
+        elif name == 'contains_usernames':
+            record.contains_usernames = value
 
         db.session.commit()
 
@@ -230,7 +233,8 @@ class SessionManager:
                 int(session.hashcat.increment_min),
                 int(session.hashcat.increment_max),
                 int(session.hashcat.optimised_kernel),
-                int(session.hashcat.workload)
+                int(session.hashcat.workload),
+                int(session.hashcat.contains_usernames)
             )
 
             # Before we start a new session, rename the previous "screen.log" file
@@ -321,6 +325,7 @@ class SessionManager:
             increment_max=record.increment_max,
             optimised_kernel=record.optimised_kernel,
             workload=record.workload,
+            contains_usernames=record.contains_usernames,
             created_at=datetime.datetime.now(),
         )
 

@@ -67,6 +67,7 @@ def setup_hashes_save(session_id):
         return redirect(url_for('home.index'))
 
     mode = int(request.form['mode'].strip())
+    contains_usernames = int(request.form.get('contains_usernames', 0))
     save_as = sessions.session_filesystem.get_hashfile_path(current_user.id, session_id)
 
     if mode == 0:
@@ -104,6 +105,8 @@ def setup_hashes_save(session_id):
     else:
         flash('Invalid mode selected', 'error')
         return redirect(url_for('sessions.setup_hashes', session_id=session_id))
+
+    sessions.set_hashcat_setting(session_id, 'contains_usernames', contains_usernames)
 
     return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
 
