@@ -15,6 +15,7 @@ Web Interface for Hashcat by [Context Information Security](https://www.contexti
 * [Installation](docs/installation.md)
 * [Troubleshooting](docs/troubleshooting.md)
 * [Screenshots](#screenshots)
+* [License](#license)
 
 ## Introduction
 
@@ -98,3 +99,11 @@ As we maintain an internal tracker as well, before contributing please create an
 ## General Session Settings
 
 ![](screenshots/cj-settings.png)
+
+# License
+
+CrackerJack is released under MIT License.
+
+In addition, the following third-party components are also used:
+
+* office2hashcat.py - modified BSD - https://github.com/stricture/hashstack-server-plugin-hashcat/

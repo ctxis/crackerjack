@@ -18,6 +18,7 @@ from app.lib.base.hashid import HashIdentifier
 from app.lib.base.webpush import WebPushManager
 from app.lib.base.hashes import HashesManager
 from app.lib.base.password_complexity import PasswordComplexityManager
+from app.lib.modules.office.manager import ModuleOfficeManager
 from flask_login import current_user
 
 
@@ -134,3 +135,6 @@ class Provider:
     def hashes(self):
         settings = self.settings()
         return HashesManager(self.filesystem(), settings.get('uploaded_hashes_path', ''))
+
+    def module_office(self):
+        return ModuleOfficeManager()
