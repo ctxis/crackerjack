@@ -1,0 +1,78 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+{% include 'sessions/includes/header.html' %}
+
+<div class="row mt-5">
+    <div class="col-2">
+        {% set active_nav = 'browse' %}
+        {% include 'sessions/includes/nav.html' %}
+    </div>
+    <div class="col">
+        <div class="card">
+            <h4 class="card-header">Browse Cracked Passwords</h4>
+            <div class="card-body">
+                <table class="table table-sm table-striped table-cracked">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th class="w-50">Username</th>
+                        <th class="w-50">Password</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="d-none row-template">
+                        <td class="row-count"></td>
+                        <td class="row-username"></td>
+                        <td class="row-password"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-2"></div>
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/lib/datatables.min.css') }}">
+<script type="text/javascript" src="{{ url_for('static', filename='js/lib/datatables.min.js') }}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        let cUsers = {{ cracked|safe }};
+        let tRow = $('.row-template');
+        let tResults = $('.table-cracked tbody');
+
+        if (cUsers.length > 0) {
+            for (let i = 0; i < cUsers.length; i++) {
+                if (cUsers[i].trim().length == 0) {
+                    continue;
+                }
+                let sep = cUsers[i].indexOf(':');
+                if (sep === -1) {
+                    continue;
+                }
+                let username = cUsers[i].substr(0, sep);
+                let password = cUsers[i].substr(sep + 1);
+
+                let row = $(tRow).clone();
+                $(row).find('.row-count').text(i + 1);
+                $(row).find('.row-username').text(username);
+                $(row).find('.row-password').text(password);
+                $(row).removeClass('d-none');
+
+                $(row).appendTo(tResults);
+            }
+
+            $(tRow).remove();
+
+            $('.table-cracked').DataTable({
+                pageLength: 100
+            });
+        }
+
+    });
+</script>
+{% endblock %}

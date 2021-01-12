@@ -1,28 +1,33 @@
 <ul class="nav nav-pills flex-column">
     <li class="nav-item">
-        <a class="nav-link {{ 'active' if active_nav == 'session' }}" href="{{ url_for('sessions.view', session_id=session.id) }}"><i class="fas fa-spinner mr-1"></i>Session</a>
+        <a class="nav-link {{ 'active' if active_nav == 'session' }}" href="{{ url_for('sessions.view', session_id=session.id) }}"><i class="fas fa-fw fa-spinner mr-1"></i>Session</a>
     </li>
     {% if session.hashcat.state != 1 %}
     <li class="nav-item">
-        <a class="nav-link {{ 'active' if active_nav == 'hashes' }}" href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}"><i class="fas fa-hashtag mr-1"></i>Hashes</a>
+        <a class="nav-link {{ 'active' if active_nav == 'hashes' }}" href="{{ url_for('sessions.setup_hashes', session_id=session.id) }}"><i class="fas fa-fw fa-hashtag mr-1"></i>Hashes</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link {{ 'active' if active_nav == 'hashcat' }}" href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}"><i class="fas fa-cat mr-1"></i>Hashcat</a>
+        <a class="nav-link {{ 'active' if active_nav == 'hashcat' }}" href="{{ url_for('sessions.setup_hashcat', session_id=session.id) }}"><i class="fas fa-fw fa-cat mr-1"></i>Hashcat</a>
     </li>
         {% if session.hashcat.mode == 0 %}
     <li class="nav-item">
-        <a class="nav-link {{ 'active' if active_nav == 'wordlist' }}" href="{{ url_for('sessions.setup_wordlist', session_id=session.id) }}"><i class="fas fa-file-alt mr-1"></i>Wordlist</a>
+        <a class="nav-link {{ 'active' if active_nav == 'wordlist' }}" href="{{ url_for('sessions.setup_wordlist', session_id=session.id) }}"><i class="fas fa-fw fa-file-alt mr-1"></i>Wordlist</a>
     </li>
         {% elif session.hashcat.mode == 3 %}
     <li class="nav-item">
-        <a class="nav-link {{ 'active' if active_nav == 'mask' }}" href="{{ url_for('sessions.setup_mask', session_id=session.id) }}"><i class="fas fa-sliders-h mr-1"></i>Mask</a>
+        <a class="nav-link {{ 'active' if active_nav == 'mask' }}" href="{{ url_for('sessions.setup_mask', session_id=session.id) }}"><i class="fas fa-fw fa-sliders-h mr-1"></i>Mask</a>
     </li>
         {% endif %}
     {% endif %}
     <li class="nav-item">
-        <a class="nav-link {{ 'active' if active_nav == 'settings' }}" href="{{ url_for('sessions.settings', session_id=session.id) }}"><i class="fas fa-cog mr-1"></i>Settings</a>
+        <a class="nav-link {{ 'active' if active_nav == 'settings' }}" href="{{ url_for('sessions.settings', session_id=session.id) }}"><i class="fas fa-fw fa-cog mr-1"></i>Settings</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link {{ 'active' if active_nav == 'files' }}" href="{{ url_for('sessions.files', session_id=session.id) }}"><i class="fas fa-folder-open mr-1"></i>Files</a>
+        <a class="nav-link {{ 'active' if active_nav == 'files' }}" href="{{ url_for('sessions.files', session_id=session.id) }}"><i class="fas fa-fw fa-folder-open mr-1"></i>Files</a>
     </li>
+    {% if session.hashcat.contains_usernames == 1 %}
+    <li class="nav-item">
+        <a class="nav-link {{ 'active' if active_nav == 'browse' }}" href="{{ url_for('sessions.browse', session_id=session.id) }}"><i class="fas fa-fw fa-user-ninja mr-1"></i>Browse</a>
+    </li>
+    {% endif %}
 </ul>

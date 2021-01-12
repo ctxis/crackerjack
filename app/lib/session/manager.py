@@ -374,6 +374,16 @@ class SessionManager:
 
         return send_file(file, attachment_filename=save_as, as_attachment=True)
 
+    def get_cracked_passwords(self, session_id):
+        session = self.get(session_id=session_id)[0]
+        file = self.session_filesystem.get_custom_wordlist_path(session.user_id, session_id, prefix='pwd_cracked')
+        if os.path.isfile(file):
+            os.remove(file)
+
+        self.export_cracked_passwords(session_id, file)
+
+        return self.session_filesystem.read_file(file)
+
     def get_running_processes(self):
         sessions = self.get()
 

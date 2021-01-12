@@ -547,3 +547,26 @@ def delete(session_id):
 
     flash('Session deleted', 'success')
     return redirect(url_for('home.index'))
+
+
+@bp.route('/<int:session_id>/browse', methods=['GET'])
+@login_required
+def browse(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    user_id = 0 if current_user.admin else current_user.id
+    session = sessions.get(user_id=user_id, session_id=session_id)[0]
+    if not session.hashcat.contains_usernames:
+        return redirect(url_for('sessions.view', session_id=session_id))
+    cracked = sessions.get_cracked_passwords(session_id).split("\n")
+
+    return render_template(
+        'sessions/browse.html',
+        session=session,
+        cracked=json.dumps(cracked, indent=4, sort_keys=True, default=str)
+    )
