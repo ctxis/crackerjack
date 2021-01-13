@@ -15,11 +15,10 @@ from flask import send_file
 
 
 class SessionManager:
-    def __init__(self, hashcat, screens, wordlists, hashid, filesystem, webpush, shell):
+    def __init__(self, hashcat, screens, wordlists, filesystem, webpush, shell):
         self.hashcat = hashcat
         self.screens = screens
         self.wordlists = wordlists
-        self.hashid = hashid
         self.filesystem = filesystem
         self.webpush = webpush
         self.shell = shell
@@ -124,7 +123,7 @@ class SessionManager:
         data = []
         for session in sessions:
             hashcat_instance = HashcatInstance(session, self.session_filesystem, self.hashcat, self.wordlists)
-            instance = SessionInstance(session, hashcat_instance, self.session_filesystem, self.hashid)
+            instance = SessionInstance(session, hashcat_instance, self.session_filesystem)
             data.append(instance)
 
         return data
@@ -462,7 +461,7 @@ class SessionManager:
                 print("Terminating session %d" % past_session.id)
                 self.hashcat_action(session.id, 'stop')
 
-    def guess_hashtype(self, user_id, session_id):
+    def guess_hashtype(self, user_id, session_id, contains_username):
         hashfile = self.session_filesystem.get_hashfile_path(user_id, session_id)
         if not os.path.isfile(hashfile):
             return []
@@ -471,10 +470,13 @@ class SessionManager:
         try:
             with open(hashfile, 'r') as f:
                 hash = f.readline().strip()
+
+            if contains_username:
+                hash = hash.split(':', 1)[1]
         except UnicodeDecodeError:
             hash = ''
 
-        return self.hashid.guess(hash)
+        return self.hashcat.guess_hash(hash)
 
     def get_data_files(self, user_id, session_id):
         user_data_path = self.session_filesystem.get_user_data_path(user_id, session_id)

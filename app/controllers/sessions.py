@@ -137,7 +137,8 @@ def setup_hashcat(session_id):
     return render_template(
         'sessions/setup/hashcat.html',
         session=session,
-        hashes_json=json.dumps(supported_hashes, indent=4, sort_keys=True, default=str)
+        hashes_json=json.dumps(supported_hashes, indent=4, sort_keys=True, default=str),
+        guess_hashtype=sessions.guess_hashtype(session.user_id, session.id, session.hashcat.contains_usernames)
     )
 
 

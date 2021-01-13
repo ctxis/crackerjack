@@ -3,9 +3,10 @@ import re
 
 
 class HashcatManager:
-    def __init__(self, shell, hashcat_binary, status_interval=10, force=False):
+    def __init__(self, shell, hashcat_binary, hashid, status_interval=10, force=False):
         self.shell = shell
         self.hashcat_binary = hashcat_binary
+        self.hashid = hashid
         self.status_interval = 10 if int(status_interval) <= 0 else int(status_interval)
         self.force = force
 
@@ -16,6 +17,19 @@ class HashcatManager:
         lines = list(map(str.strip, output.split("\n")))
         hashes = self.__parse_supported_hashes(lines)
         return hashes
+
+    def guess_hash(self, hash):
+        supported_hashes = self.get_supported_hashes()
+
+        results = self.hashid.guess(hash)
+        results['descriptions'] = {}
+        for hashtype in results['matches']:
+            description = self.__get_hashtype_description(hashtype, supported_hashes=supported_hashes)
+            if len(description) == 0:
+                continue
+            results['descriptions'][hashtype] = description
+
+        return results
 
     def __parse_supported_hashes(self, lines):
         found = False
@@ -62,6 +76,25 @@ class HashcatManager:
         # Sort dict - why you gotta be like that python? This is why you have no friends.
         data = collections.OrderedDict(sorted(data.items(), key=lambda kv: kv[1]))
         return data
+
+    def __get_hashtype_description(self, hash_type, supported_hashes=None):
+        description = ''
+        if supported_hashes is None:
+            supported_hashes = self.get_supported_hashes()
+
+        if not isinstance(hash_type, int):
+            hash_type = int(hash_type)
+
+        for type, hashes in supported_hashes.items():
+            for code, name in hashes.items():
+                if int(code) == hash_type:
+                    description = name
+                    break
+
+            if len(description) > 0:
+                break
+
+        return description
 
     def is_valid_hash_type(self, hash_type):
         valid = False

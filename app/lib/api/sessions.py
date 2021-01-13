@@ -219,6 +219,5 @@ class ApiSession(ApiBase):
         api_session.hashesInFile = session.hashes_in_file
         api_session.hashFileExists = session.hashfile_exists
         api_session.validation = session.validation
-        api_session.guessHashType = session.guess_hashtype
 
         return api_session

@@ -32,7 +32,6 @@ class Provider:
             self.hashcat(),
             self.screens(),
             self.wordlists(),
-            self.hashid(),
             self.filesystem(),
             self.webpush(),
             self.shell()
@@ -50,6 +49,7 @@ class Provider:
         return HashcatManager(
             self.shell(),
             settings.get('hashcat_binary', ''),
+            self.hashid(),
             status_interval=int(settings.get('hashcat_status_interval', 10)),
             force=int(settings.get('hashcat_force', 0))
         )

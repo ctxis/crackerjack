@@ -5,11 +5,10 @@ from sqlalchemy import desc
 
 
 class SessionInstance:
-    def __init__(self, session, hashcat, filesystem, hashid):
+    def __init__(self, session, hashcat, filesystem):
         self.session = session
         self.hashcat = hashcat
         self.filesystem = filesystem
-        self.hashid = hashid
         self.user = UserModel.query.filter(UserModel.id == session.user_id).first()
 
         self._hashes_in_file = None
@@ -111,16 +110,3 @@ class SessionInstance:
         return HashcatHistoryModel.query.filter(
             HashcatHistoryModel.session_id == self.id
         ).order_by(desc(HashcatHistoryModel.id)).all()
-
-    @property
-    def guess_hashtype(self):
-        if not self.hashfile_exists:
-            return []
-
-        try:
-            with open(self.hashfile, 'r') as f:
-                hash = f.readline().strip()
-        except UnicodeDecodeError:
-            hash = ''
-
-        return self.hashid.guess(hash)
