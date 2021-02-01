@@ -203,7 +203,8 @@ class SessionManager:
             self.session_filesystem.get_hashfile_path(session.user_id, session_id),
             self.session_filesystem.get_potfile_path(session.user_id, session_id),
             save_as,
-            session.hashcat.contains_usernames
+            session.hashcat.contains_usernames,
+            session.hashcat.hashtype
         )
         self.shell.execute(command)
 
