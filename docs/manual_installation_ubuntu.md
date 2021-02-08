@@ -25,12 +25,12 @@ Install required packages:
 
 16.04 / 18.04
 ```
-sudo apt install git screen python3-venv python-pip sqlite3
+sudo apt install git screen python3-venv python3-pip sqlite3
 ```
 
 14.04 (Python 3.6 is not installed by default, make sure you install it before you proceed)
 ```
-sudo apt install git screen python3.6-venv python-pip sqlite3
+sudo apt install git screen python3.6-venv python3-pip sqlite3
 ```
 
 # CrackerJack
