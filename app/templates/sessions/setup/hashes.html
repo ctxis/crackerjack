@@ -81,6 +81,14 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="contains_usernames">Hashes contain usernames <i>(username:hash)</i></label>
+                        <div class="custom-control custom-switch float-right">
+                            <input name="contains_usernames" type="checkbox" class="custom-control-input" id="contains_usernames" value="1" {{ "checked='checked'" if session.hashcat.contains_usernames == 1 else '' }}>
+                            <label class="custom-control-label" for="contains_usernames"></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block">save</button>
                     </div>
                 </form>

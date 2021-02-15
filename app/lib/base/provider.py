@@ -18,6 +18,7 @@ from app.lib.base.hashid import HashIdentifier
 from app.lib.base.webpush import WebPushManager
 from app.lib.base.hashes import HashesManager
 from app.lib.base.password_complexity import PasswordComplexityManager
+from app.lib.modules.office.manager import ModuleOfficeManager
 from flask_login import current_user
 
 
@@ -31,7 +32,6 @@ class Provider:
             self.hashcat(),
             self.screens(),
             self.wordlists(),
-            self.hashid(),
             self.filesystem(),
             self.webpush(),
             self.shell()
@@ -49,6 +49,7 @@ class Provider:
         return HashcatManager(
             self.shell(),
             settings.get('hashcat_binary', ''),
+            self.hashid(),
             status_interval=int(settings.get('hashcat_status_interval', 10)),
             force=int(settings.get('hashcat_force', 0))
         )
@@ -134,3 +135,6 @@ class Provider:
     def hashes(self):
         settings = self.settings()
         return HashesManager(self.filesystem(), settings.get('uploaded_hashes_path', ''))
+
+    def module_office(self):
+        return ModuleOfficeManager()

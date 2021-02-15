@@ -42,6 +42,15 @@
             </li>
             {% if current_user.is_authenticated %}
             <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="menu-modules" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Modules
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="menu-modules">
+                    <a class="dropdown-item" href="{{ url_for('modules.office_index') }}">Office</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="menu-settings" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Settings
                 </a>
@@ -53,9 +62,6 @@
                     {% endif %}
                 </div>
             </li>
-            {% endif %}
-
-            {% if current_user.is_authenticated %}
             <li>
                 <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout [ {{ current_user.full_name }} ]</a>
             </li>

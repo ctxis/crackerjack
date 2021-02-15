@@ -151,3 +151,12 @@ class SessionFileSystem:
 
     def delete_path(self, path):
         return shutil.rmtree(path)
+
+    def read_file(self, file):
+        if not os.path.isfile(file):
+            return ''
+
+        with open(file, 'r') as f:
+            contents = f.read()
+
+        return contents

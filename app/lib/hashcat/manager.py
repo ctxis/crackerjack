@@ -3,9 +3,10 @@ import re
 
 
 class HashcatManager:
-    def __init__(self, shell, hashcat_binary, status_interval=10, force=False):
+    def __init__(self, shell, hashcat_binary, hashid, status_interval=10, force=False):
         self.shell = shell
         self.hashcat_binary = hashcat_binary
+        self.hashid = hashid
         self.status_interval = 10 if int(status_interval) <= 0 else int(status_interval)
         self.force = force
 
@@ -16,6 +17,19 @@ class HashcatManager:
         lines = list(map(str.strip, output.split("\n")))
         hashes = self.__parse_supported_hashes(lines)
         return hashes
+
+    def guess_hash(self, hash):
+        supported_hashes = self.get_supported_hashes()
+
+        results = self.hashid.guess(hash)
+        results['descriptions'] = {}
+        for hashtype in results['matches']:
+            description = self.__get_hashtype_description(hashtype, supported_hashes=supported_hashes)
+            if len(description) == 0:
+                continue
+            results['descriptions'][hashtype] = description
+
+        return results
 
     def __parse_supported_hashes(self, lines):
         found = False
@@ -63,6 +77,25 @@ class HashcatManager:
         data = collections.OrderedDict(sorted(data.items(), key=lambda kv: kv[1]))
         return data
 
+    def __get_hashtype_description(self, hash_type, supported_hashes=None):
+        description = ''
+        if supported_hashes is None:
+            supported_hashes = self.get_supported_hashes()
+
+        if not isinstance(hash_type, int):
+            hash_type = int(hash_type)
+
+        for type, hashes in supported_hashes.items():
+            for code, name in hashes.items():
+                if int(code) == hash_type:
+                    description = name
+                    break
+
+            if len(description) > 0:
+                break
+
+        return description
+
     def is_valid_hash_type(self, hash_type):
         valid = False
         supported_hashes = self.get_supported_hashes()
@@ -77,7 +110,7 @@ class HashcatManager:
 
         return valid
 
-    def build_export_password_command_line(self, hashfile, potfile, save_as):
+    def build_export_password_command_line(self, hashfile, potfile, save_as, contains_usernames, hashtype):
         command = [
             self.hashcat_binary,
             '--potfile-path',
@@ -87,13 +120,16 @@ class HashcatManager:
             '--outfile-format',
             '2',
             '--show',
-            hashfile
+            hashfile,
+            '--hash-type',
+            hashtype,
+            '--username' if contains_usernames == 1 else ''
         ]
 
         return command
 
     def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile,
-                           increment_min, increment_max, optimised_kernel, workload):
+                           increment_min, increment_max, optimised_kernel, workload, contains_usernames):
         command = {
             self.hashcat_binary: '',
             '--session': session_name,
@@ -135,6 +171,9 @@ class HashcatManager:
 
         if optimised_kernel == 1:
             command['--optimized-kernel-enable'] = ''
+
+        if contains_usernames == 1:
+            command['--username'] = ''
 
         if self.force:
             command['--force'] = ''

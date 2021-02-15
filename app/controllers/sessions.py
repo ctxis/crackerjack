@@ -67,6 +67,7 @@ def setup_hashes_save(session_id):
         return redirect(url_for('home.index'))
 
     mode = int(request.form['mode'].strip())
+    contains_usernames = int(request.form.get('contains_usernames', 0))
     save_as = sessions.session_filesystem.get_hashfile_path(current_user.id, session_id)
 
     if mode == 0:
@@ -105,6 +106,8 @@ def setup_hashes_save(session_id):
         flash('Invalid mode selected', 'error')
         return redirect(url_for('sessions.setup_hashes', session_id=session_id))
 
+    sessions.set_hashcat_setting(session_id, 'contains_usernames', contains_usernames)
+
     return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
 
 
@@ -134,7 +137,8 @@ def setup_hashcat(session_id):
     return render_template(
         'sessions/setup/hashcat.html',
         session=session,
-        hashes_json=json.dumps(supported_hashes, indent=4, sort_keys=True, default=str)
+        hashes_json=json.dumps(supported_hashes, indent=4, sort_keys=True, default=str),
+        guess_hashtype=sessions.guess_hashtype(session.user_id, session.id, session.hashcat.contains_usernames)
     )
 
 
@@ -544,3 +548,26 @@ def delete(session_id):
 
     flash('Session deleted', 'success')
     return redirect(url_for('home.index'))
+
+
+@bp.route('/<int:session_id>/browse', methods=['GET'])
+@login_required
+def browse(session_id):
+    provider = Provider()
+    sessions = provider.sessions()
+
+    if not sessions.can_access(current_user, session_id):
+        flash('Access Denied', 'error')
+        return redirect(url_for('home.index'))
+
+    user_id = 0 if current_user.admin else current_user.id
+    session = sessions.get(user_id=user_id, session_id=session_id)[0]
+    if not session.hashcat.contains_usernames:
+        return redirect(url_for('sessions.view', session_id=session_id))
+    cracked = sessions.get_cracked_passwords(session_id).split("\n")
+
+    return render_template(
+        'sessions/browse.html',
+        session=session,
+        cracked=json.dumps(cracked, indent=4, sort_keys=True, default=str)
+    )

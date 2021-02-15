@@ -4,7 +4,7 @@ from app.lib.base.provider import Provider
 
 class ApiHashes(ApiBase):
     def upload(self, user_id, session_id):
-        required_fields = ['data']
+        required_fields = ['data', 'contains_usernames']
         data = self.get_json(required_fields)
         if data is False:
             return self.send_error_response(5000, 'Missing fields',
@@ -18,6 +18,8 @@ class ApiHashes(ApiBase):
             return self.send_access_denied_response()
 
         sessions.session_filesystem.save_hashes(user_id, session_id, data['data'])
+        contains_usernames = True if data['contains_usernames'] else False
+        sessions.set_hashcat_setting(session_id, 'contains_usernames', contains_usernames)
 
         return self.send_success_response()
 

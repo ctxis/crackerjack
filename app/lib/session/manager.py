@@ -15,11 +15,10 @@ from flask import send_file
 
 
 class SessionManager:
-    def __init__(self, hashcat, screens, wordlists, hashid, filesystem, webpush, shell):
+    def __init__(self, hashcat, screens, wordlists, filesystem, webpush, shell):
         self.hashcat = hashcat
         self.screens = screens
         self.wordlists = wordlists
-        self.hashid = hashid
         self.filesystem = filesystem
         self.webpush = webpush
         self.shell = shell
@@ -124,7 +123,7 @@ class SessionManager:
         data = []
         for session in sessions:
             hashcat_instance = HashcatInstance(session, self.session_filesystem, self.hashcat, self.wordlists)
-            instance = SessionInstance(session, hashcat_instance, self.session_filesystem, self.hashid)
+            instance = SessionInstance(session, hashcat_instance, self.session_filesystem)
             data.append(instance)
 
         return data
@@ -145,6 +144,7 @@ class SessionManager:
         current.increment_min = history.increment_min
         current.increment_max = history.increment_max
         current.optimised_kernel = history.optimised_kernel
+        current.contains_usernames = history.contains_usernames
         current.workload = history.workload
 
         db.session.commit()
@@ -175,6 +175,8 @@ class SessionManager:
             record.wordlist_type = value
         elif name == 'workload':
             record.workload = value
+        elif name == 'contains_usernames':
+            record.contains_usernames = value
 
         db.session.commit()
 
@@ -200,7 +202,9 @@ class SessionManager:
         command = self.hashcat.build_export_password_command_line(
             self.session_filesystem.get_hashfile_path(session.user_id, session_id),
             self.session_filesystem.get_potfile_path(session.user_id, session_id),
-            save_as
+            save_as,
+            session.hashcat.contains_usernames,
+            session.hashcat.hashtype
         )
         self.shell.execute(command)
 
@@ -230,7 +234,8 @@ class SessionManager:
                 int(session.hashcat.increment_min),
                 int(session.hashcat.increment_max),
                 int(session.hashcat.optimised_kernel),
-                int(session.hashcat.workload)
+                int(session.hashcat.workload),
+                int(session.hashcat.contains_usernames)
             )
 
             # Before we start a new session, rename the previous "screen.log" file
@@ -321,6 +326,7 @@ class SessionManager:
             increment_max=record.increment_max,
             optimised_kernel=record.optimised_kernel,
             workload=record.workload,
+            contains_usernames=record.contains_usernames,
             created_at=datetime.datetime.now(),
         )
 
@@ -367,6 +373,16 @@ class SessionManager:
             return 'Error'
 
         return send_file(file, attachment_filename=save_as, as_attachment=True)
+
+    def get_cracked_passwords(self, session_id):
+        session = self.get(session_id=session_id)[0]
+        file = self.session_filesystem.get_custom_wordlist_path(session.user_id, session_id, prefix='pwd_cracked')
+        if os.path.isfile(file):
+            os.remove(file)
+
+        self.export_cracked_passwords(session_id, file)
+
+        return self.session_filesystem.read_file(file)
 
     def get_running_processes(self):
         sessions = self.get()
@@ -446,7 +462,7 @@ class SessionManager:
                 print("Terminating session %d" % past_session.id)
                 self.hashcat_action(session.id, 'stop')
 
-    def guess_hashtype(self, user_id, session_id):
+    def guess_hashtype(self, user_id, session_id, contains_username):
         hashfile = self.session_filesystem.get_hashfile_path(user_id, session_id)
         if not os.path.isfile(hashfile):
             return []
@@ -455,10 +471,13 @@ class SessionManager:
         try:
             with open(hashfile, 'r') as f:
                 hash = f.readline().strip()
+
+            if contains_username:
+                hash = hash.split(':', 1)[1]
         except UnicodeDecodeError:
             hash = ''
 
-        return self.hashid.guess(hash)
+        return self.hashcat.guess_hash(hash)
 
     def get_data_files(self, user_id, session_id):
         user_data_path = self.session_filesystem.get_user_data_path(user_id, session_id)

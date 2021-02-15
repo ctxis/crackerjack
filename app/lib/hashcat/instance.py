@@ -139,6 +139,10 @@ class HashcatInstance:
         return self.settings.optimised_kernel if self.settings else 0
 
     @property
+    def contains_usernames(self):
+        return self.settings.contains_usernames if self.settings else 0
+
+    @property
     def workload(self):
         return 2 if self.settings.workload is None else int(self.settings.workload)
 

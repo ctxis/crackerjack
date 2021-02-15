@@ -71,6 +71,9 @@ def create_app(config_class=None):
     from app.controllers.webpush import bp as webpush_bp
     app.register_blueprint(webpush_bp, url_prefix='/webpush')
 
+    from app.controllers.modules import bp as modules_bp
+    app.register_blueprint(modules_bp)
+
     from app.lib.base.provider import Provider
 
     # This is to be able to access settings from any template (shared variables).
