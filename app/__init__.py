@@ -32,6 +32,8 @@ def create_app(config_class=None):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = 'ThisIsNotTheKeyYouAreLookingFor'
     app.config['SESSION_COOKIE_HTTPONLY'] = True
+    # The referrer is disabled further down in the response headers.
+    app.config['WTF_CSRF_SSL_STRICT'] = False
 
     # And now we override any custom settings from config.cfg if it exists.
     app.config.from_pyfile('config.py', silent=True)
