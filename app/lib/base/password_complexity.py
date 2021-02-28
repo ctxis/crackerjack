@@ -1,6 +1,3 @@
-import string
-
-
 class PasswordComplexityManager:
     def __init__(self, min_length, min_lower, min_upper, min_digits, min_special):
         self.min_length = int(min_length)
@@ -9,24 +6,19 @@ class PasswordComplexityManager:
         self.min_digits = int(min_digits)
         self.min_special = int(min_special)
 
-        self.lower = string.ascii_lowercase
-        self.upper = string.ascii_uppercase
-        self.digits = string.digits
-        self.special = string.punctuation
-
     def meets_requirements(self, password):
         if len(password) < self.min_length:
             return False
 
         lower = upper = digits = special = 0
         for c in password:
-            if c in self.lower:
+            if c.islower():
                 lower += 1
-            elif c in self.upper:
+            elif c.isupper():
                 upper += 1
-            elif c in self.digits:
+            elif c.isdigit():
                 digits += 1
-            elif c in self.special:
+            else:
                 special += 1
 
         if lower < self.min_lower:
