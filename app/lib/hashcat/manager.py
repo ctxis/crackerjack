@@ -34,6 +34,8 @@ class HashcatManager:
     def __parse_supported_hashes(self, lines):
         found = False
         hashes = {}
+        alphanum_hashes = {}
+        parent_code = ''
         for line in lines:
             if line == '- [ Hash modes ] -':
                 found = True
@@ -48,11 +50,60 @@ class HashcatManager:
                 if info is False:
                     continue
 
-                if not info['category'] in hashes:
-                    hashes[info['category']] = {}
+                if not info['code'].isnumeric():
+                    if info['code'][0].isdigit():
+                        parent_code = info['code']
 
-                hashes[info['category']][info['code']] = info['name']
+                    if parent_code not in alphanum_hashes:
+                        alphanum_hashes[parent_code] = {
+                            'code': info['code'],
+                            'name': info['name'],
+                            'category': info['category'],
+                            'data': {}
+                        }
+                    else:
+                        if info['code'] not in alphanum_hashes[parent_code]['data']:
+                            alphanum_hashes[parent_code]['data'][info['code']] = []
+                        alphanum_hashes[parent_code]['data'][info['code']].append(info['name'])
+                else:
+                    if not info['category'] in hashes:
+                        hashes[info['category']] = {}
 
+                    hashes[info['category']][info['code']] = info['name']
+
+        return self.__fix_alphanum_hashes(hashes, alphanum_hashes)
+
+    def __fix_alphanum_hashes(self, hashes, alphanum_hashes):
+        if len(alphanum_hashes) == 0:
+            return hashes
+
+        grouped = {}
+        for parent_type, data in alphanum_hashes.items():
+            grouped[data['code']] = {
+                'category': data['category'],
+                'items': {}
+            }
+            for type1 in data['data']['X']:
+                code1 = type1[0].strip()
+                name1 = type1[3:].strip()
+                for type2 in data['data']['Y']:
+                    code2 = type2[0].strip()
+                    name2 = type2[3:].strip()
+
+                    code = data['code'].replace('X', code1).replace('Y', code2)
+                    if code not in grouped[data['code']]['items']:
+                        grouped[data['code']]['items'][code] = "{0} {1} + {2}".format(data['name'], name1, name2)
+                    else:
+                        # Same number can map to another encryption algorithm.
+                        grouped[data['code']]['items'][code] += " / {0}".format(name2)
+
+        for code, data in grouped.items():
+            category = data['category']
+            for code, name in data['items'].items():
+                if not category in hashes:
+                    hashes[category] = {}
+
+                hashes[category][code] = name
         return hashes
 
     def __parse_hash_line(self, line):
