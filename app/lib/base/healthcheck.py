@@ -66,13 +66,13 @@ class HealthCheck:
             errors.append(datapath + ' is not writable')
 
     def check_screen_software(self, shell, errors):
-        screen_binary = shell.execute(['which', 'screen'], user_id=0)
+        screen_binary = shell.execute(['which', 'screen'], user_id=0, log_to_db=False)
         if len(screen_binary) == 0:
             errors.append('screen binary does not exist')
             # No need to keep checking.
             return False
 
-        output = shell.execute(['screen', '--help'], user_id=0)
+        output = shell.execute(['screen', '--help'], user_id=0, log_to_db=False)
         if "-Logfile" not in output:
             errors.append(
                 'The *screen* application seems to be out of date. In order for CrackerJack to work it will need to be v4.06 or higher, as those versions introduced the -Logfile parameter which is required.')

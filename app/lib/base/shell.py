@@ -13,13 +13,15 @@ class ShellManager:
     def __init__(self, user_id=0):
         self.user_id = user_id
 
-    def execute(self, command, user_id=None):
+    def execute(self, command, user_id=None, log_to_db=True):
         user_id = self.user_id if user_id is None else user_id
-        log = self.__log_start(' '.join(command), user_id)
+        if log_to_db:
+            log = self.__log_start(' '.join(command), user_id)
 
         output = subprocess.run(command, stdout=subprocess.PIPE).stdout.decode().strip()
 
-        log = self.__log_finish(log, output)
+        if log_to_db:
+            log = self.__log_finish(log, output)
 
         return output
 
