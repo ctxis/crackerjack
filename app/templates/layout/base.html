@@ -123,18 +123,10 @@
     <div class="container text-center">
         {% set commit_count = setting_get('git_commit_count', 0)|int %}
         {% set last_commit_date = setting_get('last_commit_date', '') %}
+        {% set version = config.CRACKERJACK_VERSION %}
         <span class="text-default">
-            Hashcat
-            {{ setting_get('hashcat_version', '') }}
-            |
-            CrackerJack
-            {{ setting_get('git_hash_version', '') }}
-            {% if commit_count > 0 %}
-            | v{{ commit_count }}
-            {% if last_commit_date|length > 0 %}
-            | {{ last_commit_date }}
-            {% endif %}
-            {% endif %}
+            <span title="Commits: {{ commit_count }} | Commit Date: {{ last_commit_date }}">CrackerJack v{{ version }}</span>
+            - Hashcat {{ setting_get('hashcat_version', '') }}
         </span>
     </div>
 </footer>

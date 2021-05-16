@@ -6,6 +6,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from flask_crontab import Crontab
+from app import version
 
 
 db = SQLAlchemy()
@@ -37,6 +38,8 @@ def create_app(config_class=None):
 
     # And now we override any custom settings from config.cfg if it exists.
     app.config.from_pyfile('config.py', silent=True)
+
+    app.config['CRACKERJACK_VERSION'] = version.__version__
 
     # If we have passed any object on app creation (ie testing), override here.
     if config_class is not None:
