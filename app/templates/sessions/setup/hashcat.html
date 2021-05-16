@@ -25,6 +25,7 @@
                 <div class="card-body">
                     {% if guess_hashtype.matches|length > 0 %}
                     <div class="form-group">
+                        {% if guess_hashtype.descriptions.items()|length > 0 %}
                         <div class="alert alert-primary">
                             Possible Hash Type:
                             <ul>
@@ -33,6 +34,7 @@
                                 {% endfor %}
                             </ul>
                         </div>
+                        {% endif %}
                     </div>
                     {% endif %}
 

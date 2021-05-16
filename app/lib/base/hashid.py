@@ -60,6 +60,8 @@ class HashIdentifier:
                 matches.append(9500)
             elif subhash[0] == '2013':
                 matches.append(9600)
+            elif len(hash) > 2 and hash[1] == '2016':
+                matches.append(25300)
         elif sig == 'oldoffice':
             if subhash[0] in ['0', '1']:
                 if ':' in subhash[-1]:
@@ -76,6 +78,7 @@ class HashIdentifier:
                     matches.extend([10400, 10410])
             elif subhash[0] == '2':
                 matches.append(10500)
+                matches.append(25400)
             elif subhash[0] == '5':
                 matches.extend([10600, 10700])
         elif sig == 'postgres' and subhash[0] == 'postgres' and self.__is_hex(subhash[2]):
@@ -190,8 +193,11 @@ class HashIdentifier:
             matches.append(20400)
         elif sig == 'SHA' and self.__is_hex(hash[-1]):
             matches.append(20711)
-        elif sig == 'solarwinds' and self.__is_base64(False, hash[-1]):
-            matches.append(21500)
+        elif sig == 'solarwinds':
+            if hash[1] == '0':
+                matches.append(21500)
+            elif hash[1] == '1':
+                matches.append(21501)
         elif sig == 'itunes_backup':
             if subhash[0] == '9':
                 matches.append(14700)
@@ -240,6 +246,8 @@ class HashIdentifier:
                 matches.append(22301)
             elif subhash[0] == '1':
                 matches.append(22600)
+            elif subhash[0] == '2':
+                matches.append(24500)
         elif sig == 'aescrypt':
             matches.append(22400)
         elif sig == 'multibit':
@@ -280,6 +288,20 @@ class HashIdentifier:
                 matches.append(24410)
             elif hash[1] == '2':
                 matches.append(24420)
+        elif sig == 'mongodb-scram':
+            if subhash[0] == '0':
+                matches.append(24100)
+            elif subhash[0] == '1':
+                matches.append(24200)
+        elif sig == 'stellar':
+            matches.append(25500)
+        elif sig == 'knx-ip-secure-device-authentication-code':
+            matches.append(25900)
+        elif sig == 'mozilla':
+            if subhash[0] == '3DES':
+                matches.append(26000)
+            elif subhash[0] == 'AES':
+                matches.append(26100)
 
         return matches
 
@@ -322,7 +344,7 @@ class HashIdentifier:
         elif len(hash) > 128:
             matches.extend([1722, 9000, 12300, 12900, 22200])
         else:
-            matches.append(8100)
+            matches.extend([8100, 24700])
 
         return matches
 
@@ -347,11 +369,11 @@ class HashIdentifier:
                     else:
                         matches.extend([3100, 14000, 14100])
                 elif len(hash[0]) == 32:
-                    matches.extend([10, 11, 12, 20, 21, 23, 30, 40, 50, 60, 1100, 2611, 2711, 2811, 3710, 3800, 3910])
+                    matches.extend([10, 11, 12, 20, 21, 23, 24, 30, 40, 50, 60, 1100, 2611, 2711, 2811, 3710, 3800, 3910])
                     matches.extend([4010, 4110, 11000, 21200, 21300])
                 elif len(hash[0]) == 40:
                     matches.extend([110, 112, 120, 121, 130, 140, 150, 160, 4510, 4520, 4521, 4522, 4710, 4711, 4900])
-                    matches.extend([5800, 8400, 13900, 14400, 21100, 13500])
+                    matches.extend([5800, 8400,  13500, 13900, 14400, 21100, 24300])
                 elif len(hash[0]) == 64:
                     matches.extend([1410, 1420, 1430, 1440, 1450, 1460, 11750, 11760, 12600, 13800, 20710, 22300])
                 elif len(hash[0]) == 128:
@@ -465,6 +487,8 @@ class HashIdentifier:
         hash = hash.split('*')
         if hash[0] == 'WPA':
             matches.extend([22000, 22001])
+        elif hash[0] == 'SQLCIPHER':
+            matches.append(24600)
 
         return matches
 
@@ -487,9 +511,9 @@ class HashIdentifier:
             matches.extend([16500])
         elif self.__is_base64(True, hash):
             if len(hash) <= 16:
-                matches.extend([1500, 2400, 16000])
+                matches.extend([1500, 2400, 16000, 24900])
             else:
-                matches.extend([133, 501, 5700, 7000, 18800])
+                matches.extend([133, 501, 5700, 7000, 18800, 24800])
 
         return matches
 
