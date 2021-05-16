@@ -1,0 +1,26 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Content-Language" content="en">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="shortcut icon" href="/static/images/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/images/favicon.png" type="image/x-icon">
+
+    <title>CrackerJack</title>
+    {% set user_theme = user_setting_get(current_user.id if current_user.id else 0, 'theme', setting_get('theme', 'lumen')) %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/themes/'~user_theme~'.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/select2.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lib/tempusdominus-bootstrap-4.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/crackerjack.css') }}">
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/jquery.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/jquery.validate.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/popper.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/bootstrap.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/select2.full.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/moment.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/lib/tempusdominus-bootstrap-4.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='fontawesome/js/all.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/crackerjack/utils.js') }}"></script>
+</head>
