@@ -83,7 +83,7 @@
                         <th scope="row">Cracked</th>
                         <td class="text-right">
                             <span>{{ '{0:,}'.format(session.hashcat.cracked_passwords) }}/{{ '{0:,}'.format(session.hashcat.all_passwords) }}</span>
-                            {% if session.hashcat.cracked_passwords > 0 %}
+                            {% if session.hashcat.cracked_passwords > 0 or session.potfile_has_data() %}
                             <form action="{{ url_for('sessions.download_file', session_id=session.id, which_file='cracked') }}" method="post" class="force-inline" autocomplete="off">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <a href="#" class="text-warning ml-1 submit-on-click" title="Download cracked hashes+plain"><i class="fas fa-file-download fa-lg"></i></a>
