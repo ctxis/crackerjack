@@ -123,12 +123,6 @@ def ldap_changepwd():
         session.pop('ldap_time', None)
         return redirect(url_for('auth.login', next=next))
 
-    user = users.get_ldap_user(username)
-    if not user:
-        session.pop('ldap_username', None)
-        session.pop('ldap_time', None)
-        return redirect(url_for('auth.login', next=next))
-
     return render_template('auth/ldap_password.html', next=request.args.get('next', ''))
 
 
