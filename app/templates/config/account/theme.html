@@ -1,0 +1,31 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-lg-3">
+        {% set active_nav = 'theme' %}
+        {% include 'config/includes/sidebar.html' %}
+    </div>
+    <div class="col-lg-6">
+        <h4>Theme</h4>
+
+        <form method="post" action="{{ url_for('config.theme_save') }}" autocomplete="off">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group clearfix">
+                <label for="theme">Theme</label>
+                <select name="theme" id="theme" class="form-control custom-select">
+                    <option value=""></option>
+                    {% for name, theme in themes.items() %}
+                    {% set t = name|replace('.css', '') %}
+                    <option value="{{ t }}" {{ 'selected' if selected_theme == t else '' }}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+                <small class="font-italic float-right">themes are from <a href="https://bootswatch.com/">https://bootswatch.com/</a></small>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">save</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

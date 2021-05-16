@@ -1,0 +1,35 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-lg-3">
+        {% set active_nav = 'messages' %}
+        {% include 'config/includes/sidebar.html' %}
+    </div>
+    <div class="col-lg-6">
+        <form action="{{ url_for('config.messages_save') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <h4>System Messages</h4>
+            <div class="text-danger mb-3">
+                All these boxes allow raw HTML. It is your responsibility to not end up with an XSS.
+                <br>
+                For best results use BootStrap 4.
+            </div>
+
+            <div class="form-group">
+                <label for="system_message_login_show">Login Page</label>
+                <div class="custom-control custom-switch float-right">
+                    <input name="system_message_login_show" type="checkbox" class="custom-control-input" id="system_message_login_show" value="1" {{ "checked='checked'" if setting_get('system_message_login_show', '0') == '1' else '' }}>
+                    <label class="custom-control-label" for="system_message_login_show"></label>
+                </div>
+                <textarea class="form-control text-monospace" id="system_message_login" name="system_message_login" rows="10" placeholder="RAW HTML - Be Careful!">{{ setting_get('system_message_login', '') }}</textarea>
+            </div>
+
+            <div class="form-group mt-5">
+                <button type="submit" class="btn btn-block btn-primary">save</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

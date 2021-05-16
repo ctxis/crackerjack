@@ -1,0 +1,25 @@
+{% if current_user.admin %}
+<h4>System</h4>
+<nav class="nav nav-pills flex-column pb-3">
+    <a class="nav-link ml-n4"><i class="fas fa-chevron-circle-right fa-fw"></i> Settings</a>
+    <a class="nav-link {{ 'active' if active_nav == 'general' }}" href="{{ url_for('config.general') }}"><i class="fas fa-cog fa-fw"></i> <span class="pl-2">General</span></a>
+    <a class="nav-link {{ 'active' if active_nav == 'hashcat' }}" href="{{ url_for('config.hashcat') }}"><i class="fas fa-cat fa-fw"></i> <span class="pl-2">Hashcat</span></a>
+    <a class="nav-link {{ 'active' if active_nav == 'shell_logs' }}" href="{{ url_for('config.shell_logs') }}"><i class="fas fa-clipboard-list fa-fw"></i> <span class="pl-2">Shell Logs</span></a>
+    <a class="nav-link {{ 'active' if active_nav == 'messages' }}" href="{{ url_for('config.messages') }}"><i class="fas fa-comment-dots fa-fw"></i> <span class="pl-2">System Messages</span></a>
+    <a class="nav-link ml-n4"><i class="fas fa-chevron-circle-right fa-fw"></i> Notifications</a>
+    <a class="nav-link {{ 'active' if active_nav == 'webpush' }}" href="{{ url_for('config.webpush') }}"><i class="fas fa-bell fa-fw"></i> <span class="pl-2">Web Push</span></a>
+    <a class="nav-link ml-n4"><i class="fas fa-chevron-circle-right fa-fw"></i> Authentication</a>
+    <a class="nav-link {{ 'active' if active_nav == 'ldap' }}" href="{{ url_for('config.ldap') }}"><i class="fas fa-passport fa-fw"></i> <span class="pl-2">LDAP</span></a>
+    <a class="nav-link ml-n4"><i class="fas fa-chevron-circle-right fa-fw"></i> Accounts</a>
+    <a class="nav-link {{ 'active' if active_nav == 'users' }}" href="{{ url_for('config.users') }}"><i class="fas fa-users fa-fw"></i> <span class="pl-2">Users</span></a>
+    <a class="nav-link {{ 'active' if active_nav == 'password_complexity' }}" href="{{ url_for('config.password_complexity') }}"><i class="fas fa-puzzle-piece fa-fw"></i> <span class="pl-2">Password Complexity</span></a>
+</nav>
+{% endif %}
+
+<h4>Account</h4>
+<nav class="nav nav-pills flex-column">
+    <a class="nav-link {{ 'active' if active_nav == 'profile' }}" href="{{ url_for('config.profile') }}"><i class="fas fa-id-card fa-fw"></i> <span class="pl-2">Profile</span></a>
+    <a class="nav-link {{ 'active' if active_nav == 'theme' }}" href="{{ url_for('config.theme') }}"><i class="fas fa-images fa-fw"></i> <span class="pl-2">Theme</span></a>
+    <a class="nav-link {{ 'active' if active_nav == 'logins' }}" href="{{ url_for('config.logins') }}"><i class="fas fa-clipboard fa-fw"></i> <span class="pl-2">Login Logs</span></a>
+    <a class="nav-link {{ 'active' if active_nav == 'api' }}" href="{{ url_for('config.api') }}"><i class="fas fa-key fa-fw"></i> <span class="pl-2">API Keys</span></a>
+</nav>

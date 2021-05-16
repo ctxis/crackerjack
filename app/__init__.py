@@ -57,14 +57,8 @@ def create_app(config_class=None):
     from app.controllers.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
-    from app.controllers.admin import bp as admin_bp
-    app.register_blueprint(admin_bp, url_prefix='/admin')
-
     from app.controllers.sessions import bp as sessions_bp
     app.register_blueprint(sessions_bp, url_prefix='/sessions')
-
-    from app.controllers.account import bp as account_bp
-    app.register_blueprint(account_bp, url_prefix='/account')
 
     from app.controllers.install import bp as install_bp
     app.register_blueprint(install_bp, url_prefix='/install')
@@ -78,6 +72,9 @@ def create_app(config_class=None):
 
     from app.controllers.modules import bp as modules_bp
     app.register_blueprint(modules_bp)
+
+    from app.controllers.config import bp as config_bp
+    app.register_blueprint(config_bp)
 
     from app.lib.base.provider import Provider
 

@@ -1,0 +1,64 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-lg-3">
+        {% set active_nav = 'hashcat' %}
+        {% include 'config/includes/sidebar.html' %}
+    </div>
+    <div class="col-lg-6">
+        <form action="{{ url_for('config.hashcat_save') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <h4>Hashcat Settings</h4>
+
+            <div class="form-group">
+                <label for="hashcat_binary">Executable Path</label>
+                <input name="hashcat_binary" type="text" id="hashcat_binary" class="form-control" value="{{ setting_get('hashcat_binary', '') }}" placeholder="/path/to/hashcat" required>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-8"><label for="hashcat_status_interval">Hashcat Status Interval</label></div>
+                    <div class="col">
+                        <input type="number" id="hashcat_status_interval" name="hashcat_status_interval" class="form-control text-right" value="{{ setting_get('hashcat_status_interval', 10) }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="hashcat_force">Use --force</label>
+                <div class="custom-control custom-switch float-right">
+                    <input name="hashcat_force" type="checkbox" class="custom-control-input" id="hashcat_force" value="1" {{ "checked='checked'" if setting_get('hashcat_force', '0') == '1' else '' }}>
+                    <label class="custom-control-label" for="hashcat_force"></label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="wordlists_path">Wordlists Path</label>
+                <input name="wordlists_path" type="text" id="wordlists_path" class="form-control" value="{{ setting_get('wordlists_path', '') }}" placeholder="/path/to/wordlists" required>
+            </div>
+
+            <div class="form-group">
+                <label for="hashcat_rules_path">Rules Path</label>
+                <input name="hashcat_rules_path" type="text" id="hashcat_rules_path" class="form-control" value="{{ setting_get('hashcat_rules_path', '') }}" placeholder="/path/to/hashcat/rules" required>
+            </div>
+
+            <div class="form-group">
+                <span>
+                    <label for="uploaded_hashes_path">Uploaded Hashes Path</label>
+                    <span class="text-primary" title="" data-container="body" data-toggle="popover" data-placement="left" data-content="This folder will be used in cases where the user wants to upload a very large hash file (ie from HIBP).<br>In this instance, users will upload the file via SSH and then select it from the front-end." data-original-title="Uploaded Hashes">
+                        <i class="fas fa-question-circle"></i>
+                    </span>
+                </span>
+                <input name="uploaded_hashes_path" type="text" id="uploaded_hashes_path" class="form-control" value="{{ setting_get('uploaded_hashes_path', '') }}" placeholder="/path/to/uploaded/hashes/folder">
+                <div class="text-info small mt-2">Make sure all users have <b>write</b> access to this folder.</div>
+            </div>
+
+            <div class="form-group mt-5">
+                <button type="submit" class="btn btn-block btn-primary">save</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -32,12 +32,8 @@ class HealthCheck:
         return False
 
     def check_settings(self, settings, errors):
-        allow_logins = settings.get('allow_logins', 0)
         hashcat_binary = settings.get('hashcat_binary', '')
         wordlists_path = settings.get('wordlists_path', '')
-
-        if int(allow_logins) == 0:
-            errors.append('Logins are currently disabled.')
 
         if len(hashcat_binary) == 0 or not os.path.isfile(hashcat_binary):
             errors.append('Hashcat executable does not exist')

@@ -1,0 +1,31 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-lg-3">
+        {% set active_nav = 'logins' %}
+        {% include 'config/includes/sidebar.html' %}
+    </div>
+    <div class="col-lg-6">
+        <h4>Logins</h4>
+        <table class="table table-sm table-striped">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th class="text-right">Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for login in logins %}
+            <tr>
+                <td>{{ login.id }}</td>
+                <td>{{ login.username }}</td>
+                <td class="text-right">{{ login.login_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

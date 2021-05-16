@@ -1,0 +1,34 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-lg-3">
+        {% set active_nav = 'profile' %}
+        {% include 'config/includes/sidebar.html' %}
+    </div>
+    <div class="col-lg-6">
+        <h4>Profile</h4>
+
+        <form method="post" action="{{ url_for('config.profile_save', user_id=user.id) }}" autocomplete="off">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label for="existing_password">Existing Password</label>
+                <input type="password" value="" name="existing_password" id="existing_password" class="form-control" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="new_password">New Password</label>
+                <input type="password" value="" name="new_password" id="new_password" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" value="" name="confirm_password" id="confirm_password" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">save</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
