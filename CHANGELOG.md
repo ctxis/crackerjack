@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.1
+
+* `[Update]` If hashcat >= v6.2.3 is installed, use the built-in `--id --mach [hash]` functionality to identify a hash.
+
 ## v1.1.0
 
 * `[New]` Added semantic versioning.
