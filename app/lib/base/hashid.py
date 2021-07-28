@@ -539,17 +539,4 @@ class HashIdentifier:
         return all_hex
 
     def guess(self, hash):
-        result = {
-            'hash': hash,
-            'matches': [],
-            'confidence': 0
-        }
-
-        if len(hash) == 0:
-            return result
-
-        result['matches'] = self.__find(hash)
-        if len(result['matches']) > 0:
-            result['confidence'] = round(100 / len(result['matches']))
-
-        return result
+        return [] if len(hash) == 0 else self.__find(hash)

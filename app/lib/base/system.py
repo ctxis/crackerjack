@@ -1,6 +1,7 @@
 import os
 import getpass
 import datetime
+from packaging import version
 
 
 class SystemManager:
@@ -11,6 +12,18 @@ class SystemManager:
     def run_updates(self):
         self.update_hashcat_version()
         self.update_git_hash_version()
+        self.update_autoid()
+
+    def update_autoid(self):
+        current_version = self.settings.get('hashcat_version', '').replace('v', '').strip()
+        has_autoid = False
+        if len(current_version) > 0:
+            minimum_version = '6.2.3'
+            if version.parse(current_version) >= version.parse(minimum_version):
+                has_autoid = True
+
+        self.settings.save('hashcat_autoid', 1 if has_autoid else 0)
+        return True
 
     def update_hashcat_version(self):
         hashcat_binary = self.settings.get('hashcat_binary', '')

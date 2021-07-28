@@ -3,12 +3,13 @@ import re
 
 
 class HashcatManager:
-    def __init__(self, shell, hashcat_binary, hashid, status_interval=10, force=False):
+    def __init__(self, shell, hashcat_binary, hashid, status_interval=10, force=False, autoid=False):
         self.shell = shell
         self.hashcat_binary = hashcat_binary
         self.hashid = hashid
         self.status_interval = 10 if int(status_interval) <= 0 else int(status_interval)
         self.force = force
+        self.autoid = autoid
 
     def get_supported_hashes(self):
         output = self.shell.execute([self.hashcat_binary, '--help'], user_id=0, log_to_db=False)
@@ -21,8 +22,13 @@ class HashcatManager:
     def guess_hash(self, hash):
         supported_hashes = self.get_supported_hashes()
 
-        results = self.hashid.guess(hash)
-        results['descriptions'] = {}
+        guesses = self.auto_guess_hash(hash) if self.autoid else self.hashid.guess(hash)
+        results = {
+            'hash': hash,
+            'matches': guesses,
+            'confidence': 0 if len(guesses) == 0 else round(100 / len(guesses)),
+            'descriptions': {}
+        }
         for hashtype in results['matches']:
             description = self.__get_hashtype_description(hashtype, supported_hashes=supported_hashes)
             if len(description) == 0:
@@ -30,6 +36,31 @@ class HashcatManager:
             results['descriptions'][hashtype] = description
 
         return results
+
+    def auto_guess_hash(self, hash):
+        if len(self.hashcat_binary) == 0:
+            return []
+
+        command = [
+            self.hashcat_binary,
+            '--id',
+            '--mach',
+            hash
+        ]
+        output = self.shell.execute(command)
+        if len(output) == 0:
+            return []
+
+        output = output.split("\r")
+        hashes = []
+        for item in output:
+            item = item.split("\n")
+            for guess in item:
+                if not guess.isnumeric():
+                    continue
+                hashes.append(guess)
+
+        return hashes
 
     def __parse_supported_hashes(self, lines):
         found = False
