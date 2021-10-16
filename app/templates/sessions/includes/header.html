@@ -22,7 +22,7 @@
                             session.hashcat.state == 3 or
                             session.hashcat.state == 98
                     %}
-                    {% if session.hashcat.state == 2 %}
+                    {% if session.hashcat.state == 2 or session.hashcat.state == 98 %}
                     <a href="#" data-action="restore" title="Restore" class="form-action ml-2 btn btn-info"><i class="fas fa-redo"></i> Restore</a>
                     {% endif %}
                     <a href="#" data-action="start" title="Start" class="form-action ml-2 btn btn-success"><i class="fas fa-play-circle"></i> Start</a>
