@@ -105,6 +105,15 @@
                 <button type="submit" class="btn btn-block btn-primary">save</button>
             </div>
         </form>
+
+        <h4>Test Connection</h4>
+        <form action="{{ url_for('config.ldap_test') }}" method="post" class="pb-2">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-block btn-primary">test connection</button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

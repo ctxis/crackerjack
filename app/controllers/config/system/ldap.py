@@ -64,3 +64,18 @@ def ldap_save():
 
     flash('Settings saved', 'success')
     return redirect(url_for('config.ldap'))
+
+
+@bp.route('/ldap/test', methods=['POST'])
+@login_required
+@admin_required
+def ldap_test():
+    provider = Provider()
+    ldap = provider.ldap()
+
+    if not ldap.test_connection():
+        message = ldap.error_details if len(ldap.error_details) > 0 else 'Could not connect to LDAP Server'
+        flash('LDAP Response: {0}'.format(message), 'error')
+    else:
+        flash('Connection established!', 'success')
+    return redirect(url_for('config.ldap'))

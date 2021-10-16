@@ -236,3 +236,12 @@ class LDAPManager:
         connection = self.__connect(self.bind_user, self.bind_pass)
         result = ad_modify_password(connection, user['dn'], new_password, old_password)
         return result
+
+    def test_connection(self):
+        self.error_message = ''
+        self.error_details = ''
+        connection = self.__connect(self.bind_user, self.bind_pass)
+        if connection:
+            connection.unbind()
+            return True
+        return False

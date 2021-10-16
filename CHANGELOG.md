@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.2
+
+* `[New]` Added "Test Connection" feature to LDAP settings.
+
 ## v1.1.1
 
 * `[Update]` If hashcat >= v6.2.3 is installed, use the built-in `--id --mach [hash]` functionality to identify a hash.
