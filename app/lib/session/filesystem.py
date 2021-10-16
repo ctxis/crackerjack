@@ -41,6 +41,9 @@ class SessionFileSystem:
 
         return os.path.join(self.get_user_data_path(user_id, session_id), name)
 
+    def custom_wordlist_exists(self, wordlist_path):
+        return os.path.isfile(wordlist_path)
+
     def hashfile_exists(self, user_id, session_id):
         path = self.get_hashfile_path(user_id, session_id)
         return os.path.isfile(path)

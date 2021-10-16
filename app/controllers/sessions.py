@@ -267,12 +267,14 @@ def setup_wordlist(session_id):
 
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id=user_id, session_id=session_id)[0]
+    has_custom_wordlist = sessions.session_filesystem.custom_wordlist_exists(sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id, prefix='custom_wordlist', random=False))
 
     return render_template(
         'sessions/setup/wordlist.html',
         session=session,
         wordlists=wordlists.get_wordlists(),
-        rules=rules.get_rules()
+        rules=rules.get_rules(),
+        has_custom_wordlist=has_custom_wordlist
     )
 
 
@@ -301,18 +303,21 @@ def setup_wordlist_save(session_id):
         sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
     elif wordlist_type == 1:
         # Custom wordlist.
-        save_as = sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id, prefix='custom_wordlist_', random=True)
+        save_as = sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id, prefix='custom_wordlist', random=False)
         if len(request.files) != 1:
             flash('Uploaded file could not be found', 'error')
             return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
 
         file = request.files['custom_wordlist']
         if file.filename == '':
-            flash('No hashes uploaded', 'error')
-            return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
-
-        file.save(save_as)
-        sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
+            # If file already exists, use that one instead.
+            if not sessions.session_filesystem.custom_wordlist_exists(save_as):
+                flash('Uploaded file could not be found', 'error')
+                return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
+        else:
+            # Otherwise upload new file.
+            file.save(save_as)
+            sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
     elif wordlist_type == 2:
         # Create wordlist from cracked passwords.
         save_as = sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id, prefix='pwd_wordlist')
