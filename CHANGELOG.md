@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.3
+
+* `[Update]` Add 'SIMPLE' as an LDAP Authentication type.
+* `[Update]` Show 'Restore' button when a session errors out.
+* `[Fix]` When using a custom wordlist, allow to change the ruleset without having to re-upload the file.
+
 ## v1.1.2
 
 * `[New]` Added "Test Connection" feature to LDAP settings.

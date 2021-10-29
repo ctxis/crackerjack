@@ -91,6 +91,7 @@ class Provider:
         manager.mapping_username = settings.get('ldap_mapping_username', '')
         manager.mapping_fullname = settings.get('ldap_mapping_fullname', '')
         manager.mapping_email = settings.get('ldap_mapping_email', '')
+        manager.auth_type = int(settings.get('ldap_auth_type', manager.AUTH_METHOD_NTLM))
 
         return manager
 

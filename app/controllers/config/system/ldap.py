@@ -9,8 +9,12 @@ from app.lib.base.decorators import admin_required
 @login_required
 @admin_required
 def ldap():
+    provider = Provider()
+    ldap = provider.ldap()
+
     return render_template(
-        'config/system/ldap.html'
+        'config/system/ldap.html',
+        auth_types=ldap.get_supported_auth_methods()
     )
 
 
@@ -27,6 +31,7 @@ def ldap_save():
 
     # Put the rest of the ldap options in a dict to make it easier to validate and save.
     ldap_settings = {
+        'ldap_auth_type': {'value': request.form['ldap_auth_type'].strip(),'error': 'Please select authentication type'},
         'ldap_host': {'value': request.form['ldap_host'].strip(), 'error': 'LDAP Host cannot be empty'},
         'ldap_base_dn': {'value': request.form['ldap_base_dn'].strip(), 'error': 'LDAP Base cannot be empty'},
         'ldap_domain': {'value': request.form['ldap_domain'].strip(), 'error': 'LDAP Domain cannot be empty'},

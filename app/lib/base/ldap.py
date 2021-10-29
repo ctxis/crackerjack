@@ -9,8 +9,12 @@ class LDAPManager:
     AUTH_CHANGE_PASSWORD = 1
     AUTH_LOCKED = 2
 
+    AUTH_METHOD_NTLM = 1
+    AUTH_METHOD_SIMPLE = 2
+
     def __init__(self):
         self._enabled = 0
+        self._auth_type = self.AUTH_METHOD_NTLM
         self._host = ''
         self._base_dn = ''
         self._domain = ''
@@ -25,6 +29,14 @@ class LDAPManager:
         self.__error_message = ''
         self.__error_details = ''
         self.__last_result = None
+
+    @property
+    def auth_type(self):
+        return self._auth_type
+
+    @auth_type.setter
+    def auth_type(self, value):
+        self._auth_type = int(value)
 
     @property
     def ssl(self):
@@ -133,6 +145,12 @@ class LDAPManager:
     def is_enabled(self):
         return self._enabled > 0
 
+    def get_supported_auth_methods(self):
+        return {
+            self.AUTH_METHOD_NTLM: 'NTLM',
+            self.AUTH_METHOD_SIMPLE: 'Simple'
+        }
+
     def authenticate(self, username, password):
         connection = self.__connect(username, password)
         if connection:
@@ -205,7 +223,10 @@ class LDAPManager:
     def __connect(self, username, password):
         server = ldap3.Server(self.host, get_info=ldap3.ALL, use_ssl=self.ssl)
         ldap_user = "{0}\\{1}".format(self.domain, username)
-        connection = ldap3.Connection(server, user=ldap_user, password=password, authentication=ldap3.NTLM)
+
+        auth_type = ldap3.SIMPLE if self.auth_type == self.AUTH_METHOD_SIMPLE else ldap3.NTLM
+        connection = ldap3.Connection(server, user=ldap_user, password=password, authentication=auth_type)
+
         try:
             self.last_result = None
             result = connection.bind()
