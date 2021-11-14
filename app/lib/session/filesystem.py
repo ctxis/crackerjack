@@ -30,14 +30,14 @@ class SessionFileSystem:
     def get_hashfile_path(self, user_id, session_id):
         return os.path.join(self.get_user_data_path(user_id, session_id), 'hashes.txt')
 
-    def get_custom_wordlist_path(self, user_id, session_id, prefix='', random=False):
+    def get_custom_file_path(self, user_id, session_id, prefix='', random=False, extension='.dict'):
         if len(prefix) == 0:
             random = True
 
         name = prefix
         if random:
             name = name + str(int(time.time()))
-        name = name + '.dict'
+        name = name + extension
 
         return os.path.join(self.get_user_data_path(user_id, session_id), name)
 

@@ -196,6 +196,7 @@ class ApiSession(ApiBase):
         api_hashcat.hashType = session.hashcat.hashtype
         api_hashcat.wordlistType = session.hashcat.wordlist_type
         api_hashcat.wordlist = session.hashcat.wordlist
+        api_hashcat.rule_type = session.hashcat.rule_type
         api_hashcat.rule = session.hashcat.rule
         api_hashcat.mask = session.hashcat.mask
         api_hashcat.optimisedKernel = session.hashcat.optimised_kernel

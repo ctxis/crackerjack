@@ -68,9 +68,18 @@
                             <label class="custom-control-label" for="wordlist-passwords">Create wordlist from already cracked passwords</label>
                         </div>
                     </div>
+                </div>
+            </div>
 
+            <div class="card mt-2">
+                <h5 class="card-header">Rules Options</h5>
+                <div class="card-body">
                     <div class="form-group">
-                        <label for="rule">Rules</label>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="rule-global" name="rule_type" class="mode-option custom-control-input" value="0" {{ 'checked' if session.hashcat.rule_type == 0 or session.hashcat.rule_type == None or session.hashcat.rule_type == '' else '' }}>
+                            <label class="custom-control-label" for="rule-global">Global Rules</label>
+                        </div>
+
                         <select name="rule" id="rule" class="form-control">
                             <option value="">No Rules</option>
                             {% for key, rule in rules.items() %}
@@ -79,10 +88,22 @@
                         </select>
                     </div>
 
-                    <div class="form-group mt-3">
-                        <button type="submit" class="btn btn-primary btn-block">save</button>
+                    <div class="form-group">
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="rule-session" name="rule_type" class="mode-option custom-control-input" value="1" {{ 'checked' if session.hashcat.rule_type == 1 else '' }}>
+                            <label class="custom-control-label" for="rule-session">Custom Session Rule{% if has_custom_rule == True %} <small>(already uploaded)</small>{% endif %}</label>
+                        </div>
+
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="custom_rule" name="custom_rule">
+                            <label class="custom-file-label" for="custom_rule">Choose your rule</label>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary btn-block">save</button>
             </div>
         </form>
     </div>

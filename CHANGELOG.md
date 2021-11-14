@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.4
+
+* `[New]` Added functionality to upload custom rulesets per session.
+
 ## v1.1.3
 
 * `[Update]` Add 'SIMPLE' as an LDAP Authentication type.

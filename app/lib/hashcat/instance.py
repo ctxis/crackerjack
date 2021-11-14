@@ -127,6 +127,10 @@ class HashcatInstance:
         return self.settings.rule if self.settings else ''
 
     @property
+    def rule_type(self):
+        return self.settings.rule_type if self.settings else 0
+
+    @property
     def rule(self):
         return os.path.basename(self.settings.rule) if self.settings else ''
 

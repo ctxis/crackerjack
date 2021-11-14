@@ -267,14 +267,16 @@ def setup_wordlist(session_id):
 
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id=user_id, session_id=session_id)[0]
-    has_custom_wordlist = sessions.session_filesystem.custom_wordlist_exists(sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id, prefix='custom_wordlist', random=False))
+    has_custom_wordlist = sessions.session_filesystem.custom_wordlist_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_wordlist'))
+    has_custom_rule = sessions.session_filesystem.custom_wordlist_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_rule', extension='.rule'))
 
     return render_template(
         'sessions/setup/wordlist.html',
         session=session,
         wordlists=wordlists.get_wordlists(),
         rules=rules.get_rules(),
-        has_custom_wordlist=has_custom_wordlist
+        has_custom_wordlist=has_custom_wordlist,
+        has_custom_rule=has_custom_rule
     )
 
 
@@ -283,59 +285,18 @@ def setup_wordlist(session_id):
 def setup_wordlist_save(session_id):
     provider = Provider()
     sessions = provider.sessions()
-    wordlists = provider.wordlists()
-    rules = provider.rules()
 
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
-    wordlist_type = int(request.form['wordlist_type'].strip())
+    result = __setup_wordlist(session_id, request)
+    if not isinstance(result, bool):
+        return result
 
-    if wordlist_type == 0:
-        # Global wordlist.
-        wordlist = request.form['wordlist'].strip()
-        if not wordlists.is_valid_wordlist(wordlist):
-            flash('Invalid wordlist selected', 'error')
-            return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
-
-        wordlist_location = wordlists.get_wordlist_path(wordlist)
-        sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
-    elif wordlist_type == 1:
-        # Custom wordlist.
-        save_as = sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id, prefix='custom_wordlist', random=False)
-        if len(request.files) != 1:
-            flash('Uploaded file could not be found', 'error')
-            return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
-
-        file = request.files['custom_wordlist']
-        if file.filename == '':
-            # If file already exists, use that one instead.
-            if not sessions.session_filesystem.custom_wordlist_exists(save_as):
-                flash('Uploaded file could not be found', 'error')
-                return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
-        else:
-            # Otherwise upload new file.
-            file.save(save_as)
-            sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
-    elif wordlist_type == 2:
-        # Create wordlist from cracked passwords.
-        save_as = sessions.session_filesystem.get_custom_wordlist_path(current_user.id, session_id, prefix='pwd_wordlist')
-        sessions.export_cracked_passwords(session_id, save_as)
-        sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
-    else:
-        flash('Invalid wordlist option', 'error')
-        return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
-
-    sessions.set_hashcat_setting(session_id, 'wordlist_type', wordlist_type)
-
-    rule = request.form['rule'].strip()
-    if len(rule) > 0 and not rules.is_valid_rule(rule):
-        flash('Invalid rule selected', 'error')
-        return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
-
-    rule_location = rules.get_rule_path(rule)
-    sessions.set_hashcat_setting(session_id, 'rule', rule_location)
+    result = __setup_rules(session_id, request)
+    if not isinstance(result, bool):
+        return result
 
     return redirect(url_for('sessions.settings', session_id=session_id))
 
@@ -576,3 +537,87 @@ def browse(session_id):
         session=session,
         cracked=json.dumps(cracked, indent=4, sort_keys=True, default=str)
     )
+
+
+def __setup_wordlist(session_id, request):
+    provider = Provider()
+    sessions = provider.sessions()
+    wordlists = provider.wordlists()
+
+    wordlist_type = int(request.form['wordlist_type'].strip())
+
+    if wordlist_type == 0:
+        # Global wordlist.
+        wordlist = request.form['wordlist'].strip()
+        if not wordlists.is_valid_wordlist(wordlist):
+            flash('Invalid wordlist selected', 'error')
+            return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
+
+        wordlist_location = wordlists.get_wordlist_path(wordlist)
+        sessions.set_hashcat_setting(session_id, 'wordlist', wordlist_location)
+    elif wordlist_type == 1:
+        # Custom wordlist.
+        save_as = sessions.session_filesystem.get_custom_file_path(current_user.id, session_id,
+                                                                   prefix='custom_wordlist')
+
+        file = request.files['custom_wordlist']
+        if file.filename == '':
+            # If file already exists, use that one instead.
+            if not sessions.session_filesystem.custom_wordlist_exists(save_as):
+                flash('Uploaded wordlist file could not be found', 'error')
+                return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
+        else:
+            # Otherwise upload new file.
+            file.save(save_as)
+            sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
+    elif wordlist_type == 2:
+        # Create wordlist from cracked passwords.
+        save_as = sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='pwd_wordlist')
+        sessions.export_cracked_passwords(session_id, save_as)
+        sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
+    else:
+        flash('Invalid wordlist option', 'error')
+        return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
+
+    sessions.set_hashcat_setting(session_id, 'wordlist_type', wordlist_type)
+    return True
+
+
+def __setup_rules(session_id, request):
+    provider = Provider()
+    sessions = provider.sessions()
+    rules = provider.rules()
+
+    rule_type = int(request.form['rule_type'].strip())
+
+    if rule_type == 0:
+        # Global Rules.
+        rule = request.form['rule'].strip()
+        if len(rule) > 0 and not rules.is_valid_rule(rule):
+            flash('Invalid rule selected', 'error')
+            return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
+
+        rule_location = rules.get_rule_path(rule)
+        sessions.set_hashcat_setting(session_id, 'rule', rule_location)
+    elif rule_type == 1:
+        # Custom rule.
+        save_as = sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_rule',
+                                                                   extension='.rule')
+
+        file = request.files['custom_rule']
+        if file.filename == '':
+            # If file already exists, use that one instead.
+            if not sessions.session_filesystem.custom_wordlist_exists(save_as):
+                flash('Uploaded rule file could not be found', 'error')
+                return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
+        else:
+            # Otherwise upload new file.
+            file.save(save_as)
+            sessions.set_hashcat_setting(session_id, 'rule', save_as)
+    else:
+        flash('Invalid rule option', 'error')
+        return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
+
+    sessions.set_hashcat_setting(session_id, 'rule_type', rule_type)
+
+    return True

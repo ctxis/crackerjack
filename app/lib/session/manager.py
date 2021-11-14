@@ -139,6 +139,7 @@ class SessionManager:
         current.hashtype = history.hashtype
         current.wordlist_type = history.wordlist_type
         current.wordlist = history.wordlist
+        current.rule_type = history.rule_type
         current.rule = history.rule
         current.mask = history.mask
         current.increment_min = history.increment_min
@@ -161,6 +162,8 @@ class SessionManager:
             record.hashtype = value
         elif name == 'wordlist':
             record.wordlist = value
+        elif name == 'rule_type':
+            record.rule_type = value
         elif name == 'rule':
             record.rule = value
         elif name == 'mask':
@@ -320,6 +323,7 @@ class SessionManager:
             hashtype=record.hashtype,
             wordlist=record.wordlist,
             wordlist_type=record.wordlist_type,
+            rule_type=record.rule_type,
             rule=record.rule,
             mask=record.mask,
             increment_min=record.increment_min,
@@ -358,7 +362,7 @@ class SessionManager:
             file = self.session_filesystem.get_hashfile_path(session.user_id, session_id)
             save_as = save_as + '.hashes.txt'
         elif which_file == 'plain':
-            file = self.session_filesystem.get_custom_wordlist_path(session.user_id, session_id, prefix='pwd_wordlist')
+            file = self.session_filesystem.get_custom_file_path(session.user_id, session_id, prefix='pwd_wordlist')
             self.export_cracked_passwords(session_id, file)
             save_as = save_as + '.plain.txt'
         else:
@@ -376,7 +380,7 @@ class SessionManager:
 
     def get_cracked_passwords(self, session_id):
         session = self.get(session_id=session_id)[0]
-        file = self.session_filesystem.get_custom_wordlist_path(session.user_id, session_id, prefix='pwd_cracked')
+        file = self.session_filesystem.get_custom_file_path(session.user_id, session_id, prefix='pwd_cracked')
         if os.path.isfile(file):
             os.remove(file)
 

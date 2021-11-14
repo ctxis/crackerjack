@@ -79,7 +79,7 @@ class ApiWordlists(ApiBase):
         if not session:
             return self.send_access_denied_response()
 
-        save_as = sessions.session_filesystem.get_custom_wordlist_path(user_id, session_id, prefix='custom_wordlist_', random=True)
+        save_as = sessions.session_filesystem.get_custom_file_path(user_id, session_id, prefix='custom_wordlist_', random=True)
         sessions.session_filesystem.write_to_file(save_as, data['data'])
         sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
 
@@ -93,7 +93,7 @@ class ApiWordlists(ApiBase):
         if not session:
             return self.send_access_denied_response()
 
-        save_as = sessions.session_filesystem.get_custom_wordlist_path(user_id, session_id, prefix='pwd_wordlist')
+        save_as = sessions.session_filesystem.get_custom_file_path(user_id, session_id, prefix='pwd_wordlist')
         sessions.export_cracked_passwords(session_id, save_as)
         sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
 
