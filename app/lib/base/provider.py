@@ -9,6 +9,7 @@ from app.lib.base.wordlists import WordlistManager
 from app.lib.base.system import SystemManager
 from app.lib.base.filesystem import FileSystemManager
 from app.lib.base.rules import RulesManager
+from app.lib.base.masks import MasksManager
 from app.lib.base.ldap import LDAPManager
 from app.lib.base.users import UserManager
 from app.lib.base.user_settings import UserSettingsManager
@@ -78,6 +79,10 @@ class Provider:
     def rules(self):
         settings = self.settings()
         return RulesManager(self.filesystem(), settings.get('hashcat_rules_path', ''))
+
+    def masks(self):
+        settings = self.settings()
+        return MasksManager(self.filesystem(), settings.get('hashcat_masks_path', ''))
 
     def ldap(self):
         settings = self.settings()
