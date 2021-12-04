@@ -28,25 +28,28 @@
                         <label>Select method</label>
 
                         <div class="custom-control custom-radio">
-                            <input type="radio" id="mode-global" name="mode" class="mode-option custom-control-input" value="0" checked="checked">
+                            <input type="radio" id="mode-global" name="mask_type" class="mode-option custom-control-input" value="0" {{ 'checked' if session.hashcat.mask_type == 0 or session.hashcat.mask_type == '' else '' }}>
                             <label class="custom-control-label" for="mode-global">Global Hashcat mask file</label>
                         </div>
 
                         <div class="custom-control custom-radio">
-                            <input type="radio" id="mode-session" name="mode" class="mode-option custom-control-input" value="1">
+                            <input type="radio" id="mode-session" name="mask_type" class="mode-option custom-control-input" value="1" {{ 'checked' if session.hashcat.mask_type == 1 else '' }}>
                             <label class="custom-control-label" for="mode-session">Custom Session Hashcat mask file</label>
                         </div>
 
                         <div class="custom-control custom-radio">
-                            <input type="radio" id="mode-paste" name="mode" class="mode-option custom-control-input" value="2">
-                            <label class="custom-control-label" for="mode-paste">Enter mask manually</label>
+                            <input type="radio" id="mode-custom" name="mask_type" class="mode-option custom-control-input" value="2" {{ 'checked' if session.hashcat.mask_type == 2 else '' }}>
+                            <label class="custom-control-label" for="mode-custom">Enter mask manually</label>
                         </div>
                     </div>
 
                     <div class="box-mode-global">
-                        <label for="remotefile">Select your Hashcat mask file</label>
-                        <select name="remotefile" id="remotefile" class="form-control">
-                            <option value="">No File Selected</option>
+                        <label for="masklist">Select your Hashcat mask file</label>
+                        <select name="masklist" id="masklist" class="form-control">
+                            <option value="">No Masks</option>
+                            {% for key, mask in masks.items() %}
+                            <option value="{{ key }}">{{ mask.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
 
@@ -58,7 +61,7 @@
                         </div>
                     </div>
 
-                    <div class="box-mode-paste">
+                    <div class="box-mode-custom">
                         <div class="form-group">
                             <h4>Increments</h4>
                         </div>
@@ -181,10 +184,10 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        CJ_HashcatMasks.init();
+        CJ_HashcatMasks.init('{{ session.hashcat.masklist }}');
         CJ_HashcatMasks.parseFromString($('#compiled-mask').val());
 
-        CJ_SessionsMask.init();
+        CJ_HashcatMasks.init('{{ session.hashcat.masklist }}');
 
         $('#setup-mask').submit(function() {
             // Check for any errors.

@@ -142,6 +142,8 @@ class SessionManager:
         current.wordlist = history.wordlist
         current.rule_type = history.rule_type
         current.rule = history.rule
+        current.mask_type = history.mask_type
+        current.masklist = history.masklist
         current.mask = history.mask
         current.increment_min = history.increment_min
         current.increment_max = history.increment_max
@@ -168,6 +170,10 @@ class SessionManager:
             record.rule_type = value
         elif name == 'rule':
             record.rule = value
+        elif name == 'mask_type':
+            record.mask_type = value
+        elif name == 'masklist':
+            record.masklist = value
         elif name == 'mask':
             record.mask = value
         elif name == 'increment_min':
@@ -330,6 +336,8 @@ class SessionManager:
             wordlist_type=record.wordlist_type,
             rule_type=record.rule_type,
             rule=record.rule,
+            mask_type=record.mask_type,
+            masklist=record.masklist,
             mask=record.mask,
             increment_min=record.increment_min,
             increment_max=record.increment_max,

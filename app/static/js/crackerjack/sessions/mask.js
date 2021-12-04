@@ -29,15 +29,16 @@ var CJ_HashcatMasks = {
     // the mask compilation process while checking the boxes programmatically.
     disableEvents: false,
 
-    init: function() {
+    init: function(selected_masklist) {
         // Clone the object - this is what we will use to add new position settings.
         this.template = $('#mask-template').clone();
         // And remove it.
         $('#mask-template').remove();
+        this.bindModes();
+        this.bindMasklist(selected_masklist);
         this.bindMaxCharacters();
         this.bindSettingActions();
         this.bindCompiledMask();
-        this.bindModes();
     },
 
     bindModes: function() {
@@ -48,8 +49,12 @@ var CJ_HashcatMasks = {
         });
     },
 
+    bindMasklist: function(selected_masklist) {
+        $('#masklist').select2({}).val(selected_masklist).trigger('change');
+    },
+
     setModes: function() {
-        mode = $("input[name='mode']:checked").val();
+        mode = $("input[name='mask_type']:checked").val();
         if (typeof mode == 'undefined') {
             $('#mode-global').prop('checked', true);
             mode = 0;
@@ -58,15 +63,15 @@ var CJ_HashcatMasks = {
         if (mode == 0) {
             $('.box-mode-global').removeClass('d-none');
             $('.box-mode-session').addClass('d-none');
-            $('.box-mode-paste').addClass('d-none');
+            $('.box-mode-custom').addClass('d-none');
         } else if (mode == 1) {
             $('.box-mode-global').addClass('d-none');
             $('.box-mode-session').removeClass('d-none');
-            $('.box-mode-paste').addClass('d-none');
+            $('.box-mode-custom').addClass('d-none');
         } else if (mode == 2) {
             $('.box-mode-global').addClass('d-none');
             $('.box-mode-session').addClass('d-none');
-            $('.box-mode-paste').removeClass('d-none');
+            $('.box-mode-custom').removeClass('d-none');
         }
     },
 
