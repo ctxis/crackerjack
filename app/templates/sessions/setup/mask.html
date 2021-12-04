@@ -25,110 +25,147 @@
                 <h5 class="card-header">Brute Force Options</h5>
                 <div class="card-body">
                     <div class="form-group">
-                        <h4>Increments</h4>
-                    </div>
+                        <label>Select method</label>
 
-                    <div class="form-group">
-                        <label for="enable_increments">Enable Increments</label>
-                        <div class="custom-control custom-switch float-right">
-                            <input name="enable_increments" type="checkbox" class="custom-control-input" id="enable_increments" value="1" {{ 'checked' if session.hashcat.increment_min|int > 0 and session.hashcat.increment_max|int > 0 else '' }}>
-                            <label class="custom-control-label" for="enable_increments"></label>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-global" name="mode" class="mode-option custom-control-input" value="0" checked="checked">
+                            <label class="custom-control-label" for="mode-global">Global Hashcat mask file</label>
+                        </div>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-session" name="mode" class="mode-option custom-control-input" value="1">
+                            <label class="custom-control-label" for="mode-session">Custom Session Hashcat mask file</label>
+                        </div>
+
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-paste" name="mode" class="mode-option custom-control-input" value="2">
+                            <label class="custom-control-label" for="mode-paste">Enter mask manually</label>
                         </div>
                     </div>
 
-                    <div class="form-group row">
-                        <label for="increment-min" class="col-sm-10 col-form-label">Start mask incrementing at</label>
-                        <div class="col">
-                            <input type="number" min="1" step="1" class="form-control text-right" name="increment-min" id="increment-min" value="{{ session.hashcat.increment_min }}" placeholder="1" {{ 'disabled' if session.hashcat.increment_min|int <= 0 }}>
+                    <div class="box-mode-global">
+                        <label for="remotefile">Select your Hashcat mask file</label>
+                        <select name="remotefile" id="remotefile" class="form-control">
+                            <option value="">No File Selected</option>
+                        </select>
+                    </div>
+
+                    <div class="box-mode-session">
+                        <label>Select your Hashcat mask file</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="custom_wordlist" name="custom_wordlist">
+                            <label class="custom-file-label" for="custom_wordlist">Choose your Hashcat mask file</label>
                         </div>
                     </div>
 
-                    <div class="form-group row">
-                        <label for="increment-max" class="col-sm-10 col-form-label">Stop mask incrementing at</label>
-                        <div class="col">
-                            <input type="number" min="1" step="1" class="form-control text-right" name="increment-max" id="increment-max" value="{{ session.hashcat.increment_max }}" placeholder="10" {{ 'disabled' if session.hashcat.increment_max|int <= 0 }}>
+                    <div class="box-mode-paste">
+                        <div class="form-group">
+                            <h4>Increments</h4>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <h4>Mask</h4>
-                    </div>
-
-                    <div class="form-group row">
-                        <label for="compiled-mask" class="col-sm-3 col-form-label">Calculated Mask</label>
-                        <div class="col">
-                            <input type="text" class="form-control text-right" name="compiled-mask" id="compiled-mask" value="{{ session.hashcat.mask }}" placeholder="This will be either calculated or add manually add a mask">
-                            <div class="error mask-error"></div>
-                        </div>
-                    </div>
-
-                    <div class="form-group row">
-                        <label for="mask-max-characters" class="col-sm-3 col-form-label">Maximum Characters</label>
-                        <div class="col">
-                            <input type="number" min="0" step="1" class="form-control text-right" value="0" name="mask-max-characters" id="mask-max-characters">
-                        </div>
-                    </div>
-
-                    <div id="mask-placeholder"></div>
-
-                    <div id="mask-template" class="d-none mask-position">
-                        <div class="row">
-                            <div class="col-4">Position <span class="position-number"></span></div>
-                            <div class="col-2">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="lower" id="">
-                                    <label class="custom-control-label mask-label" data-mask="lower" for="">Lowercase</label>
-                                </div>
-
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="upper" id="">
-                                    <label class="custom-control-label mask-label" data-mask="upper" for="">Uppercase</label>
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="digits" id="">
-                                    <label class="custom-control-label mask-label" data-mask="digits" for="">Digits</label>
-                                </div>
-
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="special" id="">
-                                    <label class="custom-control-label mask-label" data-mask="special" for="">Special</label>
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="hexlower" id="">
-                                    <label class="custom-control-label mask-label" data-mask="hexlower" for="">Lower Hex</label>
-                                </div>
-
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="hexupper" id="">
-                                    <label class="custom-control-label mask-label" data-mask="hexupper" for="">Upper Hex</label>
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="binary" id="">
-                                    <label class="custom-control-label mask-label" data-mask="binary" for="">Binary</label>
-                                </div>
-
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="all" id="">
-                                    <label class="custom-control-label mask-label" data-mask="all" for="">All</label>
-                                </div>
+                        <div class="form-group">
+                            <label for="enable_increments">Enable Increments</label>
+                            <div class="custom-control custom-switch float-right">
+                                <input name="enable_increments" type="checkbox" class="custom-control-input" id="enable_increments" value="1" {{ 'checked' if session.hashcat.increment_min|int > 0 and session.hashcat.increment_max|int > 0 else '' }}>
+                                <label class="custom-control-label" for="enable_increments"></label>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-4"></div>
+                        <div class="form-group row">
+                            <label for="increment-min" class="col-sm-10 col-form-label">Start mask incrementing at</label>
                             <div class="col">
-                                <div class="form-group">
-                                    <label class="col-form-label col-form-label-sm mask-label" data-mask="charset" for="">Custom Charset</label>
-                                    <input class="form-control form-control-sm mask-input mask-charset" data-mask="charset" type="text" id="">
+                                <input type="number" min="1" step="1" class="form-control text-right" name="increment-min" id="increment-min" value="{{ session.hashcat.increment_min }}" placeholder="1" {{ 'disabled' if session.hashcat.increment_min|int <= 0 }}>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="increment-max" class="col-sm-10 col-form-label">Stop mask incrementing at</label>
+                            <div class="col">
+                                <input type="number" min="1" step="1" class="form-control text-right" name="increment-max" id="increment-max" value="{{ session.hashcat.increment_max }}" placeholder="10" {{ 'disabled' if session.hashcat.increment_max|int <= 0 }}>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <h4>Mask</h4>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="compiled-mask" class="col-sm-3 col-form-label">Calculated Mask</label>
+                            <div class="col">
+                                <input type="text" class="form-control text-right" name="compiled-mask" id="compiled-mask" value="{{ session.hashcat.mask }}" placeholder="This will be either calculated or add manually add a mask">
+                                <div class="error mask-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="mask-max-characters" class="col-sm-3 col-form-label">Maximum Characters</label>
+                            <div class="col">
+                                <input type="number" min="0" step="1" class="form-control text-right" value="0" name="mask-max-characters" id="mask-max-characters">
+                            </div>
+                        </div>
+
+                        <div id="mask-placeholder"></div>
+
+                        <div id="mask-template" class="d-none mask-position">
+                            <div class="row">
+                                <div class="col-4">Position <span class="position-number"></span></div>
+                                <div class="col-2">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="lower" id="">
+                                        <label class="custom-control-label mask-label" data-mask="lower" for="">Lowercase</label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="upper" id="">
+                                        <label class="custom-control-label mask-label" data-mask="upper" for="">Uppercase</label>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="digits" id="">
+                                        <label class="custom-control-label mask-label" data-mask="digits" for="">Digits</label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="special" id="">
+                                        <label class="custom-control-label mask-label" data-mask="special" for="">Special</label>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="hexlower" id="">
+                                        <label class="custom-control-label mask-label" data-mask="hexlower" for="">Lower Hex</label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="hexupper" id="">
+                                        <label class="custom-control-label mask-label" data-mask="hexupper" for="">Upper Hex</label>
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="binary" id="">
+                                        <label class="custom-control-label mask-label" data-mask="binary" for="">Binary</label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input mask-checkbox" data-mask="all" id="">
+                                        <label class="custom-control-label mask-label" data-mask="all" for="">All</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-4"></div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="col-form-label col-form-label-sm mask-label" data-mask="charset" for="">Custom Charset</label>
+                                        <input class="form-control form-control-sm mask-input mask-charset" data-mask="charset" type="text" id="">
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                     <div class="form-group mt-3">

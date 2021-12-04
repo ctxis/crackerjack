@@ -37,6 +37,37 @@ var CJ_HashcatMasks = {
         this.bindMaxCharacters();
         this.bindSettingActions();
         this.bindCompiledMask();
+        this.bindModes();
+    },
+
+    bindModes: function() {
+        this.setModes();
+        $('.mode-option').click(function() {
+            CJ_HashcatMasks.setModes();
+            return true;
+        });
+    },
+
+    setModes: function() {
+        mode = $("input[name='mode']:checked").val();
+        if (typeof mode == 'undefined') {
+            $('#mode-global').prop('checked', true);
+            mode = 0;
+        }
+
+        if (mode == 0) {
+            $('.box-mode-global').removeClass('d-none');
+            $('.box-mode-session').addClass('d-none');
+            $('.box-mode-paste').addClass('d-none');
+        } else if (mode == 1) {
+            $('.box-mode-global').addClass('d-none');
+            $('.box-mode-session').removeClass('d-none');
+            $('.box-mode-paste').addClass('d-none');
+        } else if (mode == 2) {
+            $('.box-mode-global').addClass('d-none');
+            $('.box-mode-session').addClass('d-none');
+            $('.box-mode-paste').removeClass('d-none');
+        }
     },
 
     bindCompiledMask: function() {
