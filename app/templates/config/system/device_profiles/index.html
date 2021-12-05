@@ -1,0 +1,85 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-lg-3">
+        {% set active_nav = 'device_profiles' %}
+        {% include 'config/includes/sidebar.html' %}
+    </div>
+    <div class="col-lg-6">
+        <h4>Device Profile Settings</h4>
+
+        {% if supported_devices|length == 0 %}
+            <div class="alert alert-danger">Could not find any devices. Check manually if hashcat -I returns your installed GPUs.</div>
+        {% else %}
+            <h5>Identified Devices</h5>
+            <table class="table table-sm table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th class="w-100">Name</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for device_id, device_name in supported_devices.items() %}
+                <tr>
+                    <td>{{ device_id }}</td>
+                    <td>{{ device_name }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            {% if profiles|length == 0 %}
+            <div class="alert alert-info">No profiles exist. <a href="{{ url_for('config.device_profile_edit', id=0) }}">Click here to create one.</a></div>
+            {% else %}
+            <h5>
+                Profiles
+            </h5>
+            <table class="table table-sm table-stripped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th class="w-100">Devices</th>
+                    <th class="text-center">Enabled</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for index, profile in profiles.items() %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ profile.name }}</td>
+                    <td>
+                        {% for profile_id, profile_info in profile.devices.items() %}
+                        {{ profile_info }}<br>
+                        {% endfor %}
+                    </td>
+                    <td class="text-center">{{ 'Yes' if profile.enabled == 1 else 'No' }}</td>
+                    <td class="text-right text-nowrap">
+                        <a href="{{ url_for('config.device_profile_edit', id=profile.id) }}"><i class="fas fa-edit"></i></a>
+
+                        <form action="{{ url_for('config.device_profile_delete', id=profile.id) }}" method="post" class="d-inline ml-1" id="delete-record-form-{{ profile.id }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <a href="#" class="confirm-delete text-danger"><i class="fas fa-trash"></i></a>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="text-right">
+                <a href="{{ url_for('config.device_profile_edit', id=0) }}" class="btn btn-primary">add profile</a>
+            </div>
+
+            {% endif %}
+        {% endif %}
+
+        <form action="" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        </form>
+    </div>
+</div>
+{% endblock %}

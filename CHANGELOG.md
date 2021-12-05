@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2
+
+* `[New]` Added functionality to define GPU profiles per session.
+
 ## v1.1.4
 
 * `[New]` Added functionality to upload custom rulesets per session.

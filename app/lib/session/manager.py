@@ -15,7 +15,7 @@ from flask import send_file
 
 
 class SessionManager:
-    def __init__(self, hashcat, screens, wordlists, filesystem, webpush, shell):
+    def __init__(self, hashcat, screens, wordlists, filesystem, webpush, shell, device_profile_manager):
         self.hashcat = hashcat
         self.screens = screens
         self.wordlists = wordlists
@@ -24,6 +24,7 @@ class SessionManager:
         self.shell = shell
         self.session_filesystem = SessionFileSystem(filesystem)
         self.cmd_sleep = 2
+        self.device_profile_manager = device_profile_manager
 
     def sanitise_name(self, name):
         return re.sub(r'\W+', '', name)
@@ -122,7 +123,7 @@ class SessionManager:
 
         data = []
         for session in sessions:
-            hashcat_instance = HashcatInstance(session, self.session_filesystem, self.hashcat, self.wordlists)
+            hashcat_instance = HashcatInstance(session, self.session_filesystem, self.hashcat, self.wordlists, self.device_profile_manager)
             instance = SessionInstance(session, hashcat_instance, self.session_filesystem)
             data.append(instance)
 
@@ -146,6 +147,7 @@ class SessionManager:
         current.increment_max = history.increment_max
         current.optimised_kernel = history.optimised_kernel
         current.contains_usernames = history.contains_usernames
+        current.device_profile_id = history.device_profile_id
         current.workload = history.workload
 
         db.session.commit()
@@ -180,6 +182,8 @@ class SessionManager:
             record.workload = value
         elif name == 'contains_usernames':
             record.contains_usernames = value
+        elif name == 'device_profile_id':
+            record.device_profile_id = value
 
         db.session.commit()
 
@@ -238,7 +242,8 @@ class SessionManager:
                 int(session.hashcat.increment_max),
                 int(session.hashcat.optimised_kernel),
                 int(session.hashcat.workload),
-                int(session.hashcat.contains_usernames)
+                int(session.hashcat.contains_usernames),
+                session.hashcat.device_list
             )
 
             # Before we start a new session, rename the previous "screen.log" file
@@ -331,6 +336,7 @@ class SessionManager:
             optimised_kernel=record.optimised_kernel,
             workload=record.workload,
             contains_usernames=record.contains_usernames,
+            device_profile_id=record.device_profile_id,
             created_at=datetime.datetime.now(),
         )
 

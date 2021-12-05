@@ -4,6 +4,7 @@
     <a class="nav-link ml-n4"><i class="fas fa-chevron-circle-right fa-fw"></i> Settings</a>
     <a class="nav-link {{ 'active' if active_nav == 'general' }}" href="{{ url_for('config.general') }}"><i class="fas fa-cog fa-fw"></i> <span class="pl-2">General</span></a>
     <a class="nav-link {{ 'active' if active_nav == 'hashcat' }}" href="{{ url_for('config.hashcat') }}"><i class="fas fa-cat fa-fw"></i> <span class="pl-2">Hashcat</span></a>
+    <a class="nav-link {{ 'active' if active_nav == 'device_profiles' }}" href="{{ url_for('config.device_profiles') }}"><i class="fas fa-ticket-alt fa-fw"></i> <span class="pl-2">Device Profiles</span></a>
     <a class="nav-link {{ 'active' if active_nav == 'shell_logs' }}" href="{{ url_for('config.shell_logs') }}"><i class="fas fa-clipboard-list fa-fw"></i> <span class="pl-2">Shell Logs</span></a>
     <a class="nav-link {{ 'active' if active_nav == 'messages' }}" href="{{ url_for('config.messages') }}"><i class="fas fa-comment-dots fa-fw"></i> <span class="pl-2">System Messages</span></a>
     <a class="nav-link ml-n4"><i class="fas fa-chevron-circle-right fa-fw"></i> Notifications</a>

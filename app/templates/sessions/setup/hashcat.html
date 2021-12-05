@@ -65,6 +65,22 @@
                         </div>
                     </div>
 
+                    {% if has_device_profiles %}
+                    <div class="form-group">
+                        <label for="device_profile">Device Profile</label>
+                        <div class="float-right">
+                            <select name="device_profile" id="device_profile" class="form-control custom-select">
+                                <option value="0">Select profile...</option>
+                                {% for profile_id, profile in device_profiles.items() %}
+                                    {% if profile.enabled %}
+                                    <option value="{{ profile_id }}" {{ 'selected' if session.hashcat.device_profile_id == profile_id }}>{{ profile.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    {% endif %}
+
                     <div class="form-group">
                         <label>Attack Mode</label>
                         <div class="custom-control custom-radio">

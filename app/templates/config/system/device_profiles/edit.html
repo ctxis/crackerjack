@@ -1,0 +1,57 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-lg-3">
+        {% set active_nav = 'device_profiles' %}
+        {% include 'config/includes/sidebar.html' %}
+    </div>
+    <div class="col-lg-6">
+        <h4>{{ 'New Profile' if profile == None else 'Edit Profile' }}</h4>
+        {% set profile_id = 0 if profile == None else profile.id %}
+
+        <form method="post" action="{{ url_for('config.device_profile_save', id=profile_id) }}" autocomplete="off">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-4"><label for="name">Name</label></div>
+                    <div class="col">
+                        <input name="name" type="text" id="name" class="form-control" value="{{ '' if profile == None else profile.name }}" placeholder="" autofocus required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-4">Devices</div>
+                    <div class="col">
+                        {% for device_id, device_name in supported_devices.items() %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="device-{{ device_id }}" name="devices" value="{{ device_id }}" {{ 'checked' if device_id in profile.devices else '' }}>
+                            <label class="form-check-label" for="device-{{ device_id }}">{{ device_name }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-4"><label for="enabled">Enabled</label></div>
+                    <div class="col">
+                        <div class="custom-control custom-switch float-right">
+                            <input name="enabled" type="checkbox" class="custom-control-input" id="enabled" value="1" {{ "checked='checked'" if profile.enabled else '' }}>
+                            <label class="custom-control-label" for="enabled"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">{{ 'create' if profile == None else 'update' }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

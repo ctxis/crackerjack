@@ -118,6 +118,7 @@ def setup_hashcat(session_id):
     sessions = provider.sessions()
     hashcat = provider.hashcat()
     system = provider.system()
+    device_profiles = provider.device_profiles()
 
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
@@ -138,7 +139,9 @@ def setup_hashcat(session_id):
         'sessions/setup/hashcat.html',
         session=session,
         hashes_json=json.dumps(supported_hashes, indent=4, sort_keys=True, default=str),
-        guess_hashtype=sessions.guess_hashtype(session.user_id, session.id, session.hashcat.contains_usernames)
+        guess_hashtype=sessions.guess_hashtype(session.user_id, session.id, session.hashcat.contains_usernames),
+        has_device_profiles=device_profiles.has_enabled_profiles(),
+        device_profiles=device_profiles.get_device_profiles()
     )
 
 
@@ -148,6 +151,7 @@ def setup_hashcat_save(session_id):
     provider = Provider()
     sessions = provider.sessions()
     hashcat = provider.hashcat()
+    device_profiles = provider.device_profiles()
 
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
@@ -157,6 +161,7 @@ def setup_hashcat_save(session_id):
     optimised_kernel = int(request.form.get('optimised_kernel', 0))
     workload = int(request.form.get('workload', 2))
     mode = int(request.form['mode'].strip())
+    device_profile_id = int(request.form.get('device_profile', 0))
 
     if mode != 0 and mode != 3:
         # As all the conditions below depend on the mode, if it's wrong return to the previous page immediately.
@@ -164,6 +169,12 @@ def setup_hashcat_save(session_id):
         return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
     elif workload not in [1, 2, 3, 4]:
         flash('Invalid workload selected', 'error')
+        return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
+    elif device_profiles.has_enabled_profiles() and device_profile_id <= 0:
+        flash('Invalid device profile selected', 'error')
+        return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
+    elif device_profiles.has_enabled_profiles() and not device_profiles.is_profile_enabled(device_profile_id):
+        flash('The selected device profile is invalid or disabled', 'error')
         return redirect(url_for('sessions.setup_hashcat', session_id=session_id))
 
     has_errors = False
@@ -178,6 +189,7 @@ def setup_hashcat_save(session_id):
     sessions.set_hashcat_setting(session_id, 'hashtype', hash_type)
     sessions.set_hashcat_setting(session_id, 'optimised_kernel', optimised_kernel)
     sessions.set_hashcat_setting(session_id, 'workload', workload)
+    sessions.set_hashcat_setting(session_id, 'device_profile_id', device_profile_id)
 
     redirect_to = 'wordlist' if mode == 0 else 'mask'
 

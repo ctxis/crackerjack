@@ -3,6 +3,7 @@ from app.lib.session.manager import SessionManager
 from app.lib.base.healthcheck import HealthCheck
 from app.lib.screen.manager import ScreenManager
 from app.lib.hashcat.manager import HashcatManager
+from app.lib.hashcat.device_profile_manager import DeviceProfileManager
 from app.lib.base.shell import ShellManager
 from app.lib.base.wordlists import WordlistManager
 from app.lib.base.system import SystemManager
@@ -34,7 +35,8 @@ class Provider:
             self.wordlists(),
             self.filesystem(),
             self.webpush(),
-            self.shell()
+            self.shell(),
+            self.device_profiles()
         )
         return session
 
@@ -140,3 +142,7 @@ class Provider:
 
     def module_office(self):
         return ModuleOfficeManager()
+
+    def device_profiles(self):
+        hashcat = self.hashcat()
+        return DeviceProfileManager(hashcat.get_detected_devices())

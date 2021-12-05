@@ -211,7 +211,7 @@ class HashcatManager:
         return command
 
     def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile,
-                           increment_min, increment_max, optimised_kernel, workload, contains_usernames):
+                           increment_min, increment_max, optimised_kernel, workload, contains_usernames, backend_devices):
         command = {
             self.hashcat_binary: '',
             '--session': session_name,
@@ -250,6 +250,9 @@ class HashcatManager:
         else:
             # Invalid or not implemented yet.
             return {}
+
+        if backend_devices is not None:
+            command['--backend-devices'] = str(backend_devices)
 
         if optimised_kernel == 1:
             command['--optimized-kernel-enable'] = ''
@@ -510,3 +513,16 @@ class HashcatManager:
                 data['estimated_completion_time'] = matches[0].strip()
 
         return data
+
+    def get_detected_devices(self):
+        output = self.shell.execute([self.hashcat_binary, '-I', '--force'], user_id=0, log_to_db=False)
+        output += "\n\n" + output
+
+        matches = re.findall(r'Backend Device ID #(\d{1,}).*?Name.*?\:\s+(.*?)\n', output,
+                             flags=re.DOTALL | re.MULTILINE)
+
+        devices = {}
+        for match in matches:
+            devices[match[0]] = match[1]
+
+        return devices

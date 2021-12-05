@@ -3,11 +3,12 @@ from app.lib.models.hashcat import HashcatModel
 
 
 class HashcatInstance:
-    def __init__(self, session, filesystem, manager, wordlists):
+    def __init__(self, session, filesystem, manager, wordlists, device_profiles):
         self.session = session
         self.filesystem = filesystem
         self.hashcat = manager
         self.wordlists = wordlists
+        self.device_profiles = device_profiles
         self.settings = HashcatModel.query.filter(HashcatModel.session_id == session.id).first()
 
         self._screen_log_file_path = None
@@ -145,6 +146,14 @@ class HashcatInstance:
     @property
     def contains_usernames(self):
         return self.settings.contains_usernames if self.settings else 0
+
+    @property
+    def device_profile_id(self):
+        return self.settings.device_profile_id if self.settings else 0
+
+    @property
+    def device_list(self):
+        return self.device_profiles.get_device_list(self.device_profile_id)
 
     @property
     def workload(self):
