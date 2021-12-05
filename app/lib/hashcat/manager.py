@@ -210,7 +210,7 @@ class HashcatManager:
 
         return command
 
-    def build_command_line(self, session_name, mode, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile,
+    def build_command_line(self, session_name, mode, mask_type, masklist_path, mask, hashtype, hashfile, wordlist, rule, outputfile, potfile,
                            increment_min, increment_max, optimised_kernel, workload, contains_usernames, backend_devices):
         command = {
             self.hashcat_binary: '',
@@ -233,11 +233,16 @@ class HashcatManager:
                 command['--rules-file'] = rule
         elif mode == 3:
             # Bruteforce.
-            parsed_mask = self.parse_mask_from_string(mask)
-            for group in parsed_mask['groups']:
-                command['-' + str(group['position'])] = group['mask']
+            if mask_type == 2:
+                # Manual mask
+                parsed_mask = self.parse_mask_from_string(mask)
+                for group in parsed_mask['groups']:
+                    command['-' + str(group['position'])] = group['mask']
 
-            command[parsed_mask['mask']] = ''
+                command[parsed_mask['mask']] = ''
+            else:
+                # Masklist file
+                command[masklist_path] = ''
 
             if increment_min > 0 or increment_max > 0:
                 command['--increment'] = ''

@@ -237,6 +237,8 @@ class SessionManager:
             command = self.hashcat.build_command_line(
                 session.screen_name,
                 int(session.hashcat.mode),
+                session.hashcat.mask_type,
+                session.hashcat.masklist_path,
                 session.hashcat.mask,
                 session.hashcat.hashtype,
                 self.session_filesystem.get_hashfile_path(session.user_id, session_id),
