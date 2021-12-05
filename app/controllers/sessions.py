@@ -209,11 +209,13 @@ def setup_mask(session_id):
 
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id=user_id, session_id=session_id)[0]
+    has_custom_masklist = sessions.session_filesystem.custom_masklist_exists(sessions.session_filesystem.get_custom_masklist_path(current_user.id, session_id, prefix='custom_masklist', random=False))
 
     return render_template(
         'sessions/setup/mask.html',
         session=session,
-        masks=masks.get_masks()
+        masks=masks.get_masks(),
+        has_custom_masklist=has_custom_masklist
     )
 
 
@@ -241,7 +243,21 @@ def setup_mask_save(session_id):
         sessions.set_hashcat_setting(session_id, 'masklist', masklist_location)
     elif mask_type == 1:
         # Custom Hashcat mask file
-        pass
+        save_as = sessions.session_filesystem.get_custom_masklist_path(current_user.id, session_id, prefix='custom_masklist', random=False)
+        if len(request.files) != 1:
+            flash('Uploaded file could not be found', 'error')
+            return redirect(url_for('sessions.setup_mask', session_id=session_id))
+
+        file = request.files['custom_masklist']
+        if file.filename == '':
+            # If file already exists, use that one instead.
+            if not sessions.session_filesystem.custom_masklist_exists(save_as):
+                flash('Uploaded file could not be found', 'error')
+                return redirect(url_for('sessions.setup_masklist', session_id=session_id))
+        else:
+            # Otherwise upload new file.
+            file.save(save_as)
+            sessions.set_hashcat_setting(session_id, 'masklist', save_as)
     elif mask_type == 2:
         # Manual mask
         mask = request.form['compiled-mask'].strip()

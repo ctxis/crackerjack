@@ -44,6 +44,20 @@ class SessionFileSystem:
     def custom_wordlist_exists(self, wordlist_path):
         return os.path.isfile(wordlist_path)
 
+    def get_custom_masklist_path(self, user_id, session_id, prefix='', random=False):
+        if len(prefix) == 0:
+            random = True
+
+        name = prefix
+        if random:
+            name = name + str(int(time.time()))
+        name = name + '.hcmask'
+
+        return os.path.join(self.get_user_data_path(user_id, session_id), name)
+
+    def custom_masklist_exists(self, masklist_path):
+        return os.path.isfile(masklist_path)
+
     def hashfile_exists(self, user_id, session_id):
         path = self.get_hashfile_path(user_id, session_id)
         return os.path.isfile(path)

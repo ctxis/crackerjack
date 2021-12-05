@@ -25,26 +25,11 @@
                 <h5 class="card-header">Brute Force Options</h5>
                 <div class="card-body">
                     <div class="form-group">
-                        <label>Select method</label>
-
                         <div class="custom-control custom-radio">
                             <input type="radio" id="mode-global" name="mask_type" class="mode-option custom-control-input" value="0" {{ 'checked' if session.hashcat.mask_type == 0 or session.hashcat.mask_type == '' else '' }}>
-                            <label class="custom-control-label" for="mode-global">Global Hashcat mask file</label>
+                            <label class="custom-control-label" for="mode-global">Global Masklist</label>
                         </div>
 
-                        <div class="custom-control custom-radio">
-                            <input type="radio" id="mode-session" name="mask_type" class="mode-option custom-control-input" value="1" {{ 'checked' if session.hashcat.mask_type == 1 else '' }}>
-                            <label class="custom-control-label" for="mode-session">Custom Session Hashcat mask file</label>
-                        </div>
-
-                        <div class="custom-control custom-radio">
-                            <input type="radio" id="mode-custom" name="mask_type" class="mode-option custom-control-input" value="2" {{ 'checked' if session.hashcat.mask_type == 2 else '' }}>
-                            <label class="custom-control-label" for="mode-custom">Enter mask manually</label>
-                        </div>
-                    </div>
-
-                    <div class="box-mode-global">
-                        <label for="masklist">Select your Hashcat mask file</label>
                         <select name="masklist" id="masklist" class="form-control">
                             <option value="">No Masks</option>
                             {% for key, mask in masks.items() %}
@@ -53,41 +38,52 @@
                         </select>
                     </div>
 
-                    <div class="box-mode-session">
-                        <label>Select your Hashcat mask file</label>
+                    <div class="form-group">
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-session" name="mask_type" class="mode-option custom-control-input" value="1" {{ 'checked' if session.hashcat.mask_type == 1 else '' }}>
+                            <label class="custom-control-label" for="mode-session">Custom Session Masklist{% if has_custom_masklist == True %} <small>(already uploaded)</small>{% endif %}</label>
+                        </div>
+
                         <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="custom_wordlist" name="custom_wordlist">
-                            <label class="custom-file-label" for="custom_wordlist">Choose your Hashcat mask file</label>
+                            <input type="file" class="custom-file-input" id="custom_masklist" name="custom_masklist">
+                            <label class="custom-file-label" for="custom_masklist">Choose your Masklist</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="mode-custom" name="mask_type" class="mode-option custom-control-input" value="2" {{ 'checked' if session.hashcat.mask_type == 2 else '' }}>
+                            <label class="custom-control-label" for="mode-custom">Enter mask manually</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <h4>Increments</h4>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="enable_increments">Enable Increments</label>
+                        <div class="custom-control custom-switch float-right">
+                            <input name="enable_increments" type="checkbox" class="custom-control-input" id="enable_increments" value="1" {{ 'checked' if session.hashcat.increment_min|int > 0 and session.hashcat.increment_max|int > 0 else '' }}>
+                            <label class="custom-control-label" for="enable_increments"></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="increment-min" class="col-sm-10 col-form-label">Start mask incrementing at</label>
+                        <div class="col">
+                            <input type="number" min="1" step="1" class="form-control text-right" name="increment-min" id="increment-min" value="{{ session.hashcat.increment_min }}" placeholder="1" {{ 'disabled' if session.hashcat.increment_min|int <= 0 }}>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="increment-max" class="col-sm-10 col-form-label">Stop mask incrementing at</label>
+                        <div class="col">
+                            <input type="number" min="1" step="1" class="form-control text-right" name="increment-max" id="increment-max" value="{{ session.hashcat.increment_max }}" placeholder="10" {{ 'disabled' if session.hashcat.increment_max|int <= 0 }}>
                         </div>
                     </div>
 
                     <div class="box-mode-custom">
-                        <div class="form-group">
-                            <h4>Increments</h4>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="enable_increments">Enable Increments</label>
-                            <div class="custom-control custom-switch float-right">
-                                <input name="enable_increments" type="checkbox" class="custom-control-input" id="enable_increments" value="1" {{ 'checked' if session.hashcat.increment_min|int > 0 and session.hashcat.increment_max|int > 0 else '' }}>
-                                <label class="custom-control-label" for="enable_increments"></label>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="increment-min" class="col-sm-10 col-form-label">Start mask incrementing at</label>
-                            <div class="col">
-                                <input type="number" min="1" step="1" class="form-control text-right" name="increment-min" id="increment-min" value="{{ session.hashcat.increment_min }}" placeholder="1" {{ 'disabled' if session.hashcat.increment_min|int <= 0 }}>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="increment-max" class="col-sm-10 col-form-label">Stop mask incrementing at</label>
-                            <div class="col">
-                                <input type="number" min="1" step="1" class="form-control text-right" name="increment-max" id="increment-max" value="{{ session.hashcat.increment_max }}" placeholder="10" {{ 'disabled' if session.hashcat.increment_max|int <= 0 }}>
-                            </div>
-                        </div>
-
                         <div class="form-group">
                             <h4>Mask</h4>
                         </div>
