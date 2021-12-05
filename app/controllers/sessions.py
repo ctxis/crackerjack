@@ -257,7 +257,7 @@ def setup_mask_save(session_id):
         else:
             # Otherwise upload new file.
             file.save(save_as)
-            sessions.set_hashcat_setting(session_id, 'masklist', save_as)
+        sessions.set_hashcat_setting(session_id, 'masklist', save_as)
     elif mask_type == 2:
         # Manual mask
         mask = request.form['compiled-mask'].strip()
@@ -610,7 +610,7 @@ def __setup_wordlist(session_id, request):
         else:
             # Otherwise upload new file.
             file.save(save_as)
-            sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
+        sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
     elif wordlist_type == 2:
         # Create wordlist from cracked passwords.
         save_as = sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='pwd_wordlist')
