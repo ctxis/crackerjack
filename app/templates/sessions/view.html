@@ -44,7 +44,18 @@
                     {% else %}
                     <tr>
                         <th scope="row">Mask</th>
-                        <td>{{ session.hashcat.mask if session.hashcat.mode == 3 else '' }}</td>
+                        <td>{% if session.hashcat.mask_type == 0 or session.hashcat.mask_type == '' %}
+                                <abbr title="{{ session.hashcat.masklist_path }}">
+                                    {{ session.hashcat.masklist }}
+                                </abbr>
+                            {% elif session.hashcat.mask_type == 1 %}
+                                <abbr title="{{ session.hashcat.masklist_path }}">
+                                    {{ session.hashcat.masklist }}
+                                </abbr>
+                            {% elif session.hashcat.mask_type == 2 %}
+                                {{ session.hashcat.mask if session.hashcat.mode == 3 else '' }}
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <th scope="row">Increments</th>
