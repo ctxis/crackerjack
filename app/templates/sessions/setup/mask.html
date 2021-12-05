@@ -183,7 +183,7 @@
         CJ_HashcatMasks.init('{{ session.hashcat.masklist }}');
         CJ_HashcatMasks.parseFromString($('#compiled-mask').val());
 
-        CJ_HashcatMasks.init('{{ session.hashcat.masklist }}');
+        CJ_SessionsMask.init();
 
         $('#setup-mask').submit(function() {
             // Check for any errors.
