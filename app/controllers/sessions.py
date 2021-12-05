@@ -253,7 +253,7 @@ def setup_mask_save(session_id):
             # If file already exists, use that one instead.
             if not sessions.session_filesystem.custom_masklist_exists(save_as):
                 flash('Uploaded file could not be found', 'error')
-                return redirect(url_for('sessions.setup_masklist', session_id=session_id))
+                return redirect(url_for('sessions.setup_mask', session_id=session_id))
         else:
             # Otherwise upload new file.
             file.save(save_as)
@@ -261,43 +261,33 @@ def setup_mask_save(session_id):
     elif mask_type == 2:
         # Manual mask
         mask = request.form['compiled-mask'].strip()
-        enable_increments = int(request.form.get('enable_increments', 0))
-        if enable_increments == 1:
-            increment_min = int(request.form['increment-min'].strip())
-            increment_max = int(request.form['increment-max'].strip())
-        else:
-            increment_min = 0
-            increment_max = 0
-        has_errors = False
         if len(mask) == 0:
             flash('No mask set', 'error')
-            has_errors = True
-
-        if enable_increments == 1:
-            if increment_min <= 0:
-                has_errors = True
-                flash('Min Increment is invalid', 'error')
-
-            if increment_max <= 0:
-                has_errors = True
-                flash('Max Increment is invalid', 'error')
-
-            if increment_min > increment_max:
-                has_errors = True
-                flash('Min Increment cannot be bigger than Max Increment', 'error')
-        else:
-            increment_min = 0
-            increment_max = 0
-
-        if has_errors:
             return redirect(url_for('sessions.setup_mask', session_id=session_id))
-
         sessions.set_hashcat_setting(session_id, 'mask', mask)
-        sessions.set_hashcat_setting(session_id, 'increment_min', increment_min)
-        sessions.set_hashcat_setting(session_id, 'increment_max', increment_max)
     else:
         flash('Invalid mask option', 'error')
         return redirect(url_for('sessions.setup_mask', session_id=session_id))
+
+    enable_increments = int(request.form.get('enable_increments', 0))
+    if enable_increments == 1:
+        increment_min = int(request.form['increment-min'].strip())
+        increment_max = int(request.form['increment-max'].strip())
+        if increment_min <= 0:
+            flash('Min Increment is invalid', 'error')
+            return redirect(url_for('sessions.setup_mask', session_id=session_id))
+        if increment_max <= 0:
+            flash('Max Increment is invalid', 'error')
+            return redirect(url_for('sessions.setup_mask', session_id=session_id))
+        if increment_min > increment_max:
+            flash('Min Increment cannot be bigger than Max Increment', 'error')
+            return redirect(url_for('sessions.setup_mask', session_id=session_id))
+    else:
+        increment_min = 0
+        increment_max = 0
+
+    sessions.set_hashcat_setting(session_id, 'increment_min', increment_min)
+    sessions.set_hashcat_setting(session_id, 'increment_max', increment_max)
 
     sessions.set_hashcat_setting(session_id, 'mask_type', mask_type)
 
