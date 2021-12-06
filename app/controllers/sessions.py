@@ -209,7 +209,7 @@ def setup_mask(session_id):
 
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id=user_id, session_id=session_id)[0]
-    has_custom_masklist = sessions.session_filesystem.custom_masklist_exists(sessions.session_filesystem.get_custom_masklist_path(current_user.id, session_id, prefix='custom_masklist', random=False))
+    has_custom_masklist = sessions.session_filesystem.custom_file_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_masklist', random=False, extension='.hcmask'))
 
     return render_template(
         'sessions/setup/mask.html',
@@ -243,7 +243,7 @@ def setup_mask_save(session_id):
         sessions.set_hashcat_setting(session_id, 'masklist', masklist_location)
     elif mask_type == 1:
         # Custom Hashcat mask file
-        save_as = sessions.session_filesystem.get_custom_masklist_path(current_user.id, session_id, prefix='custom_masklist', random=False)
+        save_as = sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_masklist', random=False, extension='.hcmask')
         if len(request.files) != 1:
             flash('Uploaded file could not be found', 'error')
             return redirect(url_for('sessions.setup_mask', session_id=session_id))
@@ -251,7 +251,7 @@ def setup_mask_save(session_id):
         file = request.files['custom_masklist']
         if file.filename == '':
             # If file already exists, use that one instead.
-            if not sessions.session_filesystem.custom_masklist_exists(save_as):
+            if not sessions.session_filesystem.custom_file_exists(save_as):
                 flash('Uploaded file could not be found', 'error')
                 return redirect(url_for('sessions.setup_mask', session_id=session_id))
         else:
@@ -308,8 +308,8 @@ def setup_wordlist(session_id):
 
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id=user_id, session_id=session_id)[0]
-    has_custom_wordlist = sessions.session_filesystem.custom_wordlist_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_wordlist'))
-    has_custom_rule = sessions.session_filesystem.custom_wordlist_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_rule', extension='.rule'))
+    has_custom_wordlist = sessions.session_filesystem.custom_file_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_wordlist'))
+    has_custom_rule = sessions.session_filesystem.custom_file_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_rule', extension='.rule'))
 
     return render_template(
         'sessions/setup/wordlist.html',
@@ -604,7 +604,7 @@ def __setup_wordlist(session_id, request):
         file = request.files['custom_wordlist']
         if file.filename == '':
             # If file already exists, use that one instead.
-            if not sessions.session_filesystem.custom_wordlist_exists(save_as):
+            if not sessions.session_filesystem.custom_file_exists(save_as):
                 flash('Uploaded wordlist file could not be found', 'error')
                 return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
         else:
@@ -648,7 +648,7 @@ def __setup_rules(session_id, request):
         file = request.files['custom_rule']
         if file.filename == '':
             # If file already exists, use that one instead.
-            if not sessions.session_filesystem.custom_wordlist_exists(save_as):
+            if not sessions.session_filesystem.custom_file_exists(save_as):
                 flash('Uploaded rule file could not be found', 'error')
                 return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
         else:
