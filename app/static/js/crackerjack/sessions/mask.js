@@ -61,16 +61,10 @@ var CJ_HashcatMasks = {
         }
 
         if (mode == 0) {
-            $('.box-mode-global').removeClass('d-none');
-            $('.box-mode-session').addClass('d-none');
             $('.box-mode-custom').addClass('d-none');
         } else if (mode == 1) {
-            $('.box-mode-global').addClass('d-none');
-            $('.box-mode-session').removeClass('d-none');
             $('.box-mode-custom').addClass('d-none');
         } else if (mode == 2) {
-            $('.box-mode-global').addClass('d-none');
-            $('.box-mode-session').addClass('d-none');
             $('.box-mode-custom').removeClass('d-none');
         }
     },
