@@ -145,7 +145,7 @@ class HashcatInstance:
 
     @property
     def masklist(self):
-        return os.path.basename(self.settings.masklist) if self.settings else ''
+        return os.path.basename(self.settings.masklist) if self.settings and self.settings.masklist else ''
 
     @property
     def mask(self):
