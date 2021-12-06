@@ -515,6 +515,8 @@ class HashcatManager:
         return data
 
     def get_detected_devices(self):
+        if len(self.hashcat_binary) == 0:
+            return {}
         output = self.shell.execute([self.hashcat_binary, '-I', '--force'], user_id=0, log_to_db=False)
         output += "\n\n" + output
 
