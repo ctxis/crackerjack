@@ -1,6 +1,10 @@
 # Changelog
 
-## v1.2
+## v1.2.1
+
+* `[New]` Added functionality to use global mask files and upload custom mask files.
+
+## v1.2.0
 
 * `[New]` Added functionality to define GPU profiles per session.
 
