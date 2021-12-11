@@ -160,7 +160,17 @@
                     <td class="text-right"><abbr title="{{ supported_hashes[history.hashtype] }}">{{ history.hashtype }}</abbr></td>
                     <td><abbr title="{{ history.wordlist_path }}">{{ basename(history.wordlist) if history.mode == 0 else '' }}</abbr></td>
                     <td><abbr title="{{ history.rule_path }}">{{ basename(history.rule) if history.mode == 0 else '' }}</abbr></td>
-                    <td>{{ history.mask if history.mode == 3 else '' }}</td>
+                    <td>
+                        {% if history.mode == 3 %}
+                            {% if history.mask_type == 0 or history.mask_type == 1 %}
+                                <abbr title="{{ history.masklist }}">
+                                    {{ basename(history.masklist) }}
+                                </abbr>
+                            {% else %}
+                                {{ history.mask }}
+                            {% endif %}
+                        {% endif %}
+                    </td>
                     <td class="text-right">
                         {% if history.mode == 3 and (history.increment_min|int > 0 or history.increment_max|int > 0) %}
                         {{ history.increment_min }} - {{ history.increment_max }}
