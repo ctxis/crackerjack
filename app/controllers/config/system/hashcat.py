@@ -25,6 +25,7 @@ def hashcat_save():
 
     hashcat_binary = request.form['hashcat_binary'].strip()
     hashcat_rules_path = request.form['hashcat_rules_path'].strip()
+    hashcat_masks_path = request.form['hashcat_masks_path'].strip()
     hashcat_status_interval = request.form['hashcat_status_interval'].strip()
     hashcat_force = int(request.form.get('hashcat_force', 0))
     wordlists_path = request.form['wordlists_path'].strip()
@@ -63,6 +64,14 @@ def hashcat_save():
         has_errors = True
         flash('Hashcat rules directory is not readable', 'error')
 
+    # Validate masks
+    if len(hashcat_masks_path) == 0 or not os.path.isdir(hashcat_masks_path):
+        has_errors = True
+        flash('Hashcat masks directory does not exist', 'error')
+    elif not os.access(hashcat_masks_path, os.R_OK):
+        has_errors = True
+        flash('Hashcat masks directory is not readable', 'error')
+
     # Validate interval
     if len(hashcat_status_interval) == 0:
         has_errors = True
@@ -77,6 +86,7 @@ def hashcat_save():
 
     settings.save('hashcat_binary', hashcat_binary)
     settings.save('hashcat_rules_path', hashcat_rules_path)
+    settings.save('hashcat_masks_path', hashcat_masks_path)
     settings.save('hashcat_status_interval', hashcat_status_interval)
     settings.save('hashcat_force', hashcat_force)
     settings.save('wordlists_path', wordlists_path)

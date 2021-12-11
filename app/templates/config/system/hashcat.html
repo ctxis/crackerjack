@@ -45,6 +45,11 @@
             </div>
 
             <div class="form-group">
+                <label for="hashcat_masks_path">Masks Path</label>
+                <input name="hashcat_masks_path" type="text" id="hashcat_masks_path" class="form-control" value="{{ setting_get('hashcat_masks_path', '') }}" placeholder="/path/to/hashcat/masks" required>
+            </div>
+
+            <div class="form-group">
                 <span>
                     <label for="uploaded_hashes_path">Uploaded Hashes Path</label>
                     <span class="text-primary" title="" data-container="body" data-toggle="popover" data-placement="left" data-content="This folder will be used in cases where the user wants to upload a very large hash file (ie from HIBP).<br>In this instance, users will upload the file via SSH and then select it from the front-end." data-original-title="Uploaded Hashes">

@@ -201,6 +201,7 @@ def setup_hashcat_save(session_id):
 def setup_mask(session_id):
     provider = Provider()
     sessions = provider.sessions()
+    masks = provider.masks()
 
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
@@ -208,10 +209,13 @@ def setup_mask(session_id):
 
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id=user_id, session_id=session_id)[0]
+    has_custom_masklist = sessions.session_filesystem.custom_file_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_masklist', random=False, extension='.hcmask'))
 
     return render_template(
         'sessions/setup/mask.html',
-        session=session
+        session=session,
+        masks=masks.get_masks(),
+        has_custom_masklist=has_custom_masklist
     )
 
 
@@ -220,47 +224,72 @@ def setup_mask(session_id):
 def setup_mask_save(session_id):
     provider = Provider()
     sessions = provider.sessions()
+    masks = provider.masks()
 
     if not sessions.can_access(current_user, session_id):
         flash('Access Denied', 'error')
         return redirect(url_for('home.index'))
 
-    mask = request.form['compiled-mask'].strip()
+    mask_type = int(request.form['mask_type'].strip())
+
+    if mask_type == 0:
+        # Global Hashcat mask file.
+        mask = request.form['masklist'].strip()
+        if not masks.is_valid_mask(mask):
+            flash('Invalid mask file selected', 'error')
+            return redirect(url_for('sessions.setup_mask', session_id=session_id))
+
+        masklist_location = masks.get_mask_path(mask)
+        sessions.set_hashcat_setting(session_id, 'masklist', masklist_location)
+    elif mask_type == 1:
+        # Custom Hashcat mask file
+        save_as = sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_masklist', random=False, extension='.hcmask')
+        if len(request.files) != 1:
+            flash('Uploaded file could not be found', 'error')
+            return redirect(url_for('sessions.setup_mask', session_id=session_id))
+
+        file = request.files['custom_masklist']
+        if file.filename == '':
+            # If file already exists, use that one instead.
+            if not sessions.session_filesystem.custom_file_exists(save_as):
+                flash('Uploaded file could not be found', 'error')
+                return redirect(url_for('sessions.setup_mask', session_id=session_id))
+        else:
+            # Otherwise upload new file.
+            file.save(save_as)
+        sessions.set_hashcat_setting(session_id, 'masklist', save_as)
+    elif mask_type == 2:
+        # Manual mask
+        mask = request.form['compiled-mask'].strip()
+        if len(mask) == 0:
+            flash('No mask set', 'error')
+            return redirect(url_for('sessions.setup_mask', session_id=session_id))
+        sessions.set_hashcat_setting(session_id, 'mask', mask)
+    else:
+        flash('Invalid mask option', 'error')
+        return redirect(url_for('sessions.setup_mask', session_id=session_id))
+
     enable_increments = int(request.form.get('enable_increments', 0))
     if enable_increments == 1:
         increment_min = int(request.form['increment-min'].strip())
         increment_max = int(request.form['increment-max'].strip())
-    else:
-        increment_min = 0
-        increment_max = 0
-
-    has_errors = False
-    if len(mask) == 0:
-        flash('No mask set', 'error')
-        has_errors = True
-
-    if enable_increments == 1:
         if increment_min <= 0:
-            has_errors = True
             flash('Min Increment is invalid', 'error')
-
+            return redirect(url_for('sessions.setup_mask', session_id=session_id))
         if increment_max <= 0:
-            has_errors = True
             flash('Max Increment is invalid', 'error')
-
+            return redirect(url_for('sessions.setup_mask', session_id=session_id))
         if increment_min > increment_max:
-            has_errors = True
             flash('Min Increment cannot be bigger than Max Increment', 'error')
+            return redirect(url_for('sessions.setup_mask', session_id=session_id))
     else:
         increment_min = 0
         increment_max = 0
 
-    if has_errors:
-        return redirect(url_for('sessions.setup_mask', session_id=session_id))
-
-    sessions.set_hashcat_setting(session_id, 'mask', mask)
     sessions.set_hashcat_setting(session_id, 'increment_min', increment_min)
     sessions.set_hashcat_setting(session_id, 'increment_max', increment_max)
+
+    sessions.set_hashcat_setting(session_id, 'mask_type', mask_type)
 
     return redirect(url_for('sessions.settings', session_id=session_id))
 
@@ -279,8 +308,8 @@ def setup_wordlist(session_id):
 
     user_id = 0 if current_user.admin else current_user.id
     session = sessions.get(user_id=user_id, session_id=session_id)[0]
-    has_custom_wordlist = sessions.session_filesystem.custom_wordlist_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_wordlist'))
-    has_custom_rule = sessions.session_filesystem.custom_wordlist_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_rule', extension='.rule'))
+    has_custom_wordlist = sessions.session_filesystem.custom_file_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_wordlist'))
+    has_custom_rule = sessions.session_filesystem.custom_file_exists(sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='custom_rule', extension='.rule'))
 
     return render_template(
         'sessions/setup/wordlist.html',
@@ -575,13 +604,13 @@ def __setup_wordlist(session_id, request):
         file = request.files['custom_wordlist']
         if file.filename == '':
             # If file already exists, use that one instead.
-            if not sessions.session_filesystem.custom_wordlist_exists(save_as):
+            if not sessions.session_filesystem.custom_file_exists(save_as):
                 flash('Uploaded wordlist file could not be found', 'error')
                 return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
         else:
             # Otherwise upload new file.
             file.save(save_as)
-            sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
+        sessions.set_hashcat_setting(session_id, 'wordlist', save_as)
     elif wordlist_type == 2:
         # Create wordlist from cracked passwords.
         save_as = sessions.session_filesystem.get_custom_file_path(current_user.id, session_id, prefix='pwd_wordlist')
@@ -619,7 +648,7 @@ def __setup_rules(session_id, request):
         file = request.files['custom_rule']
         if file.filename == '':
             # If file already exists, use that one instead.
-            if not sessions.session_filesystem.custom_wordlist_exists(save_as):
+            if not sessions.session_filesystem.custom_file_exists(save_as):
                 flash('Uploaded rule file could not be found', 'error')
                 return redirect(url_for('sessions.setup_wordlist', session_id=session_id))
         else:

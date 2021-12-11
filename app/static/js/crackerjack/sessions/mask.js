@@ -29,14 +29,44 @@ var CJ_HashcatMasks = {
     // the mask compilation process while checking the boxes programmatically.
     disableEvents: false,
 
-    init: function() {
+    init: function(selected_masklist) {
         // Clone the object - this is what we will use to add new position settings.
         this.template = $('#mask-template').clone();
         // And remove it.
         $('#mask-template').remove();
+        this.bindModes();
+        this.bindMasklist(selected_masklist);
         this.bindMaxCharacters();
         this.bindSettingActions();
         this.bindCompiledMask();
+    },
+
+    bindModes: function() {
+        this.setModes();
+        $('.mode-option').click(function() {
+            CJ_HashcatMasks.setModes();
+            return true;
+        });
+    },
+
+    bindMasklist: function(selected_masklist) {
+        $('#masklist').select2({}).val(selected_masklist).trigger('change');
+    },
+
+    setModes: function() {
+        mode = $("input[name='mask_type']:checked").val();
+        if (typeof mode == 'undefined') {
+            $('#mode-global').prop('checked', true);
+            mode = 0;
+        }
+
+        if (mode == 0) {
+            $('.box-mode-custom').addClass('d-none');
+        } else if (mode == 1) {
+            $('.box-mode-custom').addClass('d-none');
+        } else if (mode == 2) {
+            $('.box-mode-custom').removeClass('d-none');
+        }
     },
 
     bindCompiledMask: function() {
