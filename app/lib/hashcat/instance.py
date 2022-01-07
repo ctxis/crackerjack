@@ -138,7 +138,10 @@ class HashcatInstance:
     @property
     def mask_type(self):
         # 2 is the 'manual mask' (this usecase happens when CJ is upgraded to the version that supports mask files)
-        return self.settings.mask_type if self.settings and self.settings.mask_type >= 0 else 2
+        if (self.settings is None) or (self.settings.mask_type is None):
+            return 2
+
+        return self.settings.mask_type if self.settings.mask_type >= 0 else 2
 
     @property
     def masklist_path(self):
