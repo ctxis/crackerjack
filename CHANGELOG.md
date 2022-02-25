@@ -3,6 +3,7 @@
 ## v1.2.1
 
 * `[New]` Added functionality to use global mask files and upload custom mask files.
+* `[Update]` Updated jQuery to v3.6.0, jQuery Validate to v1.9.3
 
 ## v1.2.0
 
