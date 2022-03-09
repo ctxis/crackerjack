@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.2
+
+* `[Fix]` Bump the version to update the version, because why not.
+
 ## v1.2.1
 
 * `[New]` Added functionality to use global mask files and upload custom mask files.
