@@ -2,10 +2,6 @@
 
 Web Interface for Hashcat by [Context Information Security](https://www.contextis.com/en/)
 
-## Demo / Start Cracking in Under 5 Minutes
-
-[![CrackerJack Demo](https://img.youtube.com/vi/9Ol48qQtuk4/0.jpg)](https://www.youtube.com/watch?v=9Ol48qQtuk4)
-
 # Contents
 
 * [Introduction](#introduction)
@@ -107,3 +103,4 @@ CrackerJack is released under MIT License.
 In addition, the following third-party components are also used:
 
 * office2hashcat.py - modified BSD - https://github.com/stricture/hashstack-server-plugin-hashcat/
+* keepass2john.py - GNU General Public License - https://gist.github.com/HarmJ0y/116fa1b559372804877e604d7d367bbc

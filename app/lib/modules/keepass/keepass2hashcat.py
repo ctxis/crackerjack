@@ -26,7 +26,7 @@ def process_1x_database(data, databaseName, maxInlineSize=1024):
     if (encFlag & 2 == 2):
         # AES
         algorithm = 0
-    elif (enc_flag & 8):
+    elif (encFlag & 8):
         # Twofish
         algorithm = 1
     else:
@@ -86,7 +86,7 @@ def process_2x_database(data, databaseName):
         index += 1
         uSize = struct.unpack("H", data[index:index+2])[0]
         index += 2
-        print ("btFieldID : %s , uSize : %s" %(btFieldID, uSize))
+        # print ("btFieldID : %s , uSize : %s" %(btFieldID, uSize))
         
         if btFieldID == 0:
             endReached = True
@@ -138,7 +138,7 @@ def process_database(filename):
         # "1.X"
         print(process_1x_database(data, databaseName))
     else:
-        print("ERROR: KeePass signaure unrecognized")
+        print("ERROR: KeePass signature unrecognized")
 
 
 # if __name__ == "__main__":

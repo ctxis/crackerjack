@@ -1,12 +1,16 @@
 # Changelog
 
+## v1.2.3
+
+* `[New]` Added KeePass module (PR #20) - Credits to [swisskyrepo](https://github.com/swisskyrepo).
+
 ## v1.2.2
 
 * `[Fix]` Bump the version to update the version, because why not.
 
 ## v1.2.1
 
-* `[New]` Added functionality to use global mask files and upload custom mask files.
+* `[New]` Added functionality to use global mask files and upload custom mask files - Credits to [tiahgar](https://github.com/tiahgar).
 * `[Update]` Updated jQuery to v3.6.0, jQuery Validate to v1.9.3
 
 ## v1.2.0
