@@ -21,6 +21,7 @@ from app.lib.base.webpush import WebPushManager
 from app.lib.base.hashes import HashesManager
 from app.lib.base.password_complexity import PasswordComplexityManager
 from app.lib.modules.office.manager import ModuleOfficeManager
+from app.lib.modules.keepass.manager import ModuleKeePassManager
 from flask_login import current_user
 
 
@@ -147,6 +148,9 @@ class Provider:
 
     def module_office(self):
         return ModuleOfficeManager()
+
+    def module_keepass(self):
+        return ModuleKeePassManager()
 
     def device_profiles(self):
         hashcat = self.hashcat()

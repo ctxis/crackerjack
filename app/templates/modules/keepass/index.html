@@ -1,0 +1,35 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-2"></div>
+    <div class="col">
+        <h2>KeePass Hashes</h2>
+
+        {% if hash|length == 0 %}
+        <form method="post" enctype="multipart/form-data" action="{{ url_for('modules.keepass_upload') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label for="document">Upload a password protected KeePass database</label>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="document" name="document">
+                    <label class="custom-file-label" for="document">Select KeePass password protected database</label>
+                </div>
+                <div class="small text-warning">The file is deleted immediately and not stored on the server</div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">Upload</button>
+            </div>
+        </form>
+        {% else %}
+        <p>Extracted hash is:</p>
+        <div class="text-monospace">
+            <pre>{{ hash }}</pre>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-2"></div>
+</div>
+{% endblock %}
