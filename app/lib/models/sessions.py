@@ -12,7 +12,7 @@ class SessionModel(db.Model):
     active = db.Column(db.Boolean, default=False, index=True, nullable=True)
     notifications_enabled = db.Column(db.Boolean, default=False, index=True, nullable=True)
     terminate_at = db.Column(db.DateTime, nullable=True)
-    created_at = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now())
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.datetime.now)
 
 
 class SessionNotificationModel(db.Model):
