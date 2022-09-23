@@ -12,8 +12,11 @@ class UserModel(db.Model, UserMixin):
     email = db.Column(db.String(255), nullable=True, default='')
     session_token = db.Column(db.String(255), nullable=True, index=True, default='')
     ldap = db.Column(db.Boolean, default=False, index=True)
+    azure = db.Column(db.Boolean, default=False, index=True)
     admin = db.Column(db.Boolean, default=False, index=True)
     active = db.Column(db.Boolean, default=True, index=True)
+    access_token = db.Column(db.String(255), nullable=True, index=True, default='')
+    access_token_expiration = db.Column(db.Integer, nullable=True, index=True, default='')
 
     def get_id(self):
         return str(self.session_token)
@@ -38,4 +41,9 @@ class UserLogins(db.Model):
 
 @login.user_loader
 def load_user(session_token):
-    return UserModel.query.filter_by(session_token=session_token).first()
+    user = UserModel.query.filter_by(session_token=session_token).first()
+
+    if user.azure:
+        if datetime.datetime.utcnow().timestamp() > user.access_token_expiration or len(user.access_token) == 0:
+            return None
+    return user

@@ -11,6 +11,7 @@
     <a class="nav-link {{ 'active' if active_nav == 'webpush' }}" href="{{ url_for('config.webpush') }}"><i class="fas fa-bell fa-fw"></i> <span class="pl-2">Web Push</span></a>
     <a class="nav-link ml-n4"><i class="fas fa-chevron-circle-right fa-fw"></i> Authentication</a>
     <a class="nav-link {{ 'active' if active_nav == 'ldap' }}" href="{{ url_for('config.ldap') }}"><i class="fas fa-passport fa-fw"></i> <span class="pl-2">LDAP</span></a>
+    <a class="nav-link {{ 'active' if active_nav == 'azure' }}" href="{{ url_for('config.azure') }}"><i class="fas fa-passport fa-fw"></i> <span class="pl-2">Azure</span></a>
     <a class="nav-link ml-n4"><i class="fas fa-chevron-circle-right fa-fw"></i> Accounts</a>
     <a class="nav-link {{ 'active' if active_nav == 'users' }}" href="{{ url_for('config.users') }}"><i class="fas fa-users fa-fw"></i> <span class="pl-2">Users</span></a>
     <a class="nav-link {{ 'active' if active_nav == 'password_complexity' }}" href="{{ url_for('config.password_complexity') }}"><i class="fas fa-puzzle-piece fa-fw"></i> <span class="pl-2">Password Complexity</span></a>

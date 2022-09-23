@@ -10,3 +10,4 @@ Flask-Crontab
 packaging
 pywebpush
 markupsafe==2.0.1
+msal>=1.18,<2

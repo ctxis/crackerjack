@@ -1,0 +1,55 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-lg-3">
+        {% set active_nav = 'azure' %}
+        {% include 'config/includes/sidebar.html' %}
+    </div>
+    <div class="col-lg-6">
+        <form action="{{ url_for('config.azure_save') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <h4>Azure Settings</h4>
+            <div class="form-group pt-2">
+                <label for="azure_enabled">Enabled</label>
+                <div class="custom-control custom-switch float-right">
+                    <input name="azure_enabled" type="checkbox" class="custom-control-input" id="azure_enabled" value="1" {{ "checked='checked'" if setting_get('azure_enabled', '0') == '1' else '' }}>
+                    <label class="custom-control-label" for="ldap_enabled"></label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-4"><label for="azure_tenant_id">Tenant ID</label></div>
+                    <div class="col">
+                        <input name="azure_tenant_id" type="text" id="azure_tenant_id" class="form-control" value="{{ setting_get('azure_tenant_id', '') }}" placeholder="">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-4"><label for="azure_client_id">Client ID</label></div>
+                    <div class="col">
+                        <input name="azure_client_id" type="text" id="azure_client_id" class="form-control" value="{{ setting_get('azure_client_id', '') }}" placeholder="">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-4"><label for="azure_client_secret">Client Secret</label></div>
+                    <div class="col">
+                        <input name="azure_client_secret" type="password" id="azure_client_secret" class="form-control" value="{{ '********' if setting_get('azure_client_secret', '')|length > 0 else '' }}" placeholder="">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group mt-5">
+                <button type="submit" class="btn btn-block btn-primary">save</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

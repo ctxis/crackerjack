@@ -27,6 +27,12 @@
                         <button type="submit" class="btn btn-primary btn-block">login</button>
                     </div>
                 </form>
+
+                {% if setting_get('azure_enabled', '0') == '1' %}
+                    <div class="mt-5">
+                        <a class="d-block btn btn-info" href="{{ url_for('auth.auth_azure_go') }}"><i class="fab fa-microsoft"></i> Login with Microsoft Online</a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -147,6 +147,8 @@ class UserManager:
     def logout_session(self, user_id):
         user = self.get_by_id(user_id)
         user.session_token = ''
+        user.access_token = ''
+        user.access_token_expiration = 0
         db.session.commit()
         db.session.refresh(user)
         return True

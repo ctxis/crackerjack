@@ -11,6 +11,7 @@ from app.lib.base.filesystem import FileSystemManager
 from app.lib.base.rules import RulesManager
 from app.lib.base.masks import MasksManager
 from app.lib.base.ldap import LDAPManager
+from app.lib.base.azure import AzureManager
 from app.lib.base.users import UserManager
 from app.lib.base.user_settings import UserSettingsManager
 from app.lib.base.template import TemplateManager
@@ -23,6 +24,7 @@ from app.lib.base.password_complexity import PasswordComplexityManager
 from app.lib.modules.office.manager import ModuleOfficeManager
 from app.lib.modules.keepass.manager import ModuleKeePassManager
 from flask_login import current_user
+from flask import url_for
 
 
 class Provider:
@@ -102,6 +104,16 @@ class Provider:
         manager.auth_type = int(settings.get('ldap_auth_type', manager.AUTH_METHOD_NTLM))
 
         return manager
+
+    def azure(self):
+        settings = self.settings()
+
+        return AzureManager(
+            settings.get('azure_tenant_id', ''),
+            settings.get('azure_client_id', ''),
+            settings.get('azure_client_secret', ''),
+            url_for('auth.auth_azure', _external=True)
+        )
 
     def users(self):
         return UserManager(self.password_complexity())

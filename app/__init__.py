@@ -7,6 +7,7 @@ from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from flask_crontab import Crontab
 from app import version
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 db = SQLAlchemy()
@@ -35,6 +36,7 @@ def create_app(config_class=None):
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     # The referrer is disabled further down in the response headers.
     app.config['WTF_CSRF_SSL_STRICT'] = False
+    app.config['PREFERRED_URL_SCHEME'] = 'https'
 
     # And now we override any custom settings from config.cfg if it exists.
     app.config.from_pyfile('config.py', silent=True)
@@ -50,6 +52,8 @@ def create_app(config_class=None):
     login.init_app(app)
     csrf.init_app(app)
     crontab.init_app(app)
+
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
     from app.controllers.home import bp as home_bp
     app.register_blueprint(home_bp, url_prefix='/')
