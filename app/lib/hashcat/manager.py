@@ -497,8 +497,9 @@ class HashcatManager:
                 data['progress'] = matches[0]
 
         # passwords
-        if 'Recovered' in raw:
-            matches = re.findall('(\d+/\d+)', raw['Recovered'])
+        if 'Recovered' in raw or 'Recovered.Total' in raw:
+            recovered = raw['Recovered'] if 'Recovered' in raw else raw['Recovered.Total']
+            matches = re.findall('(\d+/\d+)', recovered)
             if len(matches) > 0:
                 passwords = matches[0].split('/')
                 if len(passwords) == 2:
