@@ -20,7 +20,9 @@
 
 <h4>Account</h4>
 <nav class="nav nav-pills flex-column">
+    {% if current_user.azure == False %}
     <a class="nav-link {{ 'active' if active_nav == 'profile' }}" href="{{ url_for('config.profile') }}"><i class="fas fa-id-card fa-fw"></i> <span class="pl-2">Profile</span></a>
+    {% endif %}
     <a class="nav-link {{ 'active' if active_nav == 'theme' }}" href="{{ url_for('config.theme') }}"><i class="fas fa-images fa-fw"></i> <span class="pl-2">Theme</span></a>
     <a class="nav-link {{ 'active' if active_nav == 'logins' }}" href="{{ url_for('config.logins') }}"><i class="fas fa-clipboard fa-fw"></i> <span class="pl-2">Login Logs</span></a>
     <a class="nav-link {{ 'active' if active_nav == 'api' }}" href="{{ url_for('config.api') }}"><i class="fas fa-key fa-fw"></i> <span class="pl-2">API Keys</span></a>

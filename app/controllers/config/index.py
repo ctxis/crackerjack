@@ -9,4 +9,6 @@ def index():
     if current_user.admin:
         return redirect(url_for('config.general'))
     else:
+        if current_user.azure:
+            return redirect(url_for('config.theme'))
         return redirect(url_for('config.profile'))

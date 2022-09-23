@@ -15,6 +15,10 @@ def profile(user_id=None):
         flash('Access denied', 'error')
         return redirect(url_for('home.index'))
 
+    if current_user.azure:
+        flash('Page does not apply to users logging in via Azure', 'error')
+        return redirect(url_for('home.index'))
+
     provider = Provider()
     users = provider.users()
 
@@ -37,7 +41,7 @@ def profile_save(user_id):
     users = provider.users()
     user = users.get_by_id(current_user.id)
 
-    if not user.ldap:
+    if not user.ldap and not user.azure:
         existing_password = request.form['existing_password'].strip()
         new_password = request.form['new_password'].strip()
         confirm_password = request.form['confirm_password'].strip()
