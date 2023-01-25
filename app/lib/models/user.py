@@ -44,6 +44,6 @@ def load_user(session_token):
     user = UserModel.query.filter_by(session_token=session_token).first()
 
     if user.azure:
-        if datetime.datetime.utcnow().timestamp() > user.access_token_expiration or len(user.access_token) == 0:
+        if len(user.access_token) == 0:
             return None
     return user
