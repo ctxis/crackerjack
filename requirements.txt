@@ -1,5 +1,5 @@
 Flask<2.0.0
-Flask-SQLAlchemy
+Flask-SQLAlchemy==2.5.1
 Flask-Migrate
 Flask-Login
 Flask-Bcrypt
@@ -10,3 +10,4 @@ Flask-Crontab
 packaging
 pywebpush
 markupsafe==2.0.1
+sqlalchemy==1.4.39
